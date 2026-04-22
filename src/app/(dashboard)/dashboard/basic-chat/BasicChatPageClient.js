@@ -151,9 +151,9 @@ function dedupeModels(models) {
 
 // --- Component ---
 
-export default function BasicChatPageClient() {
-  const [providerGroups, setProviderGroups] = useState([]);
-  const [loadingData, setLoadingData] = useState(true);
+export default function BasicChatPageClient({ initialData }) {
+  const [providerGroups, setProviderGroups] = useState(initialData?.providerGroups || []);
+  const [loadingData, setLoadingData] = useState(!initialData?.providerGroups);
   const [loadError, setLoadError] = useState("");
   const [sessions, setSessions] = useState([]);
   const [activeSessionId, setActiveSessionId] = useState("");

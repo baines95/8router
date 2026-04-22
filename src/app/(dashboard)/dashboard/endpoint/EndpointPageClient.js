@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import PropTypes from "prop-types";
 import { 
   Card, 
@@ -70,26 +71,27 @@ const TUNNEL_BENEFITS = [
   { icon: Lock, title: "Encrypted", desc: "End-to-end TLS via Cloudflare" },
 ];
 
-export default function APIPageClient({ machineId }) {
-  const [keys, setKeys] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function APIPageClient({ initialData }) {
+  const { machineId } = initialData;
+  const [keys, setKeys] = useState(initialData.keys || []);
+  const [loading, setLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
   const [createdKey, setCreatedKey] = useState(null);
 
-  const [requireApiKey, setRequireApiKey] = useState(false);
-  const [requireLogin, setRequireLogin] = useState(true);
-  const [tunnelDashboardAccess, setTunnelDashboardAccess] = useState(false);
+  const [requireApiKey, setRequireApiKey] = useState(initialData.settings?.requireApiKey || false);
+  const [requireLogin, setRequireLogin] = useState(initialData.settings?.requireLogin !== false);
+  const [tunnelDashboardAccess, setTunnelDashboardAccess] = useState(initialData.settings?.tunnelDashboardAccess || false);
 
-  const [tunnelEnabled, setTunnelEnabled] = useState(false);
-  const [tunnelUrl, setTunnelUrl] = useState("");
-  const [tunnelPublicUrl, setTunnelPublicUrl] = useState("");
+  const [tunnelEnabled, setTunnelEnabled] = useState(initialData.tunnel?.enabled || false);
+  const [tunnelUrl, setTunnelUrl] = useState(initialData.tunnel?.tunnelUrl || "");
+  const [tunnelPublicUrl, setTunnelPublicUrl] = useState(initialData.tunnel?.publicUrl || "");
   const [tunnelLoading, setTunnelLoading] = useState(false);
   const [showEnableTunnelModal, setShowEnableTunnelModal] = useState(false);
   const [showDisableTunnelModal, setShowDisableTunnelModal] = useState(false);
 
-  const [tsEnabled, setTsEnabled] = useState(false);
-  const [tsUrl, setTsUrl] = useState("");
+  const [tsEnabled, setTsEnabled] = useState(initialData.tailscale?.enabled || false);
+  const [tsUrl, setTsUrl] = useState(initialData.tailscale?.tunnelUrl || "");
   const [tsLoading, setTsLoading] = useState(false);
   const [tsInstalled, setTsInstalled] = useState(null);
   const [showTsModal, setShowTsModal] = useState(false);
@@ -97,8 +99,13 @@ export default function APIPageClient({ machineId }) {
 
   const [visibleKeys, setVisibleKeys] = useState(new Set());
   const { copied, copy } = useCopyToClipboard();
+  const [baseUrl, setBaseUrl] = useState("/v1");
 
-  useEffect(() => { fetchData(); loadSettings(); }, []);
+  useEffect(() => { 
+    if (typeof window !== "undefined") {
+      setBaseUrl(`${window.location.origin}/v1`);
+    }
+  }, []);
 
   const loadSettings = async () => {
     try {
@@ -159,9 +166,6 @@ export default function APIPageClient({ machineId }) {
     } catch (e) { console.log(e); }
   };
 
-  const [baseUrl, setBaseUrl] = useState("/v1");
-  useEffect(() => { if (typeof window !== "undefined") setBaseUrl(`${window.location.origin}/v1`); }, []);
-
   if (loading) return <div className="flex flex-col gap-6 max-w-7xl mx-auto py-10 px-4"><Skeleton className="h-48 w-full rounded-xl" /><div className="grid grid-cols-1 md:grid-cols-3 gap-6"><Skeleton className="h-64 w-full rounded-xl" /><Skeleton className="h-64 w-full rounded-xl" /><Skeleton className="h-64 w-full rounded-xl" /></div></div>;
 
   const activePublicUrl = tunnelEnabled ? (tunnelPublicUrl || tunnelUrl) : tsEnabled ? tsUrl : null;
@@ -181,7 +185,7 @@ export default function APIPageClient({ machineId }) {
         
         {/* Active Gateway Hero */}
         <section>
-          <Card className="shadow-none border-border bg-muted/10 p-0 overflow-hidden">
+          <Card className="shadow-none border-border bg-muted/10 overflow-hidden">
             <CardHeader className="pb-4 pt-6 px-6">
               <div className="flex items-center gap-2 mb-2">
                 <Badge variant="outline" className="bg-emerald-500/5 text-emerald-600 border-emerald-500/20 font-bold h-5 px-2">
@@ -384,5 +388,5 @@ function NodeCard({ title, desc, url, icon: Icon, badge, active, color, onClick 
 }
 
 APIPageClient.propTypes = {
-  machineId: PropTypes.string.isRequired,
+  initialData: PropTypes.object.isRequired,
 };

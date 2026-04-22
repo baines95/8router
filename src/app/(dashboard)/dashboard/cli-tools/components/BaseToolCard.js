@@ -19,10 +19,17 @@ import {
   HelpCircle,
   AlertCircle,
   CheckCircle2,
-  Clock
+  Clock,
+  Terminal
 } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+
+const ICON_MAP = {
+  terminal: Terminal,
+  settings: Settings,
+  help: HelpCircle,
+};
 
 /**
  * BaseToolCard - Component nền tảng cho các công cụ CLI
@@ -43,6 +50,8 @@ export default function BaseToolCard({
   hasActiveProviders = true,
   children
 }) {
+  const IconComponent = typeof tool.icon === 'string' ? (ICON_MAP[tool.icon] || Settings) : (tool.icon || Settings);
+  
   const renderStatusBadge = () => {
     if (checking) {
       return (
@@ -106,10 +115,10 @@ export default function BaseToolCard({
       >
         <div className="flex items-center gap-4">
           <div className="relative size-10 flex-shrink-0 bg-background rounded-lg border border-border/50 p-1.5 flex items-center justify-center shadow-sm">
-            {tool.icon ? (
-              <Image src={tool.icon} alt={tool.name} width={28} height={28} className="object-contain" />
+            {tool.image ? (
+              <Image src={tool.image} alt={tool.name} width={28} height={28} className="object-contain" />
             ) : (
-              <Settings className="text-muted-foreground size-5" />
+              <IconComponent className="text-muted-foreground size-5" />
             )}
           </div>
           <div className="space-y-0.5">

@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { getMachineId as getSysMachineId } from "@/shared/utils/machine";
 import { loadState, saveState, generateShortId } from "./state.js";
 import { spawnQuickTunnel, killCloudflared, isCloudflaredRunning, setUnexpectedExitHandler } from "./cloudflared.js";
 import { startFunnel, stopFunnel, stopDaemon, isTailscaleRunning, isTailscaleLoggedIn, startLogin, startDaemonWithPassword } from "./tailscale.js";
@@ -25,16 +26,6 @@ export function isTunnelReconnecting() {
   return isReconnecting;
 }
 
-function getMachineId() {
-  try {
-    const { machineIdSync } = require("node-machine-id");
-    const raw = machineIdSync();
-    return crypto.createHash("sha256").update(raw + MACHINE_ID_SALT).digest("hex").substring(0, 16);
-  } catch (e) {
-    return crypto.randomUUID().replace(/-/g, "").substring(0, 16);
-  }
-}
-
 // ─── Cloudflare Tunnel ───────────────────────────────────────────────────────
 
 async function registerTunnelUrl(shortId, tunnelUrl) {
@@ -58,7 +49,7 @@ export async function enableTunnel(localPort = 20128) {
 
   killCloudflared();
 
-  const machineId = getMachineId();
+  const machineId = await getSysMachineId();
   const existing = loadState();
   const shortId = existing?.shortId || generateShortId();
 

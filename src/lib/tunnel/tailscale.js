@@ -40,7 +40,14 @@ function tsArgs(...args) {
   return [...SOCKET_FLAG, ...args];
 }
 
+let cachedLoggedIn = null;
+let cachedLoggedInTime = 0;
 export function isTailscaleLoggedIn() {
+  const now = Date.now();
+  if (cachedLoggedIn !== null && (now - cachedLoggedInTime) < 10000) {
+    return cachedLoggedIn;
+  }
+
   const bin = getTailscaleBin();
   if (!bin) return false;
   try {
@@ -52,19 +59,32 @@ export function isTailscaleLoggedIn() {
     });
     const json = JSON.parse(out);
     // BackendState "Running" means fully logged in and connected
-    return json.BackendState === "Running";
+    const result = json.BackendState === "Running";
+    cachedLoggedIn = result;
+    cachedLoggedInTime = now;
+    return result;
   } catch (e) {
     return false;
   }
 }
 
+let cachedRunning = null;
+let cachedRunningTime = 0;
 export function isTailscaleRunning() {
+  const now = Date.now();
+  if (cachedRunning !== null && (now - cachedRunningTime) < 10000) {
+    return cachedRunning;
+  }
+
   const bin = getTailscaleBin();
   if (!bin) return false;
   try {
     const out = execSync(`"${bin}" ${SOCKET_FLAG.join(" ")} funnel status --json 2>/dev/null`, { encoding: "utf8", windowsHide: true });
     const json = JSON.parse(out);
-    return Object.keys(json.AllowFunnel || {}).length > 0;
+    const result = Object.keys(json.AllowFunnel || {}).length > 0;
+    cachedRunning = result;
+    cachedRunningTime = now;
+    return result;
   } catch (e) {
     return false;
   }
