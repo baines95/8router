@@ -2,48 +2,55 @@
 
 import { useState } from "react";
 import PropTypes from "prop-types";
-import { Download, Plus } from "lucide-react";
+import { Download, Plus, Check, Copy, Trash, CheckCircle, XCircle, Cpu, Flask } from "@phosphor-icons/react";
+import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { translate } from "@/i18n/runtime";
 
 function CompatibleModelRow({ modelId, fullModel, copied, onCopy, onDeleteAlias, onTest, testStatus, isTesting }) {
   const borderClass = testStatus === "ok"
-    ? "border-primary/20"
+    ? "border-primary/20 bg-primary/5"
     : testStatus === "error"
-    ? "border-destructive/20"
+    ? "border-destructive/20 bg-destructive/5"
     : "border-border/50";
 
-  const iconColor = testStatus === "ok"
-    ? "#22c55e"
+  const iconClass = testStatus === "ok"
+    ? "text-primary"
     : testStatus === "error"
-    ? "#ef4444"
-    : undefined;
+    ? "text-destructive"
+    : "text-muted-foreground";
 
   return (
-    <div className={cn("flex items-center gap-2 p-1.5 rounded-lg border transition-colors hover:bg-muted/50", borderClass)}>
-      <span
-        className="material-symbols-outlined text-sm text-muted-foreground"
-        style={iconColor ? { color: iconColor } : undefined}
-      >
-        {testStatus === "ok" ? "check_circle" : testStatus === "error" ? "cancel" : "smart_toy"}
-      </span>
+    <div className={cn("flex items-center gap-2 p-1.5 rounded-none border transition-colors hover:bg-muted/50", borderClass)}>
+      <div className={cn("shrink-0", iconClass)}>
+        {testStatus === "ok" ? (
+          <CheckCircle className="size-3.5" weight="bold" />
+        ) : testStatus === "error" ? (
+          <XCircle className="size-3.5" weight="bold" />
+        ) : (
+          <Cpu className="size-3.5" weight="bold" />
+        )}
+      </div>
       <div className="flex-1 min-w-0">
         <p className="text-xs font-medium truncate">{modelId}</p>
         <div className="flex items-center gap-1 mt-0.5">
-          <code className="text-[10px] text-muted-foreground font-mono bg-muted px-1 py-0.5 rounded leading-none">{fullModel}</code>
+          <code className="text-[10px] text-muted-foreground font-mono bg-muted px-1 py-0.5 rounded-none leading-none">{fullModel}</code>
           <div className="relative group/btn">
             <button
               onClick={() => onCopy(fullModel, `model-${modelId}`)}
-              className="p-0.5 hover:bg-accent rounded text-muted-foreground hover:text-foreground"
+              className="p-0.5 hover:bg-accent rounded-none text-muted-foreground hover:text-foreground"
             >
-              <span className="material-symbols-outlined text-sm">
-                {copied === `model-${modelId}` ? "check" : "content_copy"}
-              </span>
+              {copied === `model-${modelId}` ? (
+                <Check className="size-3.5 text-primary" weight="bold" />
+              ) : (
+                <Copy className="size-3.5" weight="bold" />
+              )}
             </button>
-            <span className="pointer-events-none absolute top-5 left-1/2 -translate-x-1/2 text-[10px] text-muted-foreground whitespace-nowrap opacity-0 group-hover/btn:opacity-100 transition-opacity">
-              {copied === `model-${modelId}` ? "Copied!" : "Copy"}
+            <span className="pointer-events-none absolute top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-tighter bg-popover text-popover-foreground px-1.5 py-0.5 rounded-none border border-border/50 shadow-none opacity-0 group-hover/btn:opacity-100 transition-opacity z-10">
+              {copied === `model-${modelId}` ? translate("Copied!") : translate("Copy")}
             </span>
           </div>
           {onTest && (
@@ -51,14 +58,16 @@ function CompatibleModelRow({ modelId, fullModel, copied, onCopy, onDeleteAlias,
               <button
                 onClick={onTest}
                 disabled={isTesting}
-                className="p-0.5 hover:bg-accent rounded text-muted-foreground hover:text-foreground transition-colors"
+                className="p-0.5 hover:bg-accent rounded-none text-muted-foreground hover:text-foreground transition-colors"
               >
-                <span className="material-symbols-outlined text-sm" style={isTesting ? { animation: "spin 1s linear infinite" } : undefined}>
-                  {isTesting ? "progress_activity" : "science"}
-                </span>
+                {isTesting ? (
+                  <Spinner className="size-3.5 animate-spin" />
+                ) : (
+                  <Flask className="size-3.5" weight="bold" />
+                )}
               </button>
-              <span className="pointer-events-none absolute top-5 left-1/2 -translate-x-1/2 text-[10px] text-muted-foreground whitespace-nowrap opacity-0 group-hover/btn:opacity-100 transition-opacity">
-                {isTesting ? "Testing..." : "Test"}
+              <span className="pointer-events-none absolute top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-tighter bg-popover text-popover-foreground px-1.5 py-0.5 rounded-none border border-border/50 shadow-none opacity-0 group-hover/btn:opacity-100 transition-opacity z-10">
+                {isTesting ? translate("Testing...") : translate("Test")}
               </span>
             </div>
           )}
@@ -66,10 +75,10 @@ function CompatibleModelRow({ modelId, fullModel, copied, onCopy, onDeleteAlias,
       </div>
       <button
         onClick={onDeleteAlias}
-        className="p-1 hover:bg-destructive/10 rounded text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+        className="p-1 hover:bg-destructive/10 rounded-none text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
         title="Remove model"
       >
-        <span className="material-symbols-outlined text-sm">delete</span>
+        <Trash className="size-3.5" weight="bold" />
       </button>
     </div>
   );
@@ -180,14 +189,14 @@ export default function CompatibleModelsSection({ providerStorageAlias, provider
   return (
     <div className="flex flex-col gap-3">
       <p className="text-xs text-muted-foreground">
-        Add {isAnthropic ? "Anthropic" : "OpenAI"}-compatible models manually or import from /models.
+        {translate("Add")} {isAnthropic ? "Anthropic" : "OpenAI"}-{translate("compatible models manually or import from /models.")}
       </p>
 
       <div className="flex flex-wrap items-end gap-2">
-        <div className="min-w-[180px] flex-1 space-y-1">
+        <div className="min-w-[180px] flex-1 flex flex-col gap-1">
           <Label
             htmlFor="new-compatible-model-input"
-            className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground"
+            className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground opacity-60"
           >
             Model ID
           </Label>
@@ -198,27 +207,28 @@ export default function CompatibleModelsSection({ providerStorageAlias, provider
             onChange={(e) => setNewModel(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAdd()}
             placeholder={isAnthropic ? "claude-3-opus-20240229" : "gpt-4o"}
-            className="h-8 text-xs bg-muted/10 border-border/40"
+            className="h-8 text-xs bg-muted/10 border-border/50 rounded-none"
           />
         </div>
         <Button
-          size="sm"
+          size="xs"
+          variant="outline"
           onClick={handleAdd}
           disabled={!newModel.trim() || adding}
-          className="h-8 gap-1 px-3 text-[10px] font-bold uppercase tracking-wider"
+          className="gap-1.5 font-semibold uppercase tracking-wider rounded-none"
         >
-          <Plus className="size-3"/>
-          {adding ? "Adding" : "Add"}
+          <Plus className="size-3" weight="bold" data-icon="inline-start" />
+          {adding ? translate("Adding") : translate("Add")}
         </Button>
         <Button
-          size="sm"
+          size="xs"
           variant="secondary"
           onClick={handleImport}
           disabled={!canImport || importing}
-          className="h-8 gap-1 px-3 text-[10px] font-bold uppercase tracking-wider"
+          className="gap-1.5 font-semibold uppercase tracking-wider rounded-none"
         >
-          <Download className="size-3"/>
-          {importing ? "Importing" : "Import"}
+          <Download className="size-3" weight="bold" data-icon="inline-start" />
+          {importing ? translate("Importing") : translate("Import")}
         </Button>
       </div>
 

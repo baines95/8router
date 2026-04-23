@@ -4,6 +4,7 @@ import { useState, useEffect } from"react";
 import PropTypes from"prop-types";
 import { Badge } from"@/components/ui/badge";
 import { Button } from"@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import {
  Dialog,
  DialogContent,
@@ -19,6 +20,7 @@ import {
  SelectTrigger,
  SelectValue,
 } from"@/components/ui/select";
+import { translate } from "@/i18n/runtime";
 
 export default function EditCompatibleNodeModal({
  isOpen,
@@ -55,8 +57,8 @@ export default function EditCompatibleNodeModal({
  }, [node, isAnthropic]);
 
  const apiTypeOptions = [
- { value:"chat", label:"Chat Completions"},
- { value:"responses", label:"Responses API"},
+ { value:"chat", label:translate("Chat Completions")},
+ { value:"responses", label:translate("Responses API")},
  ];
 
  const handleSubmit = async () => {
@@ -113,15 +115,17 @@ export default function EditCompatibleNodeModal({
  if (!open) onClose();
  }}
  >
- <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+ <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg rounded-none border-border/50">
  <DialogHeader>
  <DialogTitle>
- Edit {isAnthropic ?"Anthropic":"OpenAI"} Compatible
+ {translate("Edit")} {isAnthropic ?"Anthropic":"OpenAI"} {translate("Compatible")}
  </DialogTitle>
  </DialogHeader>
  <div className="flex flex-col gap-4">
- <div className="space-y-2">
- <Label htmlFor="edit-node-name">Name</Label>
+ <div className="flex flex-col gap-2">
+ <Label htmlFor="edit-node-name" className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground opacity-60">
+ {translate("Name")}
+ </Label>
  <Input
  id="edit-node-name"
  value={formData.name}
@@ -129,13 +133,16 @@ export default function EditCompatibleNodeModal({
  setFormData({ ...formData, name: e.target.value })
  }
  placeholder={`${isAnthropic ?"Anthropic":"OpenAI"} Compatible (Prod)`}
+ className="rounded-none border-border/50 bg-muted/5 h-8 text-xs"
  />
- <p className="text-xs text-muted-foreground">
- Required. A friendly label for this node.
+ <p className="text-[10px] text-muted-foreground font-medium italic opacity-70">
+ {translate("Required. A friendly label for this node.")}
  </p>
  </div>
- <div className="space-y-2">
- <Label htmlFor="edit-node-prefix">Prefix</Label>
+ <div className="flex flex-col gap-2">
+ <Label htmlFor="edit-node-prefix" className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground opacity-60">
+ {translate("Prefix")}
+ </Label>
  <Input
  id="edit-node-prefix"
  value={formData.prefix}
@@ -143,26 +150,29 @@ export default function EditCompatibleNodeModal({
  setFormData({ ...formData, prefix: e.target.value })
  }
  placeholder={isAnthropic ?"ac-prod":"oc-prod"}
+ className="rounded-none border-border/50 bg-muted/5 h-8 text-xs"
  />
- <p className="text-xs text-muted-foreground">
- Required. Used as the provider prefix for model IDs.
+ <p className="text-[10px] text-muted-foreground font-medium italic opacity-70">
+ {translate("Required. Used as the provider prefix for model IDs.")}
  </p>
  </div>
  {!isAnthropic && (
- <div className="space-y-2">
- <Label>API Type</Label>
+ <div className="flex flex-col gap-2">
+ <Label className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground opacity-60">
+ {translate("API Type")}
+ </Label>
  <Select
  value={formData.apiType}
  onValueChange={(v) =>
  setFormData({ ...formData, apiType: v })
  }
  >
- <SelectTrigger className="w-full">
+ <SelectTrigger className="w-full rounded-none border-border/50 bg-muted/5 h-8 text-xs">
  <SelectValue />
  </SelectTrigger>
- <SelectContent>
+ <SelectContent className="rounded-none">
  {apiTypeOptions.map((opt) => (
- <SelectItem key={opt.value} value={opt.value}>
+ <SelectItem key={opt.value} value={opt.value} className="rounded-none">
  {opt.label}
  </SelectItem>
  ))}
@@ -170,8 +180,10 @@ export default function EditCompatibleNodeModal({
  </Select>
  </div>
  )}
- <div className="space-y-2">
- <Label htmlFor="edit-node-base">Base URL</Label>
+ <div className="flex flex-col gap-2">
+ <Label htmlFor="edit-node-base" className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground opacity-60">
+ {translate("Base URL")}
+ </Label>
  <Input
  id="edit-node-base"
  value={formData.baseUrl}
@@ -183,20 +195,24 @@ export default function EditCompatibleNodeModal({
  ?"https://api.anthropic.com/v1"
  :"https://api.openai.com/v1"
  }
+ className="rounded-none border-border/50 bg-muted/5 h-8 text-xs tabular-nums"
  />
- <p className="text-xs text-muted-foreground">
- Use the base URL (ending in /v1) for your{""}
- {isAnthropic ?"Anthropic":"OpenAI"}-compatible API.
+ <p className="text-[10px] text-muted-foreground font-medium italic opacity-70">
+ {translate("Use the base URL (ending in /v1) for your")} {" "}
+ {isAnthropic ?"Anthropic":"OpenAI"}-{translate("compatible API.")}
  </p>
  </div>
  <div className="flex gap-2">
- <div className="min-w-0 flex-1 space-y-2">
- <Label htmlFor="edit-node-check-key">API Key (for Check)</Label>
+ <div className="min-w-0 flex-1 flex flex-col gap-2">
+ <Label htmlFor="edit-node-check-key" className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground opacity-60">
+ {translate("API Key (for Check)")}
+ </Label>
  <Input
  id="edit-node-check-key"
  type="password"
  value={checkKey}
  onChange={(e) => setCheckKey(e.target.value)}
+ className="rounded-none border-border/50 bg-muted/5 h-8 text-xs"
  />
  </div>
  <div className="flex items-end">
@@ -205,36 +221,41 @@ export default function EditCompatibleNodeModal({
  variant="secondary"
  onClick={handleValidate}
  disabled={!checkKey || validating || !formData.baseUrl.trim()}
+ className="h-8 rounded-none px-3 text-xs font-semibold"
  >
- {validating ?"Checking...":"Check"}
+ {validating ? <Spinner className="size-3.5" /> : translate("Check")}
  </Button>
  </div>
  </div>
- <div className="space-y-2">
- <Label htmlFor="edit-node-model">Model ID (optional)</Label>
+ <div className="flex flex-col gap-2">
+ <Label htmlFor="edit-node-model" className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground opacity-60">
+ {translate("Model ID (optional)")}
+ </Label>
  <Input
  id="edit-node-model"
  value={checkModelId}
  onChange={(e) => setCheckModelId(e.target.value)}
  placeholder="e.g. my-model-id"
+ className="rounded-none border-border/50 bg-muted/5 h-8 text-xs"
  />
- <p className="text-xs text-muted-foreground">
- If provider lacks /models endpoint, enter a model ID to validate via
- chat/completions instead.
+ <p className="text-[10px] text-muted-foreground font-medium italic opacity-70">
+ {translate("If provider lacks /models endpoint, enter a model ID to validate via chat/completions instead.")}
  </p>
  </div>
  {validationResult &&
  (validationResult ==="success"? (
- <Badge className="border-primary/20 bg-primary/10 text-primary dark:text-primary">
- Valid
+ <Badge className="border-primary/20 bg-primary/10 text-primary dark:text-primary rounded-none h-5 px-1.5 text-[10px] font-bold uppercase tracking-wider">
+ {translate("Valid")}
  </Badge>
  ) : (
- <Badge variant="destructive">Invalid</Badge>
+ <Badge variant="destructive" className="rounded-none h-5 px-1.5 text-[10px] font-bold uppercase tracking-wider">
+ {translate("Invalid")}
+ </Badge>
  ))}
- <div className="flex gap-2">
+ <div className="flex gap-2 pt-2">
  <Button
  type="button"
- className="flex-1"
+ className="flex-1 rounded-none h-8 text-xs font-bold uppercase tracking-wider"
  onClick={handleSubmit}
  disabled={
  !formData.name.trim() ||
@@ -243,15 +264,15 @@ export default function EditCompatibleNodeModal({
  saving
  }
  >
- {saving ?"Saving...":"Save"}
+ {saving ? <Spinner className="size-3.5" /> : translate("Save")}
  </Button>
  <Button
  type="button"
- variant="ghost"
- className="flex-1"
+ variant="secondary"
+ className="flex-1 rounded-none h-8 text-xs font-bold uppercase tracking-wider"
  onClick={onClose}
  >
- Cancel
+ {translate("Cancel")}
  </Button>
  </div>
  </div>

@@ -5,12 +5,12 @@ import {
   CheckCircle, 
   XCircle, 
   Cpu, 
-  CircleNotch, 
   Flask, 
   Check, 
   Copy, 
   X 
 } from "@phosphor-icons/react";
+import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import { translate } from "@/i18n/runtime";
 
@@ -44,7 +44,7 @@ export default function ModelRow({
   return (
     <div
       className={cn(
-        "group rounded-lg border px-2 py-1.5 transition-colors",
+        "group rounded-none border px-2 py-1.5 transition-colors",
         borderClass,
         "hover:bg-muted/50",
       )}
@@ -60,11 +60,11 @@ export default function ModelRow({
           )}
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <code className="rounded bg-muted px-1 py-0.5 font-mono text-[9px] text-muted-foreground w-fit max-w-full truncate">
+          <code className="rounded-none bg-muted px-1 py-0.5 font-mono text-[10px] text-muted-foreground w-fit max-w-full truncate">
             {fullModel}
           </code>
           {model.name && (
-            <span className="pl-1 text-[9px] font-medium text-muted-foreground/60 truncate">
+            <span className="pl-1 text-[10px] font-medium text-muted-foreground/60 truncate">
               {model.name}
             </span>
           )}
@@ -78,17 +78,17 @@ export default function ModelRow({
                 onClick={onTest}
                 disabled={isTesting}
                 className={cn(
-                  "rounded p-0.5 text-muted-foreground transition-opacity hover:bg-accent hover:text-foreground",
+                  "rounded-none p-0.5 text-muted-foreground transition-opacity hover:bg-accent hover:text-foreground",
                   isTesting ? "opacity-100" : "opacity-0 group-hover:opacity-100",
                 )}
               >
                 {isTesting ? (
-                  <CircleNotch className="size-3.5 animate-spin" weight="bold" />
+                  <Spinner className="size-3.5 animate-spin" />
                 ) : (
                   <Flask className="size-3.5" weight="bold" />
                 )}
               </button>
-              <span className="pointer-events-none absolute top-6 left-1/2 mt-1 -translate-x-1/2 whitespace-nowrap text-[9px] font-bold uppercase tracking-tighter bg-popover px-1.5 py-0.5 rounded shadow-sm opacity-0 transition-opacity group-hover/btn:opacity-100 z-10">
+              <span className="pointer-events-none absolute top-6 left-1/2 mt-1 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold uppercase tracking-tighter bg-popover text-popover-foreground px-1.5 py-0.5 rounded-none border border-border/50 shadow-none opacity-0 transition-opacity group-hover/btn:opacity-100 z-10">
                 {isTesting ? translate("Testing...") : translate("Test")}
               </span>
             </div>
@@ -98,7 +98,7 @@ export default function ModelRow({
             <button
               type="button"
               onClick={() => onCopy(fullModel, `model-${model.id}`)}
-              className="rounded p-0.5 text-muted-foreground hover:bg-accent hover:text-foreground"
+              className="rounded-none p-0.5 text-muted-foreground hover:bg-accent hover:text-foreground"
             >
               {copied === `model-${model.id}` ? (
                 <Check className="size-3.5 text-primary" weight="bold" />
@@ -106,7 +106,7 @@ export default function ModelRow({
                 <Copy className="size-3.5" weight="bold" />
               )}
             </button>
-            <span className="pointer-events-none absolute top-6 left-1/2 mt-1 -translate-x-1/2 whitespace-nowrap text-[9px] font-bold uppercase tracking-tighter bg-popover px-1.5 py-0.5 rounded shadow-sm opacity-0 transition-opacity group-hover/btn:opacity-100 z-10">
+            <span className="pointer-events-none absolute top-6 left-1/2 mt-1 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold uppercase tracking-tighter bg-popover text-popover-foreground px-1.5 py-0.5 rounded-none border border-border/50 shadow-none opacity-0 transition-opacity group-hover/btn:opacity-100 z-10">
               {copied === `model-${model.id}` ? translate("Copied!") : translate("Copy")}
             </span>
           </div>
@@ -115,7 +115,7 @@ export default function ModelRow({
             <button
               type="button"
               onClick={onDeleteAlias}
-              className="rounded p-0.5 text-muted-foreground opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
+              className="rounded-none p-0.5 text-muted-foreground opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
               title={translate("Remove custom model")}
             >
               <X className="size-3.5" weight="bold" />

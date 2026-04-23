@@ -6,7 +6,7 @@ import Link from"next/link";
 import Image from"next/image";
 import {
   Cookie,
-  CircleNotch as Loader2,
+  CircleNotch,
   PencilSimple as Pencil,
   Plus,
   Trash,
@@ -18,6 +18,7 @@ import {
   Key,
   ShieldCheck
 } from "@phosphor-icons/react";
+import { Spinner } from "@/components/ui/spinner";
 import { translate } from "@/i18n/runtime";
 import { cn } from"@/lib/utils";
 import { Button, buttonVariants } from"@/components/ui/button";
@@ -29,6 +30,11 @@ import {
   CardDescription, 
   CardFooter 
 } from "@/components/ui/card";
+import {
+  Alert,
+  AlertTitle,
+  AlertDescription,
+} from "@/components/ui/alert";
 import {
  Dialog,
  DialogContent,
@@ -579,14 +585,14 @@ export default function ProviderDetailPage() {
  if (!open) closeBulkProxyModal();
  }}
  >
- <DialogContent className="sm:max-w-md"showCloseButton>
+ <DialogContent className="sm:max-w-md" showCloseButton>
  <DialogHeader>
  <DialogTitle>
  Proxy Action ({selectedConnectionIds.length} selected)
  </DialogTitle>
  </DialogHeader>
  <div className="flex flex-col gap-4">
- <div className="space-y-2">
+ <div className="flex flex-col gap-2">
  <Label>Proxy Pool</Label>
  <Select
  value={bulkProxyPoolId}
@@ -626,7 +632,7 @@ export default function ProviderDetailPage() {
  >
  {bulkUpdatingProxy ? (
  <>
- <Loader2 className="size-4 animate-spin"/>
+ <Spinner className="size-4 animate-spin" data-icon="inline-start"/>
  Applying...
  </>
  ) : (
@@ -748,9 +754,9 @@ export default function ProviderDetailPage() {
  variant="outline"
  size="sm"
  onClick={() => setShowAddCustomModel(true)}
- className="h-auto border-dashed py-2 text-xs"
+ className="h-auto border-dashed py-2 text-xs rounded-none"
  >
- <Plus className="size-3.5"/>
+ <Plus className="size-3.5" data-icon="inline-start"/>
  Add Model
  </Button>
 
@@ -765,7 +771,7 @@ export default function ProviderDetailPage() {
  return (
  <div className="mt-2 w-full">
  <p className="mb-2 text-xs text-muted-foreground">
- Suggested free models (≥200k context):
+ {translate("Suggested free models")} (<span className="tabular-nums">≥200k</span> context):
  </p>
  <div className="flex flex-wrap gap-2">
  {notAdded.map((m) => (
@@ -778,10 +784,10 @@ export default function ProviderDetailPage() {
  const alias = m.id.split("/").pop();
  await handleSetAlias(m.id, alias, providerStorageAlias);
  }}
- className="h-auto gap-1 px-2.5 py-1.5 text-xs font-normal"
+ className="h-auto gap-1 px-2.5 py-1.5 text-xs font-normal rounded-none"
  title={`${m.name} · ${(m.contextLength / 1000).toFixed(0)}k ctx`}
  >
- <Plus className="size-3"/>
+ <Plus className="size-3" data-icon="inline-start"/>
  {m.id.split("/").pop()}
  </Button>
  ))}
@@ -845,7 +851,7 @@ export default function ProviderDetailPage() {
  <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mt-1">
  <div className="flex items-center gap-4">
  <div
- className="size-11 rounded-xl flex items-center justify-center border border-border/50 bg-muted/5 shadow-none"
+ className="size-11 rounded-none flex items-center justify-center border border-border/50 bg-muted/5 shadow-none"
  style={{ backgroundColor: `${providerInfo.color}08` }}
  >
  {headerImgError ? (
@@ -867,13 +873,13 @@ export default function ProviderDetailPage() {
  />
  )}
  </div>
- <div className="space-y-0.5">
- <div className="flex items-center gap-1.5 text-muted-foreground font-medium text-[9px] uppercase tracking-wider opacity-60">
- <ShieldCheck className="size-3" weight="bold"/>
+ <div className="flex flex-col gap-0.5">
+ <div className="flex items-center gap-1.5 text-muted-foreground font-medium text-xs uppercase tracking-wider opacity-60">
+ <ShieldCheck className="size-3.5" weight="bold" data-icon="inline-start"/>
  {translate("Infrastructure")}
  </div>
  <h1 className="text-xl font-semibold tracking-tight leading-none">{providerInfo.name}</h1>
- <p className="text-[10px] text-muted-foreground font-medium tabular-nums mt-1">
+ <p className="text-xs text-muted-foreground font-medium tabular-nums mt-1">
  {connections.length} {translate(connections.length === 1 ? "connection" : "connections")}
  </p>
  </div>
@@ -881,14 +887,26 @@ export default function ProviderDetailPage() {
 
  <div className="flex items-center gap-2">
  {isOAuth && (
- <Button onClick={() => setShowOAuthModal(true)} className="h-7 px-3 text-[10px] font-semibold tracking-wide">
- <Plus className="size-3 mr-1.5" weight="bold" />
+ <Button 
+ type="button"
+ variant="outline" 
+ size="sm" 
+ onClick={() => setShowOAuthModal(true)} 
+ className="font-semibold tracking-wide"
+ >
+ <Plus className="size-3.5" weight="bold" data-icon="inline-start" />
  {providerId === "iflow" ? "OAuth" : translate("Add Connection")}
  </Button>
  )}
  {!isOAuth && !isFreeNoAuth && !isCompatible && (
- <Button onClick={() => setShowAddApiKeyModal(true)} className="h-7 px-3 text-[10px] font-semibold tracking-wide">
- <Plus className="size-3 mr-1.5" weight="bold" />
+ <Button 
+ type="button"
+ variant="outline" 
+ size="sm" 
+ onClick={() => setShowAddApiKeyModal(true)} 
+ className="font-semibold tracking-wide"
+ >
+ <Plus className="size-3.5" weight="bold" data-icon="inline-start" />
  {translate("Add Connection")}
  </Button>
  )}
@@ -897,46 +915,49 @@ export default function ProviderDetailPage() {
  </header>
 
  {providerInfo.deprecated && (
- <div className="flex items-start gap-3 rounded-lg border border-orange-500/20 bg-orange-500/5 px-3 py-2">
- <Warning className="mt-0.5 shrink-0 size-3.5 text-orange-500" weight="bold" />
- <p className="text-[10px] font-medium leading-relaxed text-orange-500/90">
+ <Alert variant="destructive" className="border-orange-500/20 bg-orange-500/5">
+ <Warning className="text-orange-500" weight="bold" />
+ <AlertTitle className="text-orange-500">{translate("Deprecated")}</AlertTitle>
+ <AlertDescription className="text-orange-500/90 text-xs font-medium leading-relaxed">
  {providerInfo.deprecationNotice}
- </p>
- </div>
+ </AlertDescription>
+ </Alert>
  )}
 
  {providerInfo.notice && !providerInfo.deprecated && (
- <div className="flex flex-wrap items-center gap-3 rounded-lg border border-blue-500/20 bg-primary/10 px-3 py-2">
- <Info className="shrink-0 size-3.5 text-primary" weight="bold" />
- <p className="min-w-0 flex-1 text-[10px] font-medium leading-relaxed text-primary">
+ <Alert className="border-blue-500/20 bg-primary/10">
+ <Info className="text-primary" weight="bold" />
+ <AlertDescription className="text-primary text-xs font-medium leading-relaxed">
  {providerInfo.notice.text}
- </p>
+ </AlertDescription>
  {providerInfo.notice.apiKeyUrl && (
+ <div className="mt-2">
  <a
  href={providerInfo.notice.apiKeyUrl}
  target="_blank"
  rel="noopener noreferrer"
  className={cn(
- buttonVariants({ size: "sm", variant: "secondary" }),
- "h-6 px-2 text-[9px] font-bold tracking-widest bg-primary/20 text-primary border-none hover:bg-primary/30",
+ buttonVariants({ size: "xs", variant: "secondary" }),
+ "font-bold tracking-widest bg-primary/20 text-primary border-none hover:bg-primary/30",
  )}
  >
  Get API Key
  </a>
- )}
  </div>
+ )}
+ </Alert>
  )}
 
  {isCompatible && providerNode && (
- <Card className="p-3">
+ <Card className="p-3 rounded-none">
  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
- <div className="min-w-0 space-y-0.5">
+ <div className="min-w-0 flex flex-col gap-0.5">
  <h2 className="text-sm font-semibold tracking-tight">
  {isAnthropicCompatible
  ? translate("Anthropic Compatible Details")
  : translate("OpenAI Compatible Details")}
  </h2>
- <p className="text-[10px] text-muted-foreground tabular-nums">
+ <p className="text-xs text-muted-foreground tabular-nums">
  {isAnthropicCompatible
  ?"Messages API"
  : providerNode.apiType ==="responses"
@@ -952,25 +973,26 @@ export default function ProviderDetailPage() {
  </div>
  <div className="flex shrink-0 flex-wrap items-center gap-1.5">
  <Button
- size="sm"
+ size="xs"
+ variant="outline"
  onClick={() => setShowAddApiKeyModal(true)}
  disabled={connections.length > 0}
- className="h-6 gap-1 px-2 text-[9px] font-semibold"
+ className="gap-1 font-semibold"
  >
- <Plus className="size-2.5" weight="bold"/>
+ <Plus className="size-3" weight="bold" data-icon="inline-start"/>
  {translate("Add")}
  </Button>
  <Button
- size="sm"
+ size="xs"
  variant="secondary"
  onClick={() => setShowEditNodeModal(true)}
- className="h-6 gap-1 px-2 text-[9px] font-semibold"
+ className="gap-1 font-semibold"
  >
- <Pencil className="size-2.5" weight="bold"/>
+ <Pencil className="size-3" weight="bold" data-icon="inline-start"/>
  {translate("Edit")}
  </Button>
  <Button
- size="sm"
+ size="xs"
  variant="secondary"
  onClick={async () => {
  if (
@@ -990,15 +1012,15 @@ export default function ProviderDetailPage() {
  console.log("Error deleting provider node:", error);
  }
  }}
- className="h-6 gap-1 px-2 text-[9px] font-semibold text-destructive hover:bg-destructive/10"
+ className="gap-1 font-semibold text-destructive hover:bg-destructive/10"
  >
- <Trash className="size-2.5" weight="bold"/>
+ <Trash className="size-3" weight="bold" data-icon="inline-start"/>
  {translate("Delete")}
  </Button>
  </div>
  </div>
  {connections.length > 0 && (
- <p className="text-[10px] text-muted-foreground mt-1.5 opacity-70">
+ <p className="text-xs text-muted-foreground mt-1.5 opacity-70">
  {translate("Only one connection is allowed per compatible node.")}
  </p>
  )}
@@ -1007,28 +1029,28 @@ export default function ProviderDetailPage() {
 
  {/* Connections */}
  {isFreeNoAuth ? (
- <Card className="p-4 border-border/50 shadow-none bg-muted/5">
+ <Card className="p-4 border-border/50 shadow-none bg-muted/5 rounded-none">
  <div className="flex items-center gap-3">
- <div className="inline-flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+ <div className="inline-flex size-9 items-center justify-center rounded-none bg-primary/10 text-primary border border-primary/20">
  <LockOpen className="size-5" weight="bold" />
  </div>
- <div className="space-y-0.5">
+ <div className="flex flex-col gap-0.5">
  <p className="text-xs font-semibold">{translate("No authentication required")}</p>
- <p className="text-[10px] text-muted-foreground font-medium">
+ <p className="text-xs text-muted-foreground font-medium">
  {translate("This provider is ready to use.")}
  </p>
  </div>
  </div>
  </Card>
  ) : (
- <Card className="border-border/50 shadow-none overflow-hidden p-0 py-0">
+ <Card className="border-border/50 shadow-none overflow-hidden p-0 py-0 rounded-none">
  <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-3 py-2 border-b border-border/50 bg-muted/10">
- <CardTitle className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground opacity-50">
+ <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-50">
  {translate("Connections")}
  </CardTitle>
  <div className="flex flex-wrap items-center gap-3">
  <div className="flex items-center gap-2">
- <span className="text-[9px] font-medium tracking-wide text-muted-foreground">
+ <span className="text-[10px] font-medium tracking-wide text-muted-foreground">
  {translate("Round Robin")}
  </span>
  <Switch
@@ -1038,14 +1060,14 @@ export default function ProviderDetailPage() {
  />
  {providerStrategy === "round-robin" && (
  <div className="flex items-center gap-1.5 ml-1">
- <span className="text-[9px] font-medium tracking-wide text-muted-foreground">Sticky:</span>
+ <span className="text-[10px] font-medium tracking-wide text-muted-foreground">Sticky:</span>
  <Input
  type="number"
  min={1}
  value={providerStickyLimit}
  onChange={(e) => handleStickyLimitChange(e.target.value)}
  placeholder="1"
- className="h-6 w-8 px-1 py-0.5 text-[10px] font-bold tabular-nums text-center bg-background border-border/50"
+ className="h-8 w-10 px-1 py-0.5 text-xs font-bold tabular-nums text-center bg-background border-border/50 rounded-none"
  />
  </div>
  )}
@@ -1056,21 +1078,33 @@ export default function ProviderDetailPage() {
  <CardContent className="p-0">
  {connections.length === 0 ? (
  <div className="py-10 text-center flex flex-col items-center justify-center opacity-30">
- <div className="mb-3 inline-flex size-11 items-center justify-center rounded-xl bg-muted/10">
+ <div className="mb-3 inline-flex size-11 items-center justify-center rounded-none bg-muted/10 border border-border/50">
  {isOAuth ? <Lock className="size-6" weight="bold" /> : <Key className="size-6" weight="bold" />}
  </div>
  <p className="text-xs font-medium tracking-tight">{translate("No connections yet")}</p>
- <p className="text-[10px] text-muted-foreground mt-0.5 mb-4">{translate("Add your first connection to get started")}</p>
+ <p className="text-xs text-muted-foreground mt-0.5 mb-4">{translate("Add your first connection to get started")}</p>
  {!isCompatible && (
  <div className="flex justify-center gap-2">
  {providerId === "iflow" && (
- <Button variant="secondary" onClick={() => setShowIFlowCookieModal(true)} className="h-7 px-3 text-[10px] font-semibold">
- <Cookie className="size-3 mr-1.5" weight="bold" />
+ <Button 
+ type="button"
+ variant="secondary" 
+ size="sm" 
+ onClick={() => setShowIFlowCookieModal(true)} 
+ className="font-semibold"
+ >
+ <Cookie className="size-3.5" weight="bold" data-icon="inline-start" />
  Cookie Auth
  </Button>
  )}
- <Button onClick={() => isOAuth ? setShowOAuthModal(true) : setShowAddApiKeyModal(true)} className="h-7 px-3 text-[10px] font-semibold">
- <Plus className="size-3 mr-1.5" weight="bold" />
+ <Button 
+ type="button"
+ variant="outline" 
+ size="sm" 
+ onClick={() => isOAuth ? setShowOAuthModal(true) : setShowAddApiKeyModal(true)} 
+ className="font-semibold"
+ >
+ <Plus className="size-3.5" weight="bold" data-icon="inline-start" />
  {providerId === "iflow" ? "OAuth" : translate("Add Connection")}
  </Button>
  </div>
@@ -1084,16 +1118,16 @@ export default function ProviderDetailPage() {
  </CardContent>
  
  {!isCompatible && connections.length > 0 && (
- <CardFooter className="px-3 py-1.5 border-t border-border/50 bg-muted/5">
+ <CardFooter className="px-3 py-1.5 border-t border-border/50 bg-muted/5 rounded-none">
  <div className="flex gap-2">
  {providerId === "iflow" && (
- <Button size="sm" variant="secondary" onClick={() => setShowIFlowCookieModal(true)} className="h-6 px-2.5 text-[9px] font-semibold">
- <Cookie className="size-2.5 mr-1" weight="bold" />
+ <Button size="xs" variant="secondary" onClick={() => setShowIFlowCookieModal(true)} className="px-2.5 font-semibold">
+ <Cookie className="size-3 mr-1" weight="bold" data-icon="inline-start" />
  Cookie
  </Button>
  )}
- <Button size="sm" variant="outline" onClick={() => isOAuth ? setShowOAuthModal(true) : setShowAddApiKeyModal(true)} className="h-6 px-2.5 text-[9px] font-semibold">
- <Plus className="size-2.5 mr-1" weight="bold" />
+ <Button size="xs" variant="outline" onClick={() => isOAuth ? setShowOAuthModal(true) : setShowAddApiKeyModal(true)} className="px-2.5 font-semibold">
+ <Plus className="size-3 mr-1" weight="bold" data-icon="inline-start" />
  {translate("Add")}
  </Button>
  </div>
@@ -1103,17 +1137,20 @@ export default function ProviderDetailPage() {
  )}
 
  {/* Models */}
- <Card className="border-border/50 shadow-none overflow-hidden p-0 py-0">
+ <Card className="border-border/50 shadow-none overflow-hidden p-0 py-0 rounded-none">
  <CardHeader className="px-3 py-2 border-b border-border/50 bg-muted/10">
- <CardTitle className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground opacity-50">
+ <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-50">
  {translate("Available Models")}
  </CardTitle>
  </CardHeader>
  <CardContent className="p-3 bg-muted/5">
  {!!modelsTestError && (
- <p className="mb-3 text-[10px] font-medium text-destructive bg-destructive/5 p-2 rounded-lg border border-destructive/10">
+ <Alert variant="destructive" className="mb-3 border-destructive/10 bg-destructive/5 py-1.5">
+ <Warning className="size-4" weight="bold" />
+ <AlertDescription className="text-xs font-medium leading-relaxed">
  {modelsTestError}
- </p>
+ </AlertDescription>
+ </Alert>
  )}
  {renderModelsSection()}
  </CardContent>

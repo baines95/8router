@@ -7,21 +7,19 @@ import {
   Key, 
   CaretUp, 
   CaretDown, 
-  Pencil, 
-  Trash, 
-  Globe, 
-  CircleNotch,
-  Nodes
+  DotsThreeVertical,
+  Gear,
+  Trash
 } from "@phosphor-icons/react";
+import { Spinner } from "@/components/ui/spinner";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { translate } from "@/i18n/runtime";
 import CooldownTimer from "./CooldownTimer";
@@ -29,15 +27,15 @@ import CooldownTimer from "./CooldownTimer";
 function StatusBadge({ variant, children }) {
   if (variant === "success") {
     return (
-      <Badge className="border-primary/20 bg-primary/10 text-primary dark:text-primary px-1.5 py-0 h-4">
+      <Badge className="border-primary/20 bg-primary/10 text-primary dark:text-primary px-1.5 py-0 rounded-none h-4">
         {children}
       </Badge>
     );
   }
   if (variant === "error") {
-    return <Badge variant="destructive" className="px-1.5 py-0 h-4">{children}</Badge>;
+    return <Badge variant="destructive" className="px-1.5 py-0 rounded-none h-4">{children}</Badge>;
   }
-  return <Badge variant="secondary" className="px-1.5 py-0 h-4">{children}</Badge>;
+  return <Badge variant="secondary" className="px-1.5 py-0 rounded-none h-4">{children}</Badge>;
 }
 
 export default function ConnectionRow({
@@ -48,67 +46,16 @@ export default function ConnectionRow({
   isLast,
   onMoveUp,
   onMoveDown,
-  onToggleActive,
-  onUpdateProxy,
   onEdit,
   onDelete,
 }) {
-  const [updatingProxy, setUpdatingProxy] = useState(false);
-
   const proxyPoolMap = new Map((proxyPools || []).map((pool) => [pool.id, pool]));
   const boundProxyPoolId = connection.providerSpecificData?.proxyPoolId || null;
-  const boundProxyPool = boundProxyPoolId
-    ? proxyPoolMap.get(boundProxyPoolId)
-    : null;
-  const hasLegacyProxy =
-    connection.providerSpecificData?.connectionProxyEnabled === true &&
-    !!connection.providerSpecificData?.connectionProxyUrl;
+  const hasLegacyProxy = connection.providerSpecificData?.connectionProxyEnabled === true && !!connection.providerSpecificData?.connectionProxyUrl;
   const hasAnyProxy = !!boundProxyPoolId || hasLegacyProxy;
-  const proxyDisplayText = boundProxyPool
-    ? `Pool: ${boundProxyPool.name}`
-    : boundProxyPoolId
-    ? `Pool: ${boundProxyPoolId} (inactive/missing)`
-    : hasLegacyProxy
-    ? `Legacy: ${connection.providerSpecificData?.connectionProxyUrl}`
-    : "";
-
-  let maskedProxyUrl = "";
-  if (boundProxyPool?.proxyUrl || connection.providerSpecificData?.connectionProxyUrl) {
-    const rawProxyUrl =
-      boundProxyPool?.proxyUrl ||
-      connection.providerSpecificData?.connectionProxyUrl;
-    try {
-      const parsed = new URL(rawProxyUrl);
-      maskedProxyUrl = `${parsed.protocol}//${parsed.hostname}${parsed.port ? `:${parsed.port}` : ""}`;
-    } catch {
-      maskedProxyUrl = rawProxyUrl;
-    }
-  }
-
-  const noProxyText =
-    boundProxyPool?.noProxy || connection.providerSpecificData?.connectionNoProxy || "";
-
-  let proxyBadgeVariant = "default";
-  if (boundProxyPool?.isActive === true) {
-    proxyBadgeVariant = "success";
-  } else if (boundProxyPoolId || hasLegacyProxy) {
-    proxyBadgeVariant = "error";
-  }
-
-  const handleSelectProxy = async (poolId) => {
-    setUpdatingProxy(true);
-    try {
-      await onUpdateProxy(poolId === "__none__" ? null : poolId);
-    } finally {
-      setUpdatingProxy(false);
-    }
-  };
 
   const displayName = isOAuth
-    ? connection.name ||
-      connection.email ||
-      connection.displayName ||
-      "OAuth Account"
+    ? connection.name || connection.email || connection.displayName || "OAuth Account"
     : connection.name;
 
   const [isCooldown, setIsCooldown] = useState(false);
@@ -133,26 +80,15 @@ export default function ConnectionRow({
 
     checkCooldown();
     const interval = modelLockUntil ? setInterval(checkCooldown, 1000) : null;
-    return () => {
-      if (interval) clearInterval(interval);
-    };
+    return () => { if (interval) clearInterval(interval); };
   }, [connection, modelLockUntil]);
 
-  const effectiveStatus =
-    connection.testStatus === "unavailable" && !isCooldown
-      ? "active"
-      : connection.testStatus;
+  const effectiveStatus = connection.testStatus === "unavailable" && !isCooldown ? "active" : connection.testStatus;
 
   const getStatusVariant = () => {
     if (connection.isActive === false) return "default";
-    if (effectiveStatus === "active" || effectiveStatus === "success")
-      return "success";
-    if (
-      effectiveStatus === "error" ||
-      effectiveStatus === "expired" ||
-      effectiveStatus === "unavailable"
-    )
-      return "error";
+    if (effectiveStatus === "active" || effectiveStatus === "success") return "success";
+    if (effectiveStatus === "error" || effectiveStatus === "expired" || effectiveStatus === "unavailable") return "error";
     return "default";
   };
 
@@ -161,7 +97,7 @@ export default function ConnectionRow({
   return (
     <div
       className={cn(
-        "group flex items-center justify-between rounded-lg p-1.5 transition-colors",
+        "group flex items-center justify-between rounded-none p-1.5 transition-colors",
         "hover:bg-muted/30",
         connection.isActive === false && "opacity-60",
       )}
@@ -173,173 +109,93 @@ export default function ConnectionRow({
             onClick={onMoveUp}
             disabled={isFirst}
             className={cn(
-              "rounded p-0.5",
-              isFirst
-                ? "cursor-not-allowed text-muted-foreground/30"
-                : "text-muted-foreground hover:bg-accent hover:text-foreground",
+              "rounded-none p-0.5",
+              isFirst ? "cursor-not-allowed text-muted-foreground/30" : "text-muted-foreground hover:bg-accent hover:text-foreground",
             )}
           >
-            <CaretUp className="size-3" weight="bold" />
+            <CaretUp className="size-3.5" weight="bold" />
           </button>
           <button
             type="button"
             onClick={onMoveDown}
             disabled={isLast}
             className={cn(
-              "rounded p-0.5",
-              isLast
-                ? "cursor-not-allowed text-muted-foreground/30"
-                : "text-muted-foreground hover:bg-accent hover:text-foreground",
+              "rounded-none p-0.5",
+              isLast ? "cursor-not-allowed text-muted-foreground/30" : "text-muted-foreground hover:bg-accent hover:text-foreground",
             )}
           >
-            <CaretDown className="size-3" weight="bold" />
+            <CaretDown className="size-3.5" weight="bold" />
           </button>
         </div>
-        <div className="size-7 rounded-lg bg-muted/20 flex items-center justify-center shrink-0">
+        <div className="size-7 rounded-none bg-muted/20 flex items-center justify-center shrink-0 border border-border/50">
           {isOAuth ? (
-            <Lock className="size-3.5 text-muted-foreground" weight="bold" />
+            <Lock className="size-4 text-muted-foreground" weight="bold" />
           ) : (
-            <Key className="size-3.5 text-muted-foreground" weight="bold" />
+            <Key className="size-4 text-muted-foreground" weight="bold" />
           )}
         </div>
         <div className="min-w-0 flex-1">
           <p className="truncate text-xs font-medium">{displayName}</p>
           <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
             <StatusBadge variant={sv}>
-              <span className="text-[9px] font-semibold tracking-tight">
-                {connection.isActive === false
-                  ? translate("Disabled")
-                  : translate(effectiveStatus || "Unknown")}
+              <span className="text-[10px] font-semibold tracking-tight uppercase">
+                {connection.isActive === false ? translate("Disabled") : translate(effectiveStatus || "Unknown")}
               </span>
             </StatusBadge>
             {hasAnyProxy && (
-              <StatusBadge variant={proxyBadgeVariant}>
-                <span className="text-[9px] font-semibold tracking-tight">Proxy</span>
+              <StatusBadge variant="default">
+                <span className="text-[10px] font-semibold tracking-tight uppercase">Proxy</span>
               </StatusBadge>
             )}
             {isCooldown && connection.isActive !== false && (
               <CooldownTimer until={modelLockUntil} />
             )}
             {connection.lastError && connection.isActive !== false && (
-              <span
-                className="max-w-[200px] truncate text-[10px] text-destructive"
-                title={connection.lastError}
-              >
+              <span className="max-w-[200px] truncate text-[10px] text-destructive" title={connection.lastError}>
                 {connection.lastError}
               </span>
             )}
-            <span className="text-[10px] text-muted-foreground font-medium tabular-nums opacity-50">
+            <span className="text-xs text-muted-foreground font-medium tabular-nums opacity-50">
               #{connection.priority}
             </span>
           </div>
         </div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-2">
-        <div className="flex items-center gap-1">
-          {(proxyPools || []).length > 0 && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    "h-8 flex-col gap-0 px-2 py-1 text-muted-foreground hover:text-foreground",
-                    hasAnyProxy && "text-primary"
-                  )}
-                  disabled={updatingProxy}
-                >
-                  {updatingProxy ? (
-                    <CircleNotch className="size-3.5 animate-spin" weight="bold" />
-                  ) : (
-                    <Nodes className="size-3.5" weight="bold" />
-                  )}
-                  <span className="text-[8px] font-semibold tracking-tighter uppercase">{translate("Proxy")}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-[180px]">
-                <DropdownMenuItem
-                  onClick={() => handleSelectProxy("__none__")}
-                  className={!boundProxyPoolId ? "font-medium text-primary" : undefined}
-                >
-                  None
-                </DropdownMenuItem>
-                {(proxyPools || []).map((pool) => (
-                  <DropdownMenuItem
-                    key={pool.id}
-                    onClick={() => handleSelectProxy(pool.id)}
-                    className={boundProxyPoolId === pool.id ? "font-medium text-primary" : undefined}
-                  >
-                    {pool.name}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="h-8 flex-col gap-0 px-2 py-1 text-muted-foreground hover:text-foreground"
-            onClick={onEdit}
+      <div className="flex shrink-0 items-center">
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "icon-sm" }),
+              "size-7 rounded-none text-muted-foreground hover:text-foreground"
+            )}
           >
-            <Pencil className="size-3.5" weight="bold" />
-            <span className="text-[8px] font-semibold tracking-tighter uppercase">{translate("Edit")}</span>
-          </Button>
-
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="h-8 flex-col gap-0 px-2 py-1 text-destructive hover:bg-destructive/10 hover:text-destructive"
-            onClick={onDelete}
-          >
-            <Trash className="size-3.5" weight="bold" />
-            <span className="text-[8px] font-semibold tracking-tighter uppercase">{translate("Delete")}</span>
-          </Button>
-        </div>
-
-        <Switch
-          checked={connection.isActive ?? true}
-          onCheckedChange={onToggleActive}
-          className="scale-[0.65] origin-right"
-          title={(connection.isActive ?? true) ? translate("Disable") : translate("Enable")}
-        />
+            <DotsThreeVertical className="size-5" weight="bold" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-[140px] rounded-none border-border/50 shadow-none">
+            <DropdownMenuItem onClick={onEdit} className="rounded-none text-xs gap-2 py-2 cursor-pointer">
+              <Gear className="size-4" weight="bold" />
+              {translate("Settings")}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onDelete} className="rounded-none text-xs gap-2 py-2 text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer">
+              <Trash className="size-4" weight="bold" />
+              {translate("Delete")}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
 }
 
 ConnectionRow.propTypes = {
-  connection: PropTypes.shape({
-    id: PropTypes.string,
-    name: PropTypes.string,
-    email: PropTypes.string,
-    displayName: PropTypes.string,
-    modelLockUntil: PropTypes.string,
-    testStatus: PropTypes.string,
-    isActive: PropTypes.bool,
-    lastError: PropTypes.string,
-    priority: PropTypes.number,
-    globalPriority: PropTypes.number,
-  }).isRequired,
-  proxyPools: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string,
-      name: PropTypes.string,
-      proxyUrl: PropTypes.string,
-      noProxy: PropTypes.string,
-      isActive: PropTypes.bool,
-    })
-  ),
+  connection: PropTypes.object.isRequired,
+  proxyPools: PropTypes.array,
   isOAuth: PropTypes.bool.isRequired,
   isFirst: PropTypes.bool.isRequired,
   isLast: PropTypes.bool.isRequired,
   onMoveUp: PropTypes.func.isRequired,
   onMoveDown: PropTypes.func.isRequired,
-  onToggleActive: PropTypes.func.isRequired,
-  onUpdateProxy: PropTypes.func,
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
 };

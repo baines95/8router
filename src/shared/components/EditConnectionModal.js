@@ -8,26 +8,41 @@ import {
   DialogHeader, 
   DialogTitle, 
   DialogFooter,
-  DialogDescription
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { 
-  CheckCircle2, 
-  AlertCircle, 
-  Activity, 
+  CheckCircle, 
+  WarningCircle, 
+  Pulse, 
   ShieldCheck, 
-  RefreshCw,
-  Save,
-  X
-} from "lucide-react";
+  FloppyDisk,
+  Power
+} from "@phosphor-icons/react";
+import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
+import { translate } from "@/i18n/runtime";
 import { isOpenAICompatibleProvider, isAnthropicCompatibleProvider } from "@/shared/constants/providers";
 
 export default function EditConnectionModal({ isOpen, connection, proxyPools, onSave, onClose }) {
-  const [formData, setFormData] = useState({ name: "", priority: 1, apiKey: "" });
+  const NONE_PROXY_POOL_VALUE = "__none__";
+  const [formData, setFormData] = useState({ 
+    name: "", 
+    priority: 1, 
+    apiKey: "",
+    proxyPoolId: NONE_PROXY_POOL_VALUE,
+    isActive: true
+  });
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState(null);
   const [validating, setValidating] = useState(false);
@@ -36,14 +51,25 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, on
 
   useEffect(() => {
     if (connection) {
-      setFormData({ name: connection.name || "", priority: connection.priority || 1, apiKey: "" });
+      setFormData({ 
+        name: connection.name || "", 
+        priority: connection.priority || 1, 
+        apiKey: "",
+        proxyPoolId: connection.providerSpecificData?.proxyPoolId || NONE_PROXY_POOL_VALUE,
+        isActive: connection.isActive ?? true
+      });
       setTestResult(null);
       setValidationResult(null);
     }
-  }, [connection]);
+  }, [connection, isOpen]);
 
   const isOAuth = connection?.authType === "oauth";
   const isCompatible = connection ? (isOpenAICompatibleProvider(connection.provider) || isAnthropicCompatibleProvider(connection.provider)) : false;
+
+  const proxyOptions = [
+    { value: NONE_PROXY_POOL_VALUE, label: "None" },
+    ...(proxyPools || []).map((pool) => ({ value: pool.id, label: pool.name })),
+  ];
 
   const handleTest = async () => {
     if (!connection?.provider) return;
@@ -59,7 +85,11 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, on
     if (!connection?.provider || !formData.apiKey) return;
     setValidating(true); setValidationResult(null);
     try {
-      const res = await fetch("/api/providers/validate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ provider: connection.provider, apiKey: formData.apiKey }) });
+      const res = await fetch("/api/providers/validate", { 
+        method: "POST", 
+        headers: { "Content-Type": "application/json" }, 
+        body: JSON.stringify({ provider: connection.provider, apiKey: formData.apiKey }) 
+      });
       const data = await res.json();
       setValidationResult(data.valid ? "success" : "failed");
     } catch { setValidationResult("failed"); } finally { setValidating(false); }
@@ -69,75 +99,180 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, on
     if (!connection) return;
     setSaving(true);
     try {
-      const updates = { name: formData.name, priority: formData.priority };
+      const updates = { 
+        name: formData.name, 
+        priority: formData.priority,
+        isActive: formData.isActive,
+        proxyPoolId: formData.proxyPoolId === NONE_PROXY_POOL_VALUE ? null : formData.proxyPoolId
+      };
       if (!isOAuth && formData.apiKey) {
         updates.apiKey = formData.apiKey;
-        if (validationResult === "success") { updates.testStatus = "active"; updates.lastError = null; updates.lastErrorAt = null; }
+        if (validationResult === "success") { 
+          updates.testStatus = "active"; 
+          updates.lastError = null; 
+          updates.lastErrorAt = null; 
+        }
       }
       await onSave(updates);
-    } finally { setSaving(false); }
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (!connection) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={o => !o && onClose()}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Update Connection</DialogTitle>
-          <DialogDescription>Modify metadata and credentials for {connection.provider}.</DialogDescription>
+      <DialogContent className="sm:max-w-md rounded-none border-border/50 p-6">
+        <DialogHeader className="mb-4">
+          <DialogTitle className="text-lg font-semibold tracking-tight">{translate("Update Connection")}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          <div className="grid gap-2">
-            <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Identifier</Label>
-            <Input value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder={isOAuth ? "Account Name" : "Credential Label"} />
+        <div className="flex flex-col gap-5 py-2">
+          {/* Status Toggle */}
+          <div className="flex items-center justify-between p-3 bg-muted/5 border border-border/50 rounded-none">
+            <div className="flex items-center gap-2">
+              <Power className={cn("size-4", formData.isActive ? "text-primary" : "text-muted-foreground")} weight="bold" />
+              <span className="text-xs font-semibold uppercase tracking-wider">{translate("Status")}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-medium text-muted-foreground uppercase">{formData.isActive ? translate("Active") : translate("Disabled")}</span>
+              <Switch 
+                checked={formData.isActive} 
+                onCheckedChange={(val) => setFormData({ ...formData, isActive: val })}
+                className="scale-[0.8] data-[state=checked]:bg-primary"
+              />
+            </div>
           </div>
 
-          <div className="grid gap-2">
-            <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Routing Priority</Label>
-            <Input type="number" value={formData.priority} onChange={e => setFormData({ ...formData, priority: parseInt(e.target.value) || 1 })} />
+          <div className="flex flex-col gap-1.5">
+            <Label className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground opacity-60">
+              {translate("Identifier")}
+            </Label>
+            <Input 
+              value={formData.name} 
+              onChange={e => setFormData({ ...formData, name: e.target.value })} 
+              placeholder={isOAuth ? "Account Name" : "Credential Label"} 
+              className="rounded-none border-border/50 bg-muted/5 h-9 text-xs focus-visible:ring-0 focus-visible:border-primary/50 transition-colors"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground opacity-60">
+                {translate("Routing Priority")}
+              </Label>
+              <Input 
+                type="number" 
+                value={formData.priority} 
+                onChange={e => setFormData({ ...formData, priority: parseInt(e.target.value) || 1 })} 
+                className="rounded-none border-border/50 bg-muted/5 h-9 text-xs tabular-nums focus-visible:ring-0 focus-visible:border-primary/50 transition-colors"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground opacity-60">
+                {translate("Proxy Pool")}
+              </Label>
+              <Select
+                value={formData.proxyPoolId}
+                onValueChange={(v) => setFormData({ ...formData, proxyPoolId: v })}
+              >
+                <SelectTrigger className="w-full rounded-none border-border/50 bg-muted/5 h-9 text-xs focus:ring-0 focus:border-primary/50">
+                  <SelectValue placeholder="None"/>
+                </SelectTrigger>
+                <SelectContent className="rounded-none border-border/50">
+                  {proxyOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value} className="rounded-none text-xs focus:bg-muted/50">
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {!isOAuth && (
-            <div className="space-y-2">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Access Token</Label>
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground opacity-60">
+                {translate("Access Token")}
+              </Label>
               <div className="flex gap-2">
-                <Input type="password" value={formData.apiKey} onChange={e => setFormData({ ...formData, apiKey: e.target.value })} placeholder="Update key..." className="flex-1" />
-                <Button variant="outline" size="sm" onClick={handleValidate} disabled={!formData.apiKey || validating} className="h-9 px-4 text-[10px] font-bold uppercase">
-                  {validating ? <RefreshCw className="size-3 animate-spin" /> : "Verify"}
+                <Input 
+                  type="password" 
+                  value={formData.apiKey} 
+                  onChange={e => setFormData({ ...formData, apiKey: e.target.value })} 
+                  placeholder={translate("Update key...")} 
+                  className="flex-1 rounded-none border-border/50 bg-muted/5 h-9 text-xs focus-visible:ring-0 focus-visible:border-primary/50 transition-colors" 
+                />
+                <Button 
+                  type="button"
+                  variant="secondary" 
+                  size="sm" 
+                  onClick={handleValidate} 
+                  disabled={!formData.apiKey || validating} 
+                  className="rounded-none px-4 font-semibold h-9"
+                >
+                  {validating ? <Spinner className="size-4" /> : translate("Verify")}
                 </Button>
               </div>
               {validationResult && (
-                <div className={cn("text-[9px] font-bold uppercase tracking-widest flex items-center gap-1", validationResult === 'success' ? "text-emerald-500" : "text-destructive")}>
-                   {validationResult === 'success' ? <CheckCircle2 className="size-3" /> : <AlertCircle className="size-3" />}
-                   {validationResult === 'success' ? "Token Validated" : "Validation Failed"}
+                <div className={cn("text-[10px] font-semibold uppercase tracking-wider flex items-center gap-1.5 mt-1", validationResult === 'success' ? "text-primary" : "text-destructive")}>
+                   {validationResult === 'success' ? <CheckCircle className="size-4" weight="bold" /> : <WarningCircle className="size-4" weight="bold" />}
+                   {validationResult === 'success' ? translate("Token Validated") : translate("Validation Failed")}
                 </div>
               )}
             </div>
           )}
 
           {!isCompatible && (
-            <div className="pt-2 border-t flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">System Health Check</span>
+            <div className="pt-4 border-t border-border/50 flex items-center justify-between mt-2">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="size-4 text-muted-foreground opacity-60" weight="bold" />
+                <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground opacity-60">
+                  {translate("System Health")}
+                </span>
+              </div>
               <div className="flex items-center gap-2">
                 {testResult && (
-                  <Badge variant={testResult === 'success' ? 'secondary' : 'destructive'} className="h-5 text-[8px] font-black border-none px-2 uppercase">
-                    {testResult === 'success' ? 'Link OK' : 'LINK FAIL'}
+                  <Badge 
+                    variant={testResult === 'success' ? 'secondary' : 'destructive'} 
+                    className="rounded-none h-5 text-[9px] font-bold border-none px-2 uppercase tracking-wider tabular-nums"
+                  >
+                    {testResult === 'success' ? translate('Link OK') : translate('Link FAIL')}
                   </Badge>
                 )}
-                <Button variant="ghost" size="sm" onClick={handleTest} disabled={testing} className="h-8 text-[10px] font-bold uppercase">
-                  {testing ? <RefreshCw className="size-3 animate-spin" /> : <Activity className="size-3 mr-1" />} Test
+                <Button 
+                  type="button"
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handleTest} 
+                  disabled={testing} 
+                  className="rounded-none font-semibold h-8 px-3 hover:bg-muted/50"
+                >
+                  {testing ? <Spinner className="size-4" /> : <><Pulse className="size-4 mr-1.5" weight="bold" /> {translate("Test")}</>}
                 </Button>
               </div>
             </div>
           )}
         </div>
 
-        <DialogFooter className="gap-2 sm:gap-0">
-          <Button variant="ghost" className="font-bold text-[10px] uppercase tracking-widest" onClick={onClose}>Cancel</Button>
-          <Button className="font-bold text-[10px] uppercase tracking-widest px-8" onClick={handleSubmit} disabled={saving}>
-            {saving ? <RefreshCw className="size-3 mr-2 animate-spin" /> : <Save className="size-3 mr-2" />} Save Changes
+        <DialogFooter className="gap-2 sm:gap-2 mt-6">
+          <Button 
+            type="button"
+            variant="outline" 
+            className="flex-1 rounded-none h-10 text-[10px] font-bold uppercase tracking-wider border-border/50 hover:bg-muted/30" 
+            onClick={onClose}
+          >
+            {translate("Cancel")}
+          </Button>
+          <Button 
+            type="button"
+            className="flex-1 rounded-none h-10 text-[10px] font-bold uppercase tracking-wider shadow-none" 
+            onClick={handleSubmit} 
+            disabled={saving}
+          >
+            {saving ? <Spinner className="size-4" /> : <><FloppyDisk className="size-4 mr-2" weight="bold" data-icon="inline-start" /> {translate("Save Changes")}</>}
           </Button>
         </DialogFooter>
       </DialogContent>
