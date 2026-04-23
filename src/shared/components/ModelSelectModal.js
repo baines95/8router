@@ -133,8 +133,7 @@ export default function ModelSelectModal({ isOpen, onClose, onSelect, selectedMo
                        <button key={m.id} onClick={() => { onSelect(m); onClose(); }} className={cn("px-3 py-1.5 rounded-full text-xs font-bold border transition-all flex items-center gap-2", selectedModel === m.value ? "bg-primary text-primary-foreground border-primary" : "bg-background border-border hover:border-primary/30")}>
                           {m.isPlaceholder && <Edit2 className="size-3 opacity-50" />}
                           {m.name}
-                          {m.isCustom && <Badge variant="outline" className="h-3.5 px-1 text-[7px] border-primary/20 text-primary">CUSTOM</Badge>}
-                          {selectedModel === m.value && <Check className="size-3" />}
+                          {m.isCustom && <Badge variant="outline" className="h-3.5 px-1 text-[10px] border-primary/20 text-primary">CUSTOM</Badge>}                          {selectedModel === m.value && <Check className="size-3" />}
                        </button>
                     ))}
                  </div>

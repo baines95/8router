@@ -11,7 +11,7 @@ import {
  Database, 
  ArrowUp, 
  ArrowDown, 
- ChartLineUp as Activity,
+ ChartLineUp as Pulse,
  ClockCounterClockwise as History,
  BracketsCurly as FileJson,
  Translate as Languages,

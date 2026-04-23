@@ -15,8 +15,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import crypto from "node:crypto";
-import { PROVIDERS } from "../../open-sse/config/providers.js";
-import { ANTIGRAVITY_HEADERS, INTERNAL_REQUEST_HEADER } from "../../open-sse/config/appConstants.js";
+import { PROVIDERS } from "../../src/lib/open-sse/config/providers.js";
+import { ANTIGRAVITY_HEADERS, INTERNAL_REQUEST_HEADER } from "../../src/lib/open-sse/config/appConstants.js";
 
 const ENABLE = process.env.AG_CACHE_TEST === "1";
 const DB_PATH = path.join(os.homedir(), ".8router", "db.json");

@@ -12,7 +12,7 @@ import {
  RefreshCw, 
  Edit2, 
  Trash2, 
- Activity,
+ Pulse,
  Timer,
  ShieldCheck,
  AlertCircle

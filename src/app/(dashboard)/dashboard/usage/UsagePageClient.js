@@ -3,7 +3,7 @@
 import { Suspense, useState, useEffect, useMemo, useCallback } from"react";
 import { useSearchParams, useRouter } from"next/navigation";
 import { 
- ChartLineUp as Activity, 
+ ChartLineUp as Pulse, 
  ChartBar as BarChart3, 
  Clock, 
  Cpu, 
@@ -62,7 +62,7 @@ export default function UsagePage() {
  <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-border/50">
  <div className="space-y-1">
  <div className="flex items-center gap-2 text-muted-foreground font-medium text-xs uppercase tracking-tight">
- <Activity className="size-4" weight="bold"/>
+ <Pulse className="size-4" weight="bold"/>
  Giám sát
  </div>
  <h1 className="text-3xl font-medium tracking-tight">Usage</h1>
@@ -232,7 +232,7 @@ function UsageDashboard() {
  <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
  <KPIItem label="Requests"value={fmt(stats?.totalRequests)} icon={Zap} />
  <KPIItem label="Estimated Cost"value={`$${(stats?.totalCost || 0).toFixed(4)}`} icon={Database} />
- <KPIItem label="Token Volume"value={fmt((stats?.totalPromptTokens || 0) + (stats?.totalCompletionTokens || 0))} icon={Activity} />
+ <KPIItem label="Token Volume"value={fmt((stats?.totalPromptTokens || 0) + (stats?.totalCompletionTokens || 0))} icon={Pulse} />
  <KPIItem label="Active Streams"value={stats?.activeRequests?.length || 0} icon={Network} />
  </div>
 
@@ -264,11 +264,11 @@ function UsageDashboard() {
  <CardHeader className="flex flex-row items-center justify-between px-3 py-2 border-b border-border/40 bg-muted/10 shrink-0">
  <div className="flex items-center gap-2">
  <History className="size-3.5 text-primary" weight="bold"/>
- <CardTitle className="text-xs font-semibold capitalize">Recent Activity</CardTitle>
+ <CardTitle className="text-xs font-semibold capitalize">Recent Pulse</CardTitle>
  </div>
  </CardHeader>
  <CardContent className="p-0 flex-1 min-h-0">
- <RecentActivityList requests={stats?.recentRequests || []} />
+ <RecentPulseList requests={stats?.recentRequests || []} />
  </CardContent>
  <CardFooter className="p-1 border-t border-border/40 shrink-0 bg-muted/5">
  <a 
@@ -384,11 +384,11 @@ function KPIItem({ label, value, icon: Icon }) {
   );
 }
 
-function RecentActivityList({ requests = [] }) {
+function RecentPulseList({ requests = [] }) {
  if (!requests.length) {
  return (
  <div className="flex h-full flex-col items-center justify-center p-8 text-center opacity-20">
- <Activity className="size-8 mb-2"/>
+ <Pulse className="size-8 mb-2"/>
  <p className="text-xs font-medium capitalize text-muted-foreground">Idle State</p>
  </div>
  );
@@ -480,10 +480,10 @@ function UsageTableContainer({ stats, tableView, sortBy, sortOrder, toggleSort, 
  };
 
  const COLUMNS = {
- model: [{ field:"rawModel", label:"Model"}, { field:"provider", label:"Provider"}, { field:"requests", label:"Requests", align:"right"}, { field:"lastUsed", label:"Activity", align:"right"}],
- account: [{ field:"accountName", label:"Account"}, { field:"rawModel", label:"Last Model"}, { field:"requests", label:"Requests", align:"right"}, { field:"lastUsed", label:"Activity", align:"right"}],
- apiKey: [{ field:"keyName", label:"Key"}, { field:"rawModel", label:"Last Model"}, { field:"requests", label:"Requests", align:"right"}, { field:"lastUsed", label:"Activity", align:"right"}],
- endpoint: [{ field:"endpoint", label:"Endpoint"}, { field:"rawModel", label:"Last Model"}, { field:"requests", label:"Requests", align:"right"}, { field:"lastUsed", label:"Activity", align:"right"}]
+ model: [{ field:"rawModel", label:"Model"}, { field:"provider", label:"Provider"}, { field:"requests", label:"Requests", align:"right"}, { field:"lastUsed", label:"Pulse", align:"right"}],
+ account: [{ field:"accountName", label:"Account"}, { field:"rawModel", label:"Last Model"}, { field:"requests", label:"Requests", align:"right"}, { field:"lastUsed", label:"Pulse", align:"right"}],
+ apiKey: [{ field:"keyName", label:"Key"}, { field:"rawModel", label:"Last Model"}, { field:"requests", label:"Requests", align:"right"}, { field:"lastUsed", label:"Pulse", align:"right"}],
+ endpoint: [{ field:"endpoint", label:"Endpoint"}, { field:"rawModel", label:"Last Model"}, { field:"requests", label:"Requests", align:"right"}, { field:"lastUsed", label:"Pulse", align:"right"}]
  };
 
  const viewToField = { model:"rawModel", account:"accountName", apiKey:"keyName", endpoint:"endpoint"};

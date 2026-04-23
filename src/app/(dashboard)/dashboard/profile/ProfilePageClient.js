@@ -9,7 +9,7 @@ import {
   Shield, 
   Signpost, 
   WifiHigh, 
-  Activity,
+  Pulse,
   Download,
   Upload
 } from "@phosphor-icons/react";
@@ -626,7 +626,7 @@ export default function ProfilePageClient({ initialData }) {
  <Card>
  <div className="flex items-center gap-3 mb-4">
  <div className="p-2 rounded-lg bg-muted/30 text-muted-foreground">
- <Activity className="size-5" weight="bold" />
+ <Pulse className="size-5" weight="bold" />
  </div>
  <h3 className="text-lg font-semibold">Observability</h3>
  </div>

@@ -65,50 +65,34 @@ Result: Never stop coding, minimal cost
 
 ## ⚡ Quick Start
 
-**1. Install globally:**
-
+### Option 1: Install via NPM (Easiest)
+Install globally and run from anywhere:
 ```bash
 npm install -g 8router
 8router
 ```
-
 🎉 Dashboard opens at `http://localhost:20128`
 
-**2. Connect a FREE provider (no signup needed):**
-
-Dashboard → Providers → Connect **Claude Code** or **Antigravity** → OAuth login → Done!
-
-**3. Use in your CLI tool:**
-
-```
-Claude Code/Codex/Gemini CLI/OpenClaw/Cursor/Cline Settings:
-  Endpoint: http://localhost:20128/v1
-  API Key: [copy from dashboard]
-  Model: if/kimi-k2-thinking
-```
-
-**That's it!** Start coding with FREE AI models.
-
-**Alternative: run from source (this repository):**
-
-This repository package is private (`8router-app`), so source/Docker execution is the expected local development path.
-
+### Option 2: Run from Source (For Developers)
 ```bash
-cp .env.example .env
+# 1. Clone and install
+git clone https://github.com/decolua/8router.git
+cd 8router
 npm install
-PORT=20128 NEXT_PUBLIC_BASE_URL=http://localhost:20128 npm run dev
-```
 
-Production mode:
-
-```bash
+# 2. Build and Link (Only once)
 npm run build
-PORT=20128 HOSTNAME=0.0.0.0 NEXT_PUBLIC_BASE_URL=http://localhost:20128 npm run start
+npm link
+
+# 3. Start
+8router
 ```
 
-Default URLs:
-- Dashboard: `http://localhost:20128/dashboard`
-- OpenAI-compatible API: `http://localhost:20128/v1`
+**Default URLs:**
+- 🖥️ **Dashboard**: `http://localhost:20128`
+- 🔌 **OpenAI API**: `http://localhost:20128/v1`
+
+**Note:** Your data (API keys, configs) is safely stored in `~/.8router`, so it persists even if you update or reinstall the package.
 
 ---
 

@@ -32,7 +32,7 @@ export default function CooldownTimer({ until }) {
   if (!remaining) return null;
 
   return (
-    <span className="flex items-center gap-1 text-[9px] text-muted-foreground font-medium tabular-nums uppercase tracking-tight">
+    <span className="flex items-center gap-1 text-[10px] text-muted-foreground font-medium tabular-nums uppercase tracking-tight">
       <HourglassLow className="size-3" weight="bold" />
       {remaining}
     </span>

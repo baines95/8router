@@ -14,7 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   History, 
   RefreshCw, 
-  Activity, 
+  Pulse, 
   Terminal,
   Info
 } from "lucide-react";
@@ -71,7 +71,7 @@ export default function RequestLogger() {
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-left font-mono text-[11px] leading-none whitespace-nowrap">
-              <thead className="bg-muted/50 border-b border-border text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">
+              <thead className="bg-muted/50 border-b border-border text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
                 <tr>
                   <th className="px-4 py-3">Timestamp</th>
                   <th className="px-4 py-3">Infrastructure Node</th>
@@ -101,7 +101,7 @@ export default function RequestLogger() {
                         <td className="px-4 py-2.5 text-muted-foreground opacity-60">{parts[0]}</td>
                         <td className="px-4 py-2.5 font-bold text-foreground">{parts[1]}</td>
                         <td className="px-4 py-2.5 text-center">
-                          <Badge variant="outline" className="h-4 text-[8px] font-black uppercase bg-muted/50 border-border text-muted-foreground">{parts[2]}</Badge>
+                          <Badge variant="outline" className="h-4 text-[10px] font-black uppercase bg-muted/50 border-border text-muted-foreground">{parts[2]}</Badge>
                         </td>
                         <td className="px-4 py-2.5 truncate max-w-[180px] text-muted-foreground" title={parts[3]}>{parts[3]}</td>
                         <td className="px-4 py-2.5 text-right font-bold text-primary opacity-80">{parts[4]}</td>
@@ -118,7 +118,7 @@ export default function RequestLogger() {
           </div>
         </CardContent>
       </Card>
-      <div className="flex items-center gap-2 px-2 text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground opacity-30">
+      <div className="flex items-center gap-2 px-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground opacity-30">
         <Info className="size-2.5" /> Persistent storage: application_data/log.txt
       </div>
     </div>

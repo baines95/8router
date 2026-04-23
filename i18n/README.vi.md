@@ -1258,7 +1258,7 @@ Tài liệu tham khảo kiến trúc đầy đủ: [`docs/ARCHITECTURE.md`](docs
 ## 📧 Hỗ trợ
 
 - **Website**: [8router.com](https://8router.com)
-- **GitHub**: [github.com/decolua/9](https://github.com/decolua/8router)
+- **GitHub**: [github.com/decolua/8router](https://github.com/decolua/8router)
 - **Issues**: [github.com/decolua/8router/issues](https://github.com/decolua/8router/issues)
 
 ---

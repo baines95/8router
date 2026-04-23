@@ -10,7 +10,7 @@ import {
   Trash, 
   PencilSimple as Edit2, 
   Globe, 
-  Activity,
+  Pulse,
   WarningCircle as AlertCircle,
   CheckCircle,
   Sliders as Settings2,
@@ -239,7 +239,7 @@ export default function ProxyPoolsPageClient({ initialData }) {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard label="Tổng số Pool" value={proxyPools.length} icon={Server} />
         <StatCard label="Hoạt động" value={proxyPools.filter(p => p.isActive).length} icon={Zap} color="text-primary" />
-        <StatCard label="Nút đã liên kết" value={proxyPools.reduce((acc, p) => acc + (p.boundConnectionCount || 0), 0)} icon={Activity} color="text-primary" />
+        <StatCard label="Nút đã liên kết" value={proxyPools.reduce((acc, p) => acc + (p.boundConnectionCount || 0), 0)} icon={Pulse} color="text-primary" />
       </div>
 
       {/* Main List */}

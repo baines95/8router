@@ -1,8 +1,16 @@
 {
-  "name": "8router-app",
+  "name": "8router",
   "version": "0.3.96",
-  "description": "8Router web dashboard",
-  "private": true,
+  "description": "8Router - Free AI Router with smart fallback",
+  "author": "8Router Team",
+  "license": "MIT",
+  "private": false,
+  "files": [
+    "bin",
+    "public",
+    ".next/standalone",
+    ".next/static"
+  ],
   "bin": {
     "8router": "./bin/8router.js"
   },

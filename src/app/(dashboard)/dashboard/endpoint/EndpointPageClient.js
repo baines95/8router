@@ -53,7 +53,7 @@ import {
   Code, 
   Lock,
   ArrowSquareOut,
-  Activity,
+  Pulse,
   Lightning,
   TerminalWindow,
   HardDrives,
@@ -198,7 +198,7 @@ export default function APIPageClient({ initialData }) {
 
   <div className="flex items-center gap-2">
   <Badge variant="outline"className="bg-primary/10 text-primary border-primary/20 font-medium h-6 px-2">
-  <Activity className="size-3 mr-1.5" weight="bold" /> GATEWAY ACTIVE
+  <Pulse className="size-3 mr-1.5" weight="bold" /> GATEWAY ACTIVE
   </Badge>
   </div>
   </header>

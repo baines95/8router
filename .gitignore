@@ -42,7 +42,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-.bin/*
+.# bin/
+!bin/8router.js
 data/
 logs/*
 source/*

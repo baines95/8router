@@ -39,7 +39,7 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
-      <body className={`${jetbrainsMono.variable} font-mono antialiased`}>
+      <body className={`${jetbrainsMono.variable} font-mono text-sm antialiased`}>
         <ThemeProvider>
           <RuntimeI18nProvider>
             <TooltipProvider>

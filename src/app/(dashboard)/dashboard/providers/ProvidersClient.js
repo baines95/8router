@@ -17,7 +17,7 @@ import {
  Cloud, 
  Lightning as Zap, 
  Globe, 
- Activity, 
+ Pulse, 
  Code as SearchCode,
  ArrowRight,
  DotsThreeVertical as MoreVertical,
@@ -282,12 +282,12 @@ export default function ProvidersPage() {
  {/* Page Header */}
  <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-border/50">
  <div className="space-y-0.5">
- <div className="flex items-center gap-1.5 text-muted-foreground font-medium text-[10px] uppercase tracking-wider">
+ <div className="flex items-center gap-1.5 text-muted-foreground font-medium text-xs uppercase tracking-wider">
  <ServerIcon className="size-3.5" weight="bold"/>
  Dịch vụ chính
  </div>
- <h1 className="text-xl font-semibold tracking-tight">Providers</h1>
- <p className="text-xs text-muted-foreground font-medium">
+ <h1 className="text-2xl font-semibold tracking-tight">Providers</h1>
+ <p className="text-sm text-muted-foreground font-medium">
  {translate("Manage your model providers, API credentials, and connectivity status across the network.")}
  </p>
  </div>
@@ -296,14 +296,14 @@ export default function ProvidersPage() {
  <Button
  variant="outline"
  size="sm"
- className="h-7 text-[10px] font-bold uppercase tracking-wider px-2.5"
+ className="h-8 text-xs font-bold uppercase tracking-wider px-3"
  onClick={() => handleBatchTest("all")}
  disabled={!!testingMode}
  >
  {testingMode ==="all"?(
- <RefreshCw className="size-3 mr-1.5 animate-spin" weight="bold"/>
+ <RefreshCw className="size-3.5 mr-1.5 animate-spin" weight="bold"/>
  ):(
- <Play className="size-3 mr-1.5" weight="bold"/>
+ <Play className="size-3.5 mr-1.5" weight="bold"/>
  )}
  Batch Test
  </Button>
@@ -318,25 +318,25 @@ export default function ProvidersPage() {
  key={cat.id}
  onClick={() => setActiveCategory(cat.id)}
  className={cn(
- "flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all shrink-0",
+ "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all shrink-0",
  activeCategory === cat.id
  ? "bg-background text-foreground shadow-sm border border-border/50"
  : "text-muted-foreground hover:text-foreground"
  )}
  >
- <cat.icon className="size-3" weight={activeCategory === cat.id ?"fill":"bold"}/>
+ <cat.icon className="size-3.5" weight={activeCategory === cat.id ?"fill":"bold"}/>
  {cat.label}
  </button>
  ))}
  </div>
 
  <div className="relative w-full md:w-64 group">
- <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3 text-muted-foreground group-focus-within:text-primary transition-colors" weight="bold"/>
+ <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-primary transition-colors" weight="bold"/>
  <Input
  placeholder="Search providers..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
- className="pl-8 h-7 text-[10px] bg-muted/10 border-border/40 focus:bg-background transition-all"
+ className="pl-9 h-8 text-sm bg-muted/10 border-border/40 focus:bg-background transition-all"
  />
  </div>
  </div>
@@ -473,9 +473,9 @@ function NewProviderCard({ provider, stats, testingMode, onToggle, onTest }) {
  "group relative transition-all duration-200 border-border/50 bg-transparent hover:bg-muted/10 shadow-none rounded-lg overflow-hidden h-fit p-0",
  allDisabled && "opacity-50 grayscale"
  )}>
- <CardHeader className="flex flex-row items-center justify-between space-y-0 px-2.5 py-1.5 border-b border-border/50">
- <div className="flex items-center gap-2 min-w-0">
- <div className="size-7 rounded border border-border/40 bg-background flex items-center justify-center p-1 shrink-0 group-hover:border-primary/30 transition-colors">
+ <CardHeader className="flex flex-row items-center justify-between space-y-0 px-3 py-2 border-b border-border/50">
+ <div className="flex items-center gap-2.5 min-w-0">
+ <div className="size-8 rounded border border-border/40 bg-background flex items-center justify-center p-1.5 shrink-0 group-hover:border-primary/30 transition-colors">
  <img 
  src={getIconPath()} 
  alt={provider.name} 
@@ -488,15 +488,15 @@ function NewProviderCard({ provider, stats, testingMode, onToggle, onTest }) {
  e.target.nextSibling.style.display = 'flex';
  }}
  />
- <div className="hidden size-full items-center justify-center text-[7px] font-bold uppercase tracking-tight" style={{ color: provider.color }}>
+ <div className="hidden size-full items-center justify-center text-[10px] font-bold uppercase tracking-tight" style={{ color: provider.color }}>
  {provider.textIcon || provider.id.slice(0, 2).toUpperCase()}
  </div>
  </div>
  <div className="min-w-0 flex flex-col">
- <CardTitle className="text-xs font-semibold tracking-tight text-foreground group-hover:text-primary transition-colors truncate">
+ <CardTitle className="text-sm font-semibold tracking-tight text-foreground group-hover:text-primary transition-colors truncate">
  {provider.name}
  </CardTitle>
- <CardDescription className="text-[9px] text-muted-foreground/60 font-medium tracking-wide">
+ <CardDescription className="text-[10px] text-muted-foreground/60 font-medium tracking-wide uppercase">
  {provider.authType}
  </CardDescription>
  </div>
@@ -506,15 +506,15 @@ function NewProviderCard({ provider, stats, testingMode, onToggle, onTest }) {
  <Switch 
  checked={!allDisabled} 
  onCheckedChange={onToggle} 
- className="scale-[0.55] data-[state=checked]:bg-primary transition-all shrink-0 -mr-2"
+ className="scale-[0.6] data-[state=checked]:bg-primary transition-all shrink-0 -mr-2"
  />
  )}
  </CardHeader>
 
- <CardContent className="px-2.5 py-1.5 flex flex-col gap-1.5">
+ <CardContent className="px-3 py-2 flex flex-col gap-2">
  {/* Info & Actions Row */}
  <div className="flex items-center justify-between">
- <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground/80 font-medium tracking-wide">
+ <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/80 font-medium tracking-wide">
  {connected > 0 && !allDisabled && (
  <span className="text-primary/90 font-semibold tabular-nums">{connected} {translate("nodes")}</span>
  )}
@@ -526,33 +526,33 @@ function NewProviderCard({ provider, stats, testingMode, onToggle, onTest }) {
  )}
  </div>
 
- <div className="flex items-center gap-1">
+ <div className="flex items-center gap-1.5">
  {!allDisabled && total > 0 && (
  <Button
  variant="ghost"
  size="icon"
- className="size-5 rounded-full hover:bg-primary/10 hover:text-primary transition-all text-muted-foreground/50"
+ className="size-6 rounded-full hover:bg-primary/10 hover:text-primary transition-all text-muted-foreground/50"
  onClick={(e) => { e.preventDefault(); onTest(); }}
  disabled={isTesting}
  >
- {isTesting ? <RefreshCw className="size-2.5 animate-spin"/> : <Play className="size-2.5" weight="fill" />}
+ {isTesting ? <RefreshCw className="size-3 animate-spin"/> : <Play className="size-3" weight="fill" />}
  </Button>
  )}
  <Link 
  href={`/dashboard/providers/${provider.id}`} 
- className="text-[9px] font-semibold text-muted-foreground/40 hover:text-primary transition-colors tracking-wider px-1 py-0.5 inline-flex items-center gap-0.5"
+ className="text-[10px] font-semibold text-muted-foreground/40 hover:text-primary transition-colors tracking-wider px-1.5 py-0.5 inline-flex items-center gap-0.5"
  >
  {translate("Setup")}
- <ArrowRight className="size-2" weight="bold" />
+ <ArrowRight className="size-2.5" weight="bold" />
  </Link>
  </div>
  </div>
 
  {/* Error Row (if any) */}
  {!allDisabled && error > 0 && (
- <div className="flex items-center gap-1 pt-0.5">
- <div className="size-1 rounded-full bg-destructive animate-pulse"/>
- <span className="text-[9px] font-semibold text-destructive tracking-wider truncate">{errorCode || error} error</span>
+ <div className="flex items-center gap-1.5 pt-0.5">
+ <div className="size-1.5 rounded-full bg-destructive animate-pulse"/>
+ <span className="text-[10px] font-semibold text-destructive tracking-wider truncate">{errorCode || error} error</span>
  </div>
  )}
  </CardContent>
@@ -562,13 +562,13 @@ function NewProviderCard({ provider, stats, testingMode, onToggle, onTest }) {
 
 function StatCard({ label, value, icon: Icon, color }) {
  return (
- <Card className="flex items-center gap-2.5 px-2.5 py-1.5 min-w-[90px] border-border/40 shadow-none rounded-lg bg-muted/5">
- <div className={cn("p-1.5 rounded-md bg-muted/20", color.replace('text-', 'bg-').replace('destructive', 'destructive/10').replace('primary', 'primary/10'))}>
- <Icon className={cn("size-3", color)} weight="bold" />
+ <Card className="flex items-center gap-3 px-3 py-2 min-w-[100px] border-border/40 shadow-none rounded-lg bg-muted/5">
+ <div className={cn("p-2 rounded-md bg-muted/20", color.replace('text-', 'bg-').replace('destructive', 'destructive/10').replace('primary', 'primary/10'))}>
+ <Icon className={cn("size-4", color)} weight="bold" />
  </div>
  <div className="flex flex-col">
- <span className="text-[9px] font-medium text-muted-foreground tracking-wide leading-none mb-0.5">{translate(label)}</span>
- <span className="text-sm font-semibold tabular-nums leading-none tracking-tight">{value}</span>
+ <span className="text-[10px] font-medium text-muted-foreground tracking-wide uppercase leading-none mb-1">{translate(label)}</span>
+ <span className="text-base font-semibold tabular-nums leading-none tracking-tight">{value}</span>
  </div>
  </Card>
  );
@@ -781,14 +781,14 @@ function ProviderTestResultsView({ results }) {
  return <div className="py-6 text-center text-sm text-destructive">{results.error}</div>;
  }
  return (
- <div className="space-y-1 pt-2">
+ <div className="space-y-1.5 pt-2">
  {results.results?.map((r, i) => (
- <div key={i} className="flex items-center justify-between p-2 rounded-lg border border-border/40 bg-muted/5 text-xs">
+ <div key={i} className="flex items-center justify-between p-2.5 rounded-lg border border-border/40 bg-muted/5 text-xs">
  <div className="flex flex-col gap-0.5">
  <span className="font-medium text-foreground">{r.connectionName}</span>
- <span className="text-muted-foreground/60 uppercase text-[10px] tracking-wider">{r.provider}</span>
+ <span className="text-muted-foreground/60 uppercase text-xs tracking-wider">{r.provider}</span>
  </div>
- <Badge variant={r.valid ? "secondary" : "destructive"} className="text-[10px] h-5 px-1.5 border-none bg-primary/10 text-primary dark:text-primary font-bold">
+ <Badge variant={r.valid ? "secondary" : "destructive"} className="text-xs h-5 px-1.5 border-none bg-primary/10 text-primary dark:text-primary font-bold">
  {r.valid ? "SUCCESS" : "FAILED"}
  </Badge>
  </div>

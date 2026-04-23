@@ -110,7 +110,7 @@ export default function LoginPage() {
           </CardContent>
         </Card>
         
-        <p className="text-center text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground opacity-30">Encrypted Infrastructure Node • v0.3.96</p>
+        <p className="text-center text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground opacity-30">Encrypted Infrastructure Node • v0.3.96</p>
       </div>
     </div>
   );

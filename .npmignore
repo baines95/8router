@@ -1,31 +1,24 @@
-# Database files - NEVER publish
-data/
-**/data/
-**/db.json
-
-# Development
+# Những thứ KHÔNG gửi lên NPM
 src/
-docs/
-test/
-agents/
 scripts/
-worker/
-shared-sse/
-copilot-api/
-CLIProxyAPI/
-
-# Config files
+tests/
+cloud/
+tester/
+.github/
+.vscode/
+.git/
+node_modules/
 *.md
 !README.md
-.gitignore
 .env*
-jsconfig.json
+Dockerfile
+DOCKER.md
+start.sh
+docker-compose.yml
 eslint.config.mjs
 postcss.config.mjs
 next.config.mjs
-tsconfig.json
+jsconfig.json
 
-# Build artifacts that shouldn't be published
-.next/cache/
-.next/standalone/data/
-
+# Những thứ CẦN giữ lại trên NPM (đã build sẵn)
+# .next/standalone và .next/static sẽ được bao gồm nhờ trường "files" trong package.json

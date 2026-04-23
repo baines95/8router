@@ -15,7 +15,7 @@ export default defineConfig({
   resolve: {
     alias: {
       // Resolve open-sse/* imports to the actual local package
-      "open-sse": resolve(__dirname, "../open-sse"),
+      "open-sse": resolve(__dirname, "../src/lib/open-sse"),
     },
   },
 });

@@ -237,7 +237,7 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, on
                 {testResult && (
                   <Badge 
                     variant={testResult === 'success' ? 'secondary' : 'destructive'} 
-                    className="rounded-none h-5 text-[9px] font-bold border-none px-2 uppercase tracking-wider tabular-nums"
+                    className="rounded-none h-5 text-[10px] font-bold border-none px-2 uppercase tracking-wider tabular-nums"
                   >
                     {testResult === 'success' ? translate('Link OK') : translate('Link FAIL')}
                   </Badge>
