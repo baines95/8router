@@ -20,6 +20,7 @@ product
 # production
 /build
 .idea/
+.worktrees/
 
 # misc
 .DS_Store
