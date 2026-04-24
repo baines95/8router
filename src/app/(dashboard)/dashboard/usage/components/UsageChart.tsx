@@ -1,17 +1,20 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import {
- AreaChart,
- Area,
- XAxis,
- YAxis,
- CartesianGrid,
- Tooltip,
- ResponsiveContainer,
-} from "recharts";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 import { translate } from "@/i18n/runtime";
+
+const chartConfig = {
+  tokens: {
+    label: "Tokens",
+    color: "hsl(var(--primary))",
+  },
+  cost: {
+    label: "Cost",
+    color: "hsl(var(--destructive))",
+  },
+} satisfies ChartConfig;
 
 const fmtTokens = (n: number) => {
  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
@@ -29,12 +32,12 @@ interface ChartData {
 
 interface UsageChartProps {
   period?: string;
+  viewMode?: "tokens" | "cost";
 }
 
-export default function UsageChart({ period = "7d" }: UsageChartProps) {
+export default function UsageChart({ period = "7d", viewMode = "tokens" }: UsageChartProps) {
  const [data, setData] = useState<ChartData[]>([]);
  const [loading, setLoading] = useState(true);
- const [viewMode, setViewMode] = useState<"tokens" | "cost">("tokens");
 
  const fetchData = useCallback(async () => {
  setLoading(true);
@@ -57,107 +60,51 @@ export default function UsageChart({ period = "7d" }: UsageChartProps) {
 
  const hasData = data.some((d) => d.tokens > 0 || d.cost > 0);
 
- return (
- <div className="space-y-4">
- <div className="flex items-center justify-between">
- <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
- {translate("Performance Trend")}
- </div>
- <ToggleGroup 
- value={viewMode as any} 
- onValueChange={(v: any) => { 
-   const val = Array.isArray(v) ? v[0] : v;
-   if (val === "tokens" || val === "cost") setViewMode(val); 
- }}
- size="sm"
- className="bg-muted/30 p-0.5 border border-border/40 rounded-none h-auto"
- >
- <ToggleGroupItem 
- value="tokens" 
- className="h-6 px-3 rounded-none text-[10px] font-bold uppercase tracking-widest data-[state=on]:bg-background data-[state=on]:shadow-none data-[state=on]:text-primary"
- >
- Tokens
- </ToggleGroupItem>
- <ToggleGroupItem 
- value="cost" 
- className="h-6 px-3 rounded-none text-[10px] font-bold uppercase tracking-widest data-[state=on]:bg-background data-[state=on]:shadow-none data-[state=on]:text-primary"
- >
- Cost
- </ToggleGroupItem>
- </ToggleGroup>
- </div>
-
- <div className="pt-2">
- {loading ? (
- <div className="h-48 flex items-center justify-center text-muted-foreground text-xs font-bold uppercase tracking-widest animate-pulse italic">Loading metrics...</div>
- ) : !hasData ? (
- <div className="h-48 flex items-center justify-center text-muted-foreground text-xs font-bold uppercase tracking-widest opacity-30 italic">{translate("No data available for this period")}</div>
- ) : (
- <ResponsiveContainer width="100%" height={200}>
- <AreaChart data={data} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
- <defs>
- <linearGradient id="gradTokens" x1="0" y1="0" x2="0" y2="1">
- <stop offset="5%" stopColor="#6366f1" stopOpacity={0.1} />
- <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
- </linearGradient>
- <linearGradient id="gradCost" x1="0" y1="0" x2="0" y2="1">
- <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.1} />
- <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
- </linearGradient>
- </defs>
- <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" strokeOpacity={0.5} />
- <XAxis
- dataKey="label"
- tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))", fontWeight: "bold" }}
- tickLine={false}
- axisLine={false}
- interval="preserveStartEnd"
- />
- <YAxis
- tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))", fontWeight: "bold" }}
- tickLine={false}
- axisLine={false}
- tickFormatter={viewMode === "tokens" ? fmtTokens : fmtCost}
- />
- <Tooltip
- contentStyle={{
- backgroundColor: "hsl(var(--background))",
- border: "1px solid hsl(var(--border))",
- borderRadius: "0px",
- fontSize: "10px",
- fontWeight: "bold",
- boxShadow: "none",
- }}
- itemStyle={{ padding: "0" }}
- formatter={(value: any, name: any) =>
- name === "tokens" ? [fmtTokens(value as number), "Tokens"] : [fmtCost(value as number), "Cost"]
+ if (loading) {
+   return (
+     <div className="h-[250px] flex items-center justify-center text-sm text-muted-foreground animate-pulse">
+       {translate("Loading metrics...")}
+     </div>
+   );
  }
- />
- {viewMode === "tokens" ? (
- <Area
- type="monotone"
- dataKey="tokens"
- stroke="#6366f1"
- strokeWidth={2}
- fill="url(#gradTokens)"
- dot={false}
- activeDot={{ r: 4, strokeWidth: 0 }}
- />
- ) : (
- <Area
- type="monotone"
- dataKey="cost"
- stroke="#f59e0b"
- strokeWidth={2}
- fill="url(#gradCost)"
- dot={false}
- activeDot={{ r: 4, strokeWidth: 0 }}
- />
- )}
- </AreaChart>
- </ResponsiveContainer>
- )}
- </div>
- </div>
+
+ if (!hasData) {
+   return (
+     <div className="h-[250px] flex items-center justify-center text-sm text-muted-foreground">
+       {translate("No data available")}
+     </div>
+   );
+ }
+
+ return (
+   <ChartContainer config={chartConfig} className="h-[250px] w-full">
+     <BarChart data={data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+       <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
+       <XAxis
+         dataKey="label"
+         tickLine={false}
+         tickMargin={10}
+         axisLine={false}
+         tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+       />
+       <YAxis
+         tickLine={false}
+         axisLine={false}
+         tickMargin={10}
+         tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+         tickFormatter={viewMode === "tokens" ? fmtTokens : fmtCost}
+       />
+       <ChartTooltip 
+         cursor={{ fill: "hsl(var(--muted))", opacity: 0.4 }} 
+         content={<ChartTooltipContent hideLabel indicator="dot" />} 
+       />
+       <Bar 
+         dataKey={viewMode} 
+         fill={`var(--color-${viewMode})`}
+         radius={[2, 2, 0, 0]}
+         maxBarSize={40}
+       />
+     </BarChart>
+   </ChartContainer>
  );
 }
