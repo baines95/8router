@@ -3,6 +3,7 @@
 import { DEFAULT_LOCALE, LOCALE_COOKIE, normalizeLocale } from "./config";
 
 let translationMap: Record<string, string> = {};
+let keyedMessages: Record<string, string> = {};
 let currentLocale = DEFAULT_LOCALE;
 let reloadCallbacks: Array<() => void> = [];
 
@@ -44,6 +45,14 @@ export function translate(text: string | null | undefined): string {
 // Get current locale - exported for use in components
 export function getCurrentLocale() {
   return currentLocale;
+}
+
+export function setKeyedMessages(messages: Record<string, string>) {
+  keyedMessages = messages;
+}
+
+export function tKey(key: string, fallback: string) {
+  return keyedMessages[key] || fallback;
 }
 
 // Register callback for locale changes

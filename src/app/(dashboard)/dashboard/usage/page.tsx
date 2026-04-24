@@ -1,5 +1,10 @@
-import UsagePageClient from"./UsagePageClient";
+import { Suspense } from "react";
+import UsagePageClient from "./UsagePageClient";
 
 export default function UsagePage() {
- return <UsagePageClient />;
+  return (
+    <Suspense fallback={null}>
+      <UsagePageClient />
+    </Suspense>
+  );
 }
