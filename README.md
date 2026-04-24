@@ -1113,6 +1113,7 @@ Notes:
 
 ## 🛠️ Tech Stack
 
+- **Language**: 100% TypeScript
 - **Runtime**: Node.js 20+
 - **Framework**: Next.js 16
 - **UI**: React 19 + Tailwind CSS 4
