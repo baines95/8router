@@ -145,12 +145,12 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
           {navData.navMain.map((group) => (
             <SidebarGroup key={group.title}>
               <SidebarGroupLabel className="text-xs text-muted-foreground px-4">{translate(group.title)}</SidebarGroupLabel>
-              <SidebarMenu>
+              <SidebarMenu className="gap-0.5">
                 {group.items.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton isActive={isActive(item.url)} tooltip={translate(item.title)} render={
                       <Link href={item.url} className="text-xs font-medium">
-                        <item.icon data-icon="inline-start" weight={isActive(item.url) ? "fill" : "bold"} className={cn("size-4", isActive(item.url) ? "text-primary" : "text-muted-foreground")} />
+                        <item.icon data-icon="inline-start" weight="bold" className={cn("size-4", isActive(item.url) ? "text-primary" : "text-muted-foreground")} />
                         <span>{translate(item.title)}</span>
                       </Link>
                     } />
@@ -163,7 +163,7 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
 
           <SidebarGroup>
             <SidebarGroupLabel className="text-xs text-muted-foreground px-4">{translate("System")}</SidebarGroupLabel>
-            <SidebarMenu>
+            <SidebarMenu className="gap-0.5">
               <Collapsible defaultOpen={pathname.includes("media-providers")} className="group/collapsible" render={
                 <SidebarMenuItem>
                   <CollapsibleTrigger render={
@@ -192,8 +192,8 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
               {navData.system.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton isActive={isActive(item.url)} tooltip={item.title} render={
-                    <Link href={item.url} className="text-sm font-medium">
-                      <item.icon data-icon="inline-start" weight={isActive(item.url) ? "fill" : "bold"} className={cn("size-4", isActive(item.url) ? "text-primary" : "text-muted-foreground")} />
+                    <Link href={item.url} className="text-xs font-medium">
+                      <item.icon data-icon="inline-start" weight="bold" className={cn("size-4", isActive(item.url) ? "text-primary" : "text-muted-foreground")} />
                       <span>{item.title}</span>
                     </Link>
                   } />
