@@ -103,7 +103,7 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, on
   const isCompatible = connection ? (isOpenAICompatibleProvider(connection.provider) || isAnthropicCompatibleProvider(connection.provider)) : false;
 
   const proxyOptions = [
-    { value: NONE_PROXY_POOL_VALUE, label: "None" },
+    { value: NONE_PROXY_POOL_VALUE, label: translate("None") },
     ...(proxyPools || []).map((pool) => ({ value: pool.id, label: pool.name })),
   ];
 
@@ -169,10 +169,10 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, on
           <div className="flex items-center justify-between p-3 bg-muted/5 border border-border/50 rounded-none">
             <div className="flex items-center gap-2">
               <Power className={cn("size-4", formData.isActive ? "text-primary" : "text-muted-foreground")} weight="bold" />
-              <span className="text-xs font-semibold uppercase tracking-wider">{translate("Status")}</span>
+              <span className="text-xs font-medium">{translate("Status")}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium text-muted-foreground uppercase">{formData.isActive ? translate("Active") : translate("Disabled")}</span>
+              <span className="text-xs text-muted-foreground">{formData.isActive ? translate("Active") : translate("Disabled")}</span>
               <Switch 
                 checked={formData.isActive} 
                 onCheckedChange={(val) => setFormData({ ...formData, isActive: val })}
@@ -182,20 +182,20 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, on
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 px-1">
+            <Label className="px-1 text-xs text-muted-foreground">
               {translate("Identifier")}
             </Label>
             <Input 
               value={formData.name} 
               onChange={e => setFormData({ ...formData, name: e.target.value })} 
-              placeholder={isOAuth ? "Account Name" : "Credential Label"} 
+              placeholder={isOAuth ? translate("Account Name") : translate("Credential Label")}
               className="rounded-none border-border/50 bg-muted/5 h-9 text-sm focus-visible:ring-0 focus-visible:border-primary/50 transition-colors"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 px-1">
+              <Label className="px-1 text-xs text-muted-foreground">
                 {translate("Routing Priority")}
               </Label>
               <Input 
@@ -207,7 +207,7 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, on
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 px-1">
+              <Label className="px-1 text-xs text-muted-foreground">
                 {translate("Proxy Pool")}
               </Label>
               <Select
@@ -215,7 +215,7 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, on
                 onValueChange={(v) => setFormData({ ...formData, proxyPoolId: v as string })}
               >
                 <SelectTrigger className="w-full rounded-none border-border/50 bg-muted/5 h-9 text-xs focus:ring-0 focus:border-primary/50 shadow-none">
-                  <SelectValue placeholder="None"/>
+                  <SelectValue placeholder={translate("None")}/>
                 </SelectTrigger>
                 <SelectContent className="rounded-none border-border/50 shadow-none">
                   {proxyOptions.map((opt) => (
@@ -230,7 +230,7 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, on
 
           {!isOAuth && (
             <div className="flex flex-col gap-1.5">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 px-1">
+              <Label className="px-1 text-xs text-muted-foreground">
                 {translate("Access Token")}
               </Label>
               <div className="flex gap-2">
@@ -247,13 +247,13 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, on
                   size="sm" 
                   onClick={handleValidate} 
                   disabled={!formData.apiKey || validating} 
-                  className="rounded-none px-4 text-xs font-bold uppercase tracking-wider h-9"
+                  className="h-9 rounded-none px-4 text-xs font-medium"
                 >
                   {validating ? <Spinner className="size-4" /> : translate("Verify")}
                 </Button>
               </div>
               {validationResult && (
-                <div className={cn("text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 mt-1", validationResult === 'success' ? "text-primary" : "text-destructive")}>
+                <div className={cn("mt-1 flex items-center gap-1.5 text-xs font-medium", validationResult === 'success' ? "text-primary" : "text-destructive")}>
                    {validationResult === 'success' ? <CheckCircle className="size-4" weight="bold" /> : <WarningCircle className="size-4" weight="bold" />}
                    {validationResult === 'success' ? translate("Token Validated") : translate("Validation Failed")}
                 </div>
@@ -265,7 +265,7 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, on
             <div className="pt-4 border-t border-border/50 flex items-center justify-between mt-2">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="size-4 text-muted-foreground opacity-60" weight="bold" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-50">
+                <span className="text-xs text-muted-foreground">
                   {translate("System Health")}
                 </span>
               </div>
@@ -273,7 +273,7 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, on
                 {testResult && (
                   <Badge 
                     variant={testResult === 'success' ? 'secondary' : 'destructive'} 
-                    className="rounded-none h-5 text-[10px] font-bold border-none px-2 uppercase tracking-wider tabular-nums"
+                    className="h-5 rounded-none border-none px-2 text-xs tabular-nums"
                   >
                     {testResult === 'success' ? translate('Link OK') : translate('Link FAIL')}
                   </Badge>
@@ -284,7 +284,7 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, on
                   size="sm" 
                   onClick={handleTest} 
                   disabled={testing} 
-                  className="rounded-none text-[10px] font-bold uppercase tracking-widest h-8 px-3 hover:bg-muted/50"
+                  className="h-8 rounded-none px-3 text-xs font-medium hover:bg-muted/50"
                 >
                   {testing ? <Spinner className="size-4" /> : <><Pulse className="size-4 mr-1.5" weight="bold" /> {translate("Test")}</>}
                 </Button>
@@ -297,14 +297,14 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, on
           <Button 
             type="button"
             variant="outline" 
-            className="flex-1 rounded-none h-10 text-[10px] font-bold uppercase tracking-widest border-border/50 hover:bg-muted/30" 
+            className="h-10 flex-1 rounded-none border-border/50 text-xs font-medium hover:bg-muted/30" 
             onClick={onClose}
           >
             {translate("Cancel")}
           </Button>
           <Button 
             type="button"
-            className="flex-1 rounded-none h-10 text-[10px] font-bold uppercase tracking-widest shadow-none" 
+            className="h-10 flex-1 rounded-none text-xs font-medium shadow-none" 
             onClick={handleSubmit} 
             disabled={saving}
           >

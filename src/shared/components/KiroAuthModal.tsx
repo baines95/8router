@@ -51,10 +51,10 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
           setRefreshToken(data.refreshToken);
           setAutoDetected(true);
         } else {
-          setError(data.error || "Could not auto-detect token");
+          setError(data.error || translate("Could not auto-detect token"));
         }
       } catch (err) {
-        setError("Failed to auto-detect token");
+        setError(translate("Failed to auto-detect token"));
       } finally {
         setAutoDetecting(false);
       }
@@ -75,7 +75,7 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
 
   const handleImportToken = async () => {
     if (!refreshToken.trim()) {
-      setError("Please enter a refresh token");
+      setError(translate("Please enter a refresh token"));
       return;
     }
 
@@ -92,7 +92,7 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Import failed");
+        throw new Error(data.error || translate("Import failed"));
       }
 
       // Success - notify parent to refresh connections
@@ -106,7 +106,7 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
 
   const handleIdcContinue = () => {
     if (!idcStartUrl.trim()) {
-      setError("Please enter your IDC start URL");
+      setError(translate("Please enter your IDC start URL"));
       return;
     }
     onMethodSelect("idc", { startUrl: idcStartUrl.trim(), region: idcRegion });
@@ -118,13 +118,13 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
   };
 
   return (
-    <Modal open={isOpen} title="Connect Kiro" onClose={onClose} size="lg">
+    <Modal open={isOpen} title={translate("Connect Kiro")} onClose={onClose} size="lg">
       <div className="flex flex-col gap-4">
         {/* Method Selection */}
         {!selectedMethod && (
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground mb-4 font-medium">
-              Choose your authentication method:
+              {translate("Choose your authentication method:")}
             </p>
 
             {/* AWS Builder ID */}
@@ -135,9 +135,9 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
               <div className="flex items-start gap-3">
                 <ShieldCheck className="size-5 text-primary mt-0.5 group-hover:scale-110 transition-transform" weight="bold" />
                 <div className="flex-1">
-                  <h3 className="font-semibold mb-1 text-sm tracking-tight text-foreground">AWS Builder ID</h3>
+                  <h3 className="font-semibold mb-1 text-sm tracking-tight text-foreground">{translate("AWS Builder ID")}</h3>
                   <p className="text-xs text-muted-foreground font-medium">
-                    Recommended for most users. Free AWS account required.
+                    {translate("Recommended for most users. Free AWS account required.")}
                   </p>
                 </div>
               </div>
@@ -151,9 +151,9 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
               <div className="flex items-start gap-3">
                 <Business className="size-5 text-primary mt-0.5 group-hover:scale-110 transition-transform" weight="bold" />
                 <div className="flex-1">
-                  <h3 className="font-semibold mb-1 text-sm tracking-tight text-foreground">AWS IAM Identity Center</h3>
+                  <h3 className="font-semibold mb-1 text-sm tracking-tight text-foreground">{translate("AWS IAM Identity Center")}</h3>
                   <p className="text-xs text-muted-foreground font-medium">
-                    For enterprise users with custom AWS IAM Identity Center.
+                    {translate("For enterprise users with custom AWS IAM Identity Center.")}
                   </p>
                 </div>
               </div>
@@ -199,9 +199,9 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
               <div className="flex items-start gap-3">
                 <FileUpload className="size-5 text-primary mt-0.5 group-hover:scale-110 transition-transform" weight="bold" />
                 <div className="flex-1">
-                  <h3 className="font-semibold mb-1 text-sm tracking-tight text-foreground">Import Token</h3>
+                  <h3 className="font-semibold mb-1 text-sm tracking-tight text-foreground">{translate("Import Token")}</h3>
                   <p className="text-xs text-muted-foreground font-medium">
-                    Paste refresh token from Kiro IDE.
+                    {translate("Paste refresh token from Kiro IDE.")}
                   </p>
                 </div>
               </div>
@@ -213,8 +213,8 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
         {selectedMethod === "idc" && (
           <div className="space-y-4">
             <div className="grid gap-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 px-1">
-                IDC Start URL <span className="text-destructive">*</span>
+              <label className="px-1 text-xs text-muted-foreground">
+                {translate("IDC Start URL")} <span className="text-destructive">*</span>
               </label>
               <Input
                 value={idcStartUrl}
@@ -222,14 +222,14 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
                 placeholder="https://your-org.awsapps.com/start"
                 className="font-mono text-xs h-10 bg-muted/5 border-border/50"
               />
-              <p className="text-[10px] text-muted-foreground font-medium italic opacity-70 px-1">
-                Your organization&apos;s AWS IAM Identity Center URL
+              <p className="px-1 text-xs text-muted-foreground">
+                {translate("Your organization's AWS IAM Identity Center URL")}
               </p>
             </div>
 
             <div className="grid gap-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 px-1">
-                AWS Region
+              <label className="px-1 text-xs text-muted-foreground">
+                {translate("AWS Region")}
               </label>
               <Input
                 value={idcRegion}
@@ -242,16 +242,16 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
             {error && (
               <div className="bg-destructive/10 p-3 rounded-lg border border-destructive/20 flex items-center gap-2">
                 <WarningCircle className="size-4 text-destructive" weight="bold" />
-                <p className="text-xs font-bold uppercase tracking-wide text-destructive">{error}</p>
+                <p className="text-xs font-medium text-destructive">{translate(error)}</p>
               </div>
             )}
 
             <div className="flex gap-2 pt-2">
-              <Button onClick={handleIdcContinue} className="flex-1 h-10 font-bold text-xs uppercase tracking-widest" disabled={!idcStartUrl.trim()}>
-                Continue
+              <Button onClick={handleIdcContinue} className="flex-1 h-10 text-xs font-medium" disabled={!idcStartUrl.trim()}>
+                {translate("Continue")}
               </Button>
-              <Button onClick={handleBack} variant="ghost" className="flex-1 h-10 font-bold text-xs uppercase tracking-widest border border-border/50">
-                Back
+              <Button onClick={handleBack} variant="ghost" className="flex-1 h-10 border border-border/50 text-xs font-medium">
+                {translate("Back")}
               </Button>
             </div>
           </div>
@@ -265,7 +265,7 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
                 <span className="material-symbols-outlined text-4xl text-primary animate-spin">
                   progress_activity
                 </span>
-                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground animate-pulse">Auto-detecting AWS credentials...</p>
+                <p className="text-xs text-muted-foreground animate-pulse">{translate("Auto-detecting AWS credentials...")}</p>
               </div>
             ) : (
               <>
@@ -273,8 +273,8 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
                 {autoDetected && (
                   <div className="bg-primary/10 p-3 rounded-lg border border-primary/20 flex items-center gap-2">
                     <CheckCircle className="size-4 text-primary" weight="bold" />
-                    <p className="text-xs font-bold uppercase tracking-wide text-primary">
-                      Token auto-detected from Kiro IDE successfully!
+                    <p className="text-xs font-medium text-primary">
+                      {translate("Token auto-detected from Kiro IDE successfully!")}
                     </p>
                   </div>
                 )}
@@ -284,19 +284,19 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
                   <div className="bg-muted/10 p-3 rounded-lg border border-border/50 flex items-center gap-2">
                     <Info className="size-4 text-muted-foreground" weight="bold" />
                     <p className="text-xs font-medium text-muted-foreground">
-                      Kiro IDE not detected. Please paste your refresh token manually.
+                      {translate("Kiro IDE not detected. Please paste your refresh token manually.")}
                     </p>
                   </div>
                 )}
 
                 <div className="grid gap-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 px-1">
-                    Refresh Token <span className="text-destructive">*</span>
+                  <label className="px-1 text-xs text-muted-foreground">
+                    {translate("Refresh Token")} <span className="text-destructive">*</span>
                   </label>
                   <Input
                     value={refreshToken}
                     onChange={(e) => setRefreshToken(e.target.value)}
-                    placeholder="Token will be auto-filled..."
+                    placeholder={translate("Token will be auto-filled...") }
                     className="font-mono text-xs h-10 bg-muted/5 border-border/50"
                   />
                 </div>
@@ -304,16 +304,16 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
                 {error && (
                   <div className="bg-destructive/10 p-3 rounded-lg border border-destructive/20 flex items-center gap-2">
                     <WarningCircle className="size-4 text-destructive" weight="bold" />
-                    <p className="text-xs font-bold uppercase tracking-wide text-destructive">{error}</p>
+                    <p className="text-xs font-medium text-destructive">{translate(error)}</p>
                   </div>
                 )}
 
                 <div className="flex gap-2 pt-2">
-                  <Button onClick={handleImportToken} className="flex-1 h-10 font-bold text-xs uppercase tracking-widest" disabled={importing || !refreshToken.trim()}>
-                    {importing ? "Importing..." : "Import Token"}
+                  <Button onClick={handleImportToken} className="flex-1 h-10 text-xs font-medium" disabled={importing || !refreshToken.trim()}>
+                    {importing ? translate("Importing...") : translate("Import Token")}
                   </Button>
-                  <Button onClick={handleBack} variant="ghost" className="flex-1 h-10 font-bold text-xs uppercase tracking-widest border border-border/50">
-                    Back
+                  <Button onClick={handleBack} variant="ghost" className="flex-1 h-10 border border-border/50 text-xs font-medium">
+                    {translate("Back")}
                   </Button>
                 </div>
               </>

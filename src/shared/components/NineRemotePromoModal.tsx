@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
+import { translate } from "@/i18n/runtime";
 import { createPortal } from "react-dom";
 import { 
   Terminal, 
@@ -54,7 +55,7 @@ export default function NineRemotePromoModal({ isOpen, onClose }: NineRemoteProm
             <div className="size-7 rounded-lg flex items-center justify-center bg-[#FF570A] text-white">
               <Terminal className="size-4" weight="bold" />
             </div>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#FF570A] font-mono">9Remote</span>
+            <span className="font-mono text-xs font-medium text-[#FF570A]">9Remote</span>
           </div>
           <button
             onClick={onClose}
@@ -74,8 +75,8 @@ export default function NineRemotePromoModal({ isOpen, onClose }: NineRemoteProm
               <Terminal className="size-8 text-white" weight="bold" />
             </div>
             <h1 className="text-xl font-bold tracking-tight text-foreground">9Remote</h1>
-            <p className="text-xs text-muted-foreground font-medium leading-relaxed max-w-[220px]">
-              Access your terminal, desktop &amp; files from anywhere.
+            <p className="max-w-[220px] text-xs text-muted-foreground leading-relaxed">
+              {translate("Access your terminal, desktop & files from anywhere.")}
             </p>
           </div>
 
@@ -84,8 +85,8 @@ export default function NineRemotePromoModal({ isOpen, onClose }: NineRemoteProm
             {FEATURES.map(({ icon: Icon, label, desc }) => (
               <div key={label} className="flex-1 flex flex-col items-center gap-1.5 py-4 px-1 rounded-xl border border-border/50 bg-muted/5">
                 <Icon className="size-6 text-[#ff6e33]" weight="bold" />
-                <p className="text-[10px] font-bold uppercase tracking-tight text-foreground">{label}</p>
-                <p className="text-[9px] text-muted-foreground text-center leading-tight font-medium opacity-70">{desc}</p>
+                <p className="text-xs font-medium text-foreground">{translate(label)}</p>
+                <p className="text-[10px] text-center leading-tight text-muted-foreground">{translate(desc)}</p>
               </div>
             ))}
           </div>
@@ -95,7 +96,7 @@ export default function NineRemotePromoModal({ isOpen, onClose }: NineRemoteProm
             {BULLETS.map(({ icon: Icon, text }) => (
               <div key={text} className="flex items-center gap-2.5">
                 <Icon className="size-4 text-[#ff6e33] flex-shrink-0" weight="bold" />
-                <span className="text-[11px] text-muted-foreground font-semibold">{text}</span>
+                <span className="text-xs text-muted-foreground">{translate(text)}</span>
               </div>
             ))}
           </div>
@@ -103,10 +104,10 @@ export default function NineRemotePromoModal({ isOpen, onClose }: NineRemoteProm
           {/* CTA */}
           <button
             onClick={() => window.open(NINE_REMOTE_URL, "_blank")}
-            className="w-full py-3.5 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest text-white rounded-xl hover:opacity-90 active:scale-[0.98] transition-all bg-[#FF570A] shadow-[0_4px_16px_rgba(255,87,10,0.35)]"
+            className="w-full py-3.5 flex items-center justify-center gap-2 rounded-xl bg-[#FF570A] text-xs font-medium text-white shadow-[0_4px_16px_rgba(255,87,10,0.35)] transition-all hover:opacity-90 active:scale-[0.98]"
           >
             <ExternalLink className="size-4" weight="bold" />
-            Get 9Remote
+            {translate("Get 9Remote")}
           </button>
         </div>
       </div>
