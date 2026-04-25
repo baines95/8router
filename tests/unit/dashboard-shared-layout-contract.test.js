@@ -27,6 +27,13 @@ describe("dashboard shared layout contract", () => {
     expect(sidebarUi).toContain("group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2!");
   });
 
+  it("keeps sidebar hover/focus/active tone balanced", () => {
+    const sidebarUi = read("src/components/ui/sidebar.tsx");
+    expect(sidebarUi).toContain("hover:bg-sidebar-accent/80 hover:text-sidebar-accent-foreground");
+    expect(sidebarUi).toContain("focus-visible:bg-sidebar-accent/80");
+    expect(sidebarUi).toContain("data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground");
+  });
+
   it("keeps menu actions compact", () => {
     const menu = read("src/shared/components/HeaderMenu.tsx");
     expect(menu).toContain("h-8");
