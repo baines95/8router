@@ -1,22 +1,22 @@
 # v0.4.6-mini.1 (2026-04-26)
 
-This mini release selectively ports high-value runtime and provider improvements from the upstream 0.4.6 era while keeping 8Router intentionally slimmer, clearer, and easier to maintain than the full upstream surface area.
+Bản phát hành này nâng version của fork từ `0.3.96` lên `0.4.6-mini.1` và mang về có chọn lọc một số thay đổi runtime/provider từ nhánh upstream `0.4.6`, không nhằm đạt full parity.
 
-## Upstream-selected improvements
-- Harden dashboard and local tooling access with explicit CLI token validation instead of localhost trust.
-- Make retry and backoff behavior status-aware, with cleaner fallback behavior and stronger runtime regression coverage.
-- Honor provider reset timing for cooldown handling so fallback and unavailable-account behavior are more accurate under rate limits.
-- Add RTK fail-open compression with a runtime toggle, preserving safer tool-output handling without forcing a broad upstream merge.
-- Preserve Kiro image attachments and structured message context more accurately in the request translation pipeline.
-- Add dynamic provider model fetching with static fallback behavior so provider setup remains usable even when live model discovery fails.
+## Thay đổi chính
+- Siết truy cập dashboard và local tooling bằng kiểm tra CLI token tường minh, không còn dựa vào localhost trust.
+- Tách retry/backoff theo status code, đồng thời làm rõ hơn hành vi fallback và bổ sung regression test cho runtime.
+- Dùng thời điểm reset do provider trả về để tính cooldown khi có thể, giúp xử lý rate-limit và unavailable account sát thực tế hơn.
+- Thêm RTK fail-open compression kèm runtime toggle, giữ xử lý output an toàn hơn mà không cần merge rộng từ upstream.
+- Giữ đúng image attachments và structured message context của Kiro trong pipeline dịch request.
+- Thêm dynamic model fetching cho provider, đồng thời có static fallback để màn hình cấu hình vẫn dùng được khi fetch model list lỗi.
 
-## Fork-specific strengths
-- Keep the codebase TypeScript-first, which improves refactor safety, strengthens runtime and translator contracts, and lowers risk for future selective upstream ports.
-- Continue the fork’s cleaner shadcn/ui-based dashboard direction, with stronger hierarchy, denser-but-clearer provider/settings surfaces, and more consistent controls than the older upstream interface.
+## Đặc điểm của fork
+- Duy trì codebase TypeScript-first để giảm rủi ro khi refactor, siết chặt contract ở runtime/translator và thuận lợi hơn cho các đợt port chọn lọc sau này.
+- Giữ hướng dashboard hiện tại dựa trên shadcn/ui, ưu tiên hierarchy rõ hơn và bề mặt cấu hình gọn hơn thay vì kéo toàn bộ giao diện upstream cũ về.
 
-## Notes
-- This release tracks the upstream 0.4.6 capability era in selected areas, not full upstream parity.
-- Slice 9 provider expansion is intentionally excluded from this mini release.
+## Ghi chú
+- Release này chỉ bám theo capability của upstream `0.4.6` ở một số phần đã chọn.
+- Không bao gồm Slice 9 về mở rộng provider.
 
 # v0.3.96 (2026-04-17)
 

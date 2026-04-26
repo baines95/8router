@@ -1,861 +1,292 @@
 <div align="center">
   <img src="./images/8router.png?1" alt="8Router Dashboard" width="800"/>
-  
+
   # 8Router - Free AI Router
-  
-  **Never stop coding. Auto-route to FREE & cheap AI models with smart fallback.**
-  
-  **Connect All AI Code Tools (Claude Code, Cursor, Antigravity, Copilot, Codex, Gemini, OpenCode, Cline, OpenClaw...) to 40+ AI Providers & 100+ Models.**
-  
+
+  **Router AI local-first cho coding tools, có fallback giữa subscription, API giá rẻ và provider miễn phí.**
+
   [![npm](https://img.shields.io/npm/v/8router.svg)](https://www.npmjs.com/package/8router)
   [![Downloads](https://img.shields.io/npm/dm/8router.svg)](https://www.npmjs.com/package/8router)
   [![License](https://img.shields.io/npm/l/8router.svg)](https://github.com/baines95/8router/blob/main/LICENSE)
-  
-  [🚀 Quick Start](#-quick-start) • [💡 Features](#-key-features) • [📖 Setup](#-setup-guide) • [🌐 Website](https://8router.com)
+
+  [Khởi động nhanh](#khởi-động-nhanh) • [Tính năng](#tính-năng) • [Thiết lập](#hướng-dẫn-thiết-lập) • [Triển khai](#triển-khai) • [API](#api-reference)
 
   [🇻🇳 Tiếng Việt](./i18n/README.vi.md) • [🇨🇳 中文](./i18n/README.zh-CN.md) • [🇯🇵 日本語](./i18n/README.ja-JP.md)
 </div>
 
 ---
 
-## 🤔 Why 8Router?
+## Tổng quan
 
-**Stop wasting money and hitting limits:**
+8Router cung cấp một local endpoint ổn định cho các AI coding tool, đồng thời cho phép route request qua nhiều provider và nhiều tầng model ở phía sau.
 
-- ❌ Subscription quota expires unused every month
-- ❌ Rate limits stop you mid-coding
-- ❌ Expensive APIs ($20-50/month per provider)
-- ❌ Manual switching between providers
+Ứng dụng expose OpenAI-compatible API tại `http://localhost:20128/v1` và đi kèm dashboard web để quản lý provider, combo, usage, endpoint access và runtime settings.
 
-**8Router solves this:**
+Giá trị chính nằm ở việc đơn giản hóa vận hành: editor, CLI tool hoặc agent của bạn chỉ cần nói chuyện với một endpoint, còn 8Router xử lý phần translation, auth, fallback và các ràng buộc phía provider.
 
-- ✅ **Maximize subscriptions** - Track quota, use every bit before reset
-- ✅ **Auto fallback** - Subscription → Cheap → Free, zero downtime
-- ✅ **Multi-account** - Round-robin between accounts per provider
-- ✅ **Universal** - Works with Claude Code, Codex, Gemini CLI, Cursor, Cline, any CLI tool
+## Định hướng của fork này
 
----
+Fork này bám theo capability của upstream `0.4.6` theo hướng chọn lọc và hiện được phát hành dưới version **`0.4.6-mini.1`**.
 
-## 🔄 How It Works
+Mục tiêu không phải full parity với upstream. Thay vào đó, fork này giữ phạm vi gọn hơn, dễ kiểm soát hơn và tập trung vào các thay đổi runtime/provider có giá trị cao:
 
+- Codebase TypeScript-first để refactor an toàn hơn và contract rõ hơn
+- Dashboard đi theo hướng giao diện hiện tại dựa trên shadcn/ui
+- Mang thay đổi từ upstream về theo từng phần thay vì merge rộng
+
+## Vì sao dùng 8Router?
+
+- Dùng một local OpenAI-compatible endpoint cho nhiều CLI tool và IDE
+- Tách logic chuyển provider, fallback và auth ra khỏi từng tool riêng lẻ
+- Kết hợp subscription, provider giá rẻ và provider miễn phí trong cùng một lớp routing
+- Giữ luồng làm việc liên tục khi provider hết quota, bị rate-limit hoặc lỗi tạm thời
+- Theo dõi usage, thời điểm reset và chi phí ước tính trên một dashboard
+- Quản lý provider, API key, combo và runtime behavior theo hướng local-first
+
+## Cách hoạt động
+
+```text
+Tool hoặc IDE
+  ↓
+http://localhost:20128/v1
+  ↓
+8Router
+  • dịch request
+  • auth / token refresh
+  • chọn combo và fallback
+  • theo dõi quota / usage
+  ↓
+Subscription / provider giá rẻ / provider miễn phí
 ```
-┌─────────────┐
-│  Your CLI   │  (Claude Code, Codex, Gemini CLI, OpenClaw, Cursor, Cline...)
-│   Tool      │
-└──────┬──────┘
-       │ http://localhost:20128/v1
-       ↓
-┌─────────────────────────────────────────┐
-│           8Router (Smart Router)        │
-│  • Format translation (OpenAI ↔ Claude) │
-│  • Quota tracking                       │
-│  • Auto token refresh                   │
-└──────┬──────────────────────────────────┘
-       │
-       ├─→ [Tier 1: SUBSCRIPTION] Claude Code, Codex, Gemini CLI
-       │   ↓ quota exhausted
-       ├─→ [Tier 2: CHEAP] GLM ($0.6/1M), MiniMax ($0.2/1M)
-       │   ↓ budget limit
-       └─→ [Tier 3: FREE] iFlow, Qwen, Kiro (unlimited)
 
-Result: Never stop coding, minimal cost
-```
+## Khởi động nhanh
 
----
+### Cài từ npm
 
-## ⚡ Quick Start
-
-### Option 1: Install via NPM (Easiest)
-Install globally and run from anywhere:
 ```bash
 npm install -g 8router
 8router
 ```
-🎉 Dashboard opens at `http://localhost:20128`
 
-### Option 2: Run from Source (For Developers)
+### Chạy từ mã nguồn
+
 ```bash
-# 1. Clone and install
 git clone https://github.com/baines95/8router.git
 cd 8router
 npm install
-
-# 2. Build and Link (Only once)
 npm run build
 npm link
-
-# 3. Start
 8router
 ```
 
-**Default URLs:**
-- 🖥️ **Dashboard**: `http://localhost:20128`
-- 🔌 **OpenAI API**: `http://localhost:20128/v1`
+### URL mặc định
 
-**Note:** Your data (API keys, configs) is safely stored in `~/.8router`, so it persists even if you update or reinstall the package.
+- Dashboard: `http://localhost:20128/dashboard`
+- API base: `http://localhost:20128/v1`
 
----
+Trạng thái cục bộ được lưu tại `~/.8router`, nên cấu hình và dữ liệu provider vẫn còn sau khi nâng cấp.
 
-## 🎥 Video Tutorial
+## Tính năng
 
-<div align="center">
-  
-### 📺 Complete Setup Guide - 8Router + Claude Code FREE
-  
-[![8Router + Claude Code Setup](https://img.youtube.com/vi/raEyZPg5xE0/maxresdefault.jpg)](https://www.youtube.com/watch?v=raEyZPg5xE0)
+### Routing lõi
 
-**🎬 Watch the complete step-by-step tutorial:**
-- ✅ 8Router installation & setup
-- ✅ FREE Claude Sonnet 4.5 configuration
-- ✅ Claude Code integration
-- ✅ Live coding demonstration
+- OpenAI-compatible API cho chat và model listing
+- Fallback theo model trực tiếp hoặc combo có thứ tự
+- Hỗ trợ nhiều account cho cùng một provider
+- Retry, backoff và fallback theo status code
+- Cooldown có thể dựa trên thời điểm reset do provider trả về
 
-**⏱️ Duration:** 20 minutes | **👥 By:** Developer Community
+### Hành vi runtime và provider
 
-[▶️ Watch on YouTube](https://www.youtube.com/watch?v=o3qYCyjrFYg)
+- Hỗ trợ cả OAuth provider và API key provider
+- Tự refresh token với các provider có hỗ trợ
+- Dynamic model fetching, kèm static fallback catalog ở các nhánh liên quan
+- Dịch request an toàn hơn cho payload và attachment đặc thù từng provider
+- RTK fail-open compression có runtime toggle
 
-</div>
+### Dashboard và vận hành
 
----
+- Dashboard cho provider, combo, settings, endpoint access và usage
+- Theo dõi usage và chi phí ước tính để so sánh hoặc lập kế hoạch
+- Điều khiển request logging và runtime diagnostics
+- Lưu trạng thái local-first bằng file-backed storage
 
-## 🛠️ Supported CLI Tools
+### Trải nghiệm phát triển
 
-8Router works seamlessly with all major AI coding tools:
+- Một endpoint cho nhiều coding tool
+- Dễ onboard hơn cho môi trường local hoặc self-hosted
+- Chịu lỗi tốt hơn khi provider phía trên không ổn định hoặc bị giới hạn
+- Codebase TypeScript-first thuận lợi hơn cho việc bảo trì và port chọn lọc
 
-<div align="center">
-  <table>
-    <tr>
-      <td align="center" width="120">
-        <img src="./public/providers/claude.png" width="60" alt="Claude Code"/><br/>
-        <b>Claude-Code</b>
-      </td>
-      <td align="center" width="120">
-        <img src="./public/providers/openclaw.png" width="60" alt="OpenClaw"/><br/>
-        <b>OpenClaw</b>
-      </td>
-      <td align="center" width="120">
-        <img src="./public/providers/codex.png" width="60" alt="Codex"/><br/>
-        <b>Codex</b>
-      </td>
-      <td align="center" width="120">
-        <img src="./public/providers/opencode.png" width="60" alt="OpenCode"/><br/>
-        <b>OpenCode</b>
-      </td>
-      <td align="center" width="120">
-        <img src="./public/providers/cursor.png" width="60" alt="Cursor"/><br/>
-        <b>Cursor</b>
-      </td>
-      <td align="center" width="120">
-        <img src="./public/providers/antigravity.png" width="60" alt="Antigravity"/><br/>
-        <b>Antigravity</b>
-      </td>
-    </tr>
-    <tr>
-      <td align="center" width="120">
-        <img src="./public/providers/cline.png" width="60" alt="Cline"/><br/>
-        <b>Cline</b>
-      </td>
-      <td align="center" width="120">
-        <img src="./public/providers/continue.png" width="60" alt="Continue"/><br/>
-        <b>Continue</b>
-      </td>
-      <td align="center" width="120">
-        <img src="./public/providers/droid.png" width="60" alt="Droid"/><br/>
-        <b>Droid</b>
-      </td>
-      <td align="center" width="120">
-        <img src="./public/providers/roo.png" width="60" alt="Roo"/><br/>
-        <b>Roo</b>
-      </td>
-      <td align="center" width="120">
-        <img src="./public/providers/copilot.png" width="60" alt="Copilot"/><br/>
-        <b>Copilot</b>
-      </td>
-      <td align="center" width="120">
-        <img src="./public/providers/kilocode.png" width="60" alt="Kilo Code"/><br/>
-        <b>Kilo Code</b>
-      </td>
-    </tr>
-  </table>
-</div>
+## Phù hợp với ai?
 
----
+8Router phù hợp nếu bạn:
 
-## 🌐 Supported Providers
+- dùng nhiều AI coding tool và muốn gom về một local endpoint thống nhất
+- đã trả tiền cho một số provider nhưng muốn overflow/fallback sạch hơn
+- muốn trộn model trả phí và miễn phí mà không phải chỉnh lại client liên tục
+- muốn tự kiểm soát auth, routing và usage theo hướng local-first
+- đang chạy workflow self-hosted hoặc semi-self-hosted và cần đơn giản hóa vận hành
 
-### 🔐 OAuth Providers
+Nó không hướng tới việc trở thành một nền tảng all-in-one quá rộng, mà là một lớp router thực dụng có thể dùng lâu dài trong workflow hằng ngày.
 
-<div align="center">
-  <table>
-    <tr>
-      <td align="center" width="120">
-        <img src="./public/providers/claude.png" width="60" alt="Claude Code"/><br/>
-        <b>Claude-Code</b>
-      </td>
-      <td align="center" width="120">
-        <img src="./public/providers/antigravity.png" width="60" alt="Antigravity"/><br/>
-        <b>Antigravity</b>
-      </td>
-      <td align="center" width="120">
-        <img src="./public/providers/codex.png" width="60" alt="Codex"/><br/>
-        <b>Codex</b>
-      </td>
-      <td align="center" width="120">
-        <img src="./public/providers/github.png" width="60" alt="GitHub"/><br/>
-        <b>GitHub</b>
-      </td>
-      <td align="center" width="120">
-        <img src="./public/providers/cursor.png" width="60" alt="Cursor"/><br/>
-        <b>Cursor</b>
-      </td>
-    </tr>
-  </table>
-</div>
+## Khi nào nên dùng / không nên dùng
 
-### 🆓 Free Providers
+### Nên dùng khi
 
-<div align="center">
-  <table>
-    <tr>
-      <td align="center" width="150">
-        <img src="./public/providers/iflow.png" width="70" alt="iFlow"/><br/>
-        <b>iFlow AI</b><br/>
-        <sub>8+ models • Unlimited</sub>
-      </td>
-      <td align="center" width="150">
-        <img src="./public/providers/qwen.png" width="70" alt="Qwen"/><br/>
-        <b>Qwen Code</b><br/>
-        <sub>3+ models • Unlimited</sub>
-      </td>
-      <td align="center" width="150">
-        <img src="./public/providers/gemini-cli.png" width="70" alt="Gemini CLI"/><br/>
-        <b>Gemini CLI</b><br/>
-        <sub>180K/month FREE</sub>
-      </td>
-      <td align="center" width="150">
-        <img src="./public/providers/kiro.png" width="70" alt="Kiro"/><br/>
-        <b>Kiro AI</b><br/>
-        <sub>Claude • Unlimited</sub>
-      </td>
-    </tr>
-  </table>
-</div>
+- bạn muốn một lớp routing chung cho nhiều tool thay vì cấu hình từng nơi riêng lẻ
+- bạn cần fallback rõ ràng giữa model tốt nhất, model rẻ hơn và model miễn phí
+- bạn muốn quan sát quota, cooldown, reset time và usage ở cùng một chỗ
+- bạn cần tự host hoặc chạy cục bộ nhưng vẫn muốn bề mặt quản trị đủ rõ ràng
 
-### 🔑 API Key Providers (40+)
+### Không quá phù hợp khi
 
-<div align="center">
-  <table>
-    <tr>
-      <td align="center" width="100">
-        <img src="./public/providers/openrouter.png" width="50" alt="OpenRouter"/><br/>
-        <sub>OpenRouter</sub>
-      </td>
-      <td align="center" width="100">
-        <img src="./public/providers/glm.png" width="50" alt="GLM"/><br/>
-        <sub>GLM</sub>
-      </td>
-      <td align="center" width="100">
-        <img src="./public/providers/kimi.png" width="50" alt="Kimi"/><br/>
-        <sub>Kimi</sub>
-      </td>
-      <td align="center" width="100">
-        <img src="./public/providers/minimax.png" width="50" alt="MiniMax"/><br/>
-        <sub>MiniMax</sub>
-      </td>
-      <td align="center" width="100">
-        <img src="./public/providers/openai.png" width="50" alt="OpenAI"/><br/>
-        <sub>OpenAI</sub>
-      </td>
-      <td align="center" width="100">
-        <img src="./public/providers/anthropic.png" width="50" alt="Anthropic"/><br/>
-        <sub>Anthropic</sub>
-      </td>
-    </tr>
-    <tr>
-      <td align="center" width="100">
-        <img src="./public/providers/gemini.png" width="50" alt="Gemini"/><br/>
-        <sub>Gemini</sub>
-      </td>
-      <td align="center" width="100">
-        <img src="./public/providers/deepseek.png" width="50" alt="DeepSeek"/><br/>
-        <sub>DeepSeek</sub>
-      </td>
-      <td align="center" width="100">
-        <img src="./public/providers/groq.png" width="50" alt="Groq"/><br/>
-        <sub>Groq</sub>
-      </td>
-      <td align="center" width="100">
-        <img src="./public/providers/xai.png" width="50" alt="xAI"/><br/>
-        <sub>xAI</sub>
-      </td>
-      <td align="center" width="100">
-        <img src="./public/providers/mistral.png" width="50" alt="Mistral"/><br/>
-        <sub>Mistral</sub>
-      </td>
-      <td align="center" width="100">
-        <img src="./public/providers/perplexity.png" width="50" alt="Perplexity"/><br/>
-        <sub>Perplexity</sub>
-      </td>
-    </tr>
-    <tr>
-      <td align="center" width="100">
-        <img src="./public/providers/together.png" width="50" alt="Together"/><br/>
-        <sub>Together AI</sub>
-      </td>
-      <td align="center" width="100">
-        <img src="./public/providers/fireworks.png" width="50" alt="Fireworks"/><br/>
-        <sub>Fireworks</sub>
-      </td>
-      <td align="center" width="100">
-        <img src="./public/providers/cerebras.png" width="50" alt="Cerebras"/><br/>
-        <sub>Cerebras</sub>
-      </td>
-      <td align="center" width="100">
-        <img src="./public/providers/cohere.png" width="50" alt="Cohere"/><br/>
-        <sub>Cohere</sub>
-      </td>
-      <td align="center" width="100">
-        <img src="./public/providers/nvidia.png" width="50" alt="NVIDIA"/><br/>
-        <sub>NVIDIA</sub>
-      </td>
-      <td align="center" width="100">
-        <img src="./public/providers/siliconflow.png" width="50" alt="SiliconFlow"/><br/>
-        <sub>SiliconFlow</sub>
-      </td>
-    </tr>
-  </table>
-  <p><i>...and 20+ more providers including Nebius, Chutes, Hyperbolic, and custom OpenAI/Anthropic compatible endpoints</i></p>
-</div>
+- bạn chỉ dùng đúng một provider, một model và không cần fallback
+- bạn không muốn vận hành thêm một local service hoặc dashboard
+- bạn cần full parity với toàn bộ bề mặt upstream thay vì một fork chọn lọc
+- bạn muốn một nền tảng cloud-managed hoàn chỉnh hơn là một router local-first
 
----
+## Thuật ngữ dùng trong README
 
-## 💡 Key Features
+Để thống nhất cách gọi trong tài liệu này:
 
-| Feature | What It Does | Why It Matters |
-|---------|--------------|----------------|
-| 🎯 **Smart 3-Tier Fallback** | Auto-route: Subscription → Cheap → Free | Never stop coding, zero downtime |
-| 📊 **Real-Time Quota Tracking** | Live token count + reset countdown | Maximize subscription value |
-| 🔄 **Format Translation** | OpenAI ↔ Claude ↔ Gemini seamless | Works with any CLI tool |
-| 👥 **Multi-Account Support** | Multiple accounts per provider | Load balancing + redundancy |
-| 🔄 **Auto Token Refresh** | OAuth tokens refresh automatically | No manual re-login needed |
-| 🎨 **Custom Combos** | Create unlimited model combinations | Tailor fallback to your needs |
-| 📝 **Request Logging** | Debug mode with full request/response logs | Troubleshoot issues easily |
-| 💾 **Cloud Sync** | Sync config across devices | Same setup everywhere |
-| 📊 **Usage Analytics** | Track tokens, cost, trends over time | Optimize spending |
-| 🌐 **Deploy Anywhere** | Localhost, VPS, Docker, Cloudflare Workers | Flexible deployment options |
+- **provider**: dịch vụ/model backend ở phía sau 8Router
+- **combo**: danh sách model có thứ tự để fallback
+- **fallback**: chuyển sang model hoặc provider kế tiếp khi lớp hiện tại không còn phù hợp
+- **runtime**: hành vi của hệ thống khi đang xử lý request
+- **usage**: dữ liệu mức sử dụng, quota và thống kê liên quan
+- **endpoint**: địa chỉ API mà client gọi tới
 
-<details>
-<summary><b>📖 Feature Details</b></summary>
+## Kiến trúc repo ngắn gọn
 
-### 🎯 Smart 3-Tier Fallback
+- `src/`: dashboard, API routes và phần runtime chính
+- `src/lib/open-sse/`: translator, executor và logic routing theo provider
+- `src/app/`: giao diện dashboard và API route của Next.js
+- `tests/`: bộ test Vitest cho các hành vi runtime trọng yếu
+- `cloud/`: runtime Cloudflare Worker cho các tình huống triển khai cloud
+- `public/`: static assets của dashboard
 
-Create combos with automatic fallback:
+Nếu bạn muốn sửa hành vi request routing, translator/executor trong `src/lib/open-sse/` thường là nơi cần đọc trước.
 
-```
-Combo: "my-coding-stack"
-  1. cc/claude-opus-4-6        (your subscription)
-  2. glm/glm-4.7               (cheap backup, $0.6/1M)
-  3. if/kimi-k2-thinking       (free fallback)
+## Kiến trúc tóm tắt
 
-→ Auto switches when quota runs out or errors occur
+```text
+Client tools / IDEs
+  ↓
+Local endpoint tương thích OpenAI
+  ↓
+8Router
+  • dịch request
+  • auth / token refresh
+  • chọn combo
+  • retry / cooldown / fallback
+  • usage tracking
+  ↓
+Provider và model backend
 ```
 
-### 📊 Real-Time Quota Tracking
+Dashboard nằm song song với luồng request này để bạn quản lý provider, settings, endpoint access và routing behavior mà không phải chỉnh từng client riêng.
 
-- Token consumption per provider
-- Reset countdown (5-hour, daily, weekly)
-- Cost estimation for paid tiers
-- Monthly spending reports
+## Ý nghĩa của release này
 
-### 🔄 Format Translation
+`0.4.6-mini.1` là một bản phát hành trung thực của fork này, không phải tuyên bố tương đương hoàn toàn với upstream.
 
-Seamless translation between formats:
-- **OpenAI** ↔ **Claude** ↔ **Gemini** ↔ **OpenAI Responses**
-- Your CLI tool sends OpenAI format → 8Router translates → Provider receives native format
-- Works with any tool that supports custom OpenAI endpoints
+Mục tiêu của release là giữ lại các cải tiến runtime/provider đáng giá nhất từ giai đoạn upstream `0.4.6`, đồng thời vẫn giữ fork này gọn hơn, TypeScript-first và phù hợp với hướng dashboard hiện tại.
 
-### 👥 Multi-Account Support
+Điểm đánh đổi ở đây là: thay vì chạy theo full parity, fork này ưu tiên selective portability, khả năng bảo trì và quá trình phát triển sạch hơn trong một kiến trúc đã diverge đáng kể.
 
-- Add multiple accounts per provider
-- Auto round-robin or priority-based routing
-- Fallback to next account when one hits quota
+## Các thay đổi chính trong `0.4.6-mini.1`
 
-### 🔄 Auto Token Refresh
+Bản mini release này mang về có chọn lọc một số thay đổi đáng chú ý từ upstream:
 
-- OAuth tokens automatically refresh before expiration
-- No manual re-authentication needed
-- Seamless experience across all providers
+- Kiểm tra CLI token tường minh cho local/dashboard access
+- Retry và backoff theo status code
+- Regression coverage tốt hơn cho retry/fallback runtime
+- Cooldown của provider có thể bám theo reset timestamp khi có
+- RTK fail-open compression kèm persisted runtime toggle
+- Giữ đúng Kiro image attachment và structured context khi dịch request
+- Dynamic provider model fetching kèm static fallback behavior
 
-### 🎨 Custom Combos
+Xem thêm chi tiết tại [CHANGELOG.md](./CHANGELOG.md).
 
-- Create unlimited model combinations
-- Mix subscription, cheap, and free tiers
-- Name your combos for easy access
-- Share combos across devices with Cloud Sync
+## Các CLI tool hỗ trợ
 
-### 📝 Request Logging
+8Router hướng tới các coding tool và client tương thích OpenAI-compatible endpoint, ví dụ:
 
-- Enable debug mode for full request/response logs
-- Track API calls, headers, and payloads
-- Troubleshoot integration issues
-- Export logs for analysis
+- Claude Code
+- Codex
+- Cursor
+- Cline
+- Continue
+- Roo
+- OpenClaw
+- OpenCode
+- Antigravity
+- Các cấu hình tương thích Copilot
+- Các tool khác cho phép custom OpenAI-compatible base URL
 
-### 💾 Cloud Sync
+## Các loại provider hỗ trợ
 
-- Sync providers, combos, and settings across devices
-- Automatic background sync
-- Secure encrypted storage
-- Access your setup from anywhere
+Hệ thống hiện hỗ trợ kết hợp nhiều nhóm provider:
 
-#### Cloud Runtime Notes
+- OAuth-backed providers
+- Provider miễn phí
+- API key providers
+- Custom OpenAI-compatible endpoints
+- Custom Anthropic-compatible endpoints
 
-- Prefer server-side cloud variables in production:
-  - `BASE_URL` (internal callback URL used by sync scheduler)
-  - `CLOUD_URL` (cloud sync endpoint base)
-- `NEXT_PUBLIC_BASE_URL` and `NEXT_PUBLIC_CLOUD_URL` are still supported for compatibility/UI, but server runtime now prioritizes `BASE_URL`/`CLOUD_URL`.
-- Cloud sync requests now use timeout + fail-fast behavior to avoid UI hanging when cloud DNS/network is unavailable.
+Danh sách cụ thể có thể thay đổi theo thời gian; dashboard và provider routes trong mã nguồn là nguồn tham chiếu chính xác nhất cho bản build hiện tại.
 
-### 📊 Usage Analytics
+## Chiến lược cấu hình thường dùng
 
-- Track token usage per provider and model
-- Cost estimation and spending trends
-- Monthly reports and insights
-- Optimize your AI spending
+Một cách cấu hình phổ biến là:
 
-> **💡 IMPORTANT - Understanding Dashboard Costs:**
-> 
-> The "cost" displayed in Usage Analytics is **for tracking and comparison purposes only**. 
-> 8Router itself **never charges** you anything. You only pay providers directly (if using paid services).
-> 
-> **Example:** If your dashboard shows "$290 total cost" while using iFlow models, this represents 
-> what you would have paid using paid APIs directly. Your actual cost = **$0** (iFlow is free unlimited).
-> 
-> Think of it as a "savings tracker" showing how much you're saving by using free models or 
-> routing through 8Router!
+1. Đặt model subscription tốt nhất ở lớp đầu
+2. Thêm một model API giá rẻ làm lớp dự phòng
+3. Thêm một provider miễn phí làm lớp an toàn cuối cùng
 
-### 🌐 Deploy Anywhere
+Ví dụ:
 
-- 💻 **Localhost** - Default, works offline
-- ☁️ **VPS/Cloud** - Share across devices
-- 🐳 **Docker** - One-command deployment
-- 🚀 **Cloudflare Workers** - Global edge network
-
-</details>
-
----
-
-## 💰 Pricing at a Glance
-
-| Tier | Provider | Cost | Quota Reset | Best For |
-|------|----------|------|-------------|----------|
-| **💳 SUBSCRIPTION** | Claude Code (Pro) | $20/mo | 5h + weekly | Already subscribed |
-| | Codex (Plus/Pro) | $20-200/mo | 5h + weekly | OpenAI users |
-| | Gemini CLI | **FREE** | 180K/mo + 1K/day | Everyone! |
-| | GitHub Copilot | $10-19/mo | Monthly | GitHub users |
-| **💰 CHEAP** | GLM-4.7 | $0.6/1M | Daily 10AM | Budget backup |
-| | MiniMax M2.1 | $0.2/1M | 5-hour rolling | Cheapest option |
-| | Kimi K2 | $9/mo flat | 10M tokens/mo | Predictable cost |
-| **🆓 FREE** | iFlow | $0 | Unlimited | 8 models free |
-| | Qwen | $0 | Unlimited | 3 models free |
-| | Kiro | $0 | Unlimited | Claude free |
-
-**💡 Pro Tip:** Start with Gemini CLI (180K free/month) + iFlow (unlimited free) combo = $0 cost!
-
----
-
-### 📊 Understanding 8Router Costs & Billing
-
-**8Router Billing Reality:**
-
-✅ **8Router software = FREE forever** (open source, never charges)  
-✅ **Dashboard "costs" = Display/tracking only** (not actual bills)  
-✅ **You pay providers directly** (subscriptions or API fees)  
-✅ **FREE providers stay FREE** (iFlow, Kiro, Qwen = $0 unlimited)  
-❌ **8Router never sends invoices** or charges your card
-
-**How Cost Display Works:**
-
-The dashboard shows **estimated costs** as if you were using paid APIs directly. This is **not billing** - it's a comparison tool to show your savings.
-
-**Example Scenario:**
-```
-Dashboard Display:
-• Total Requests: 1,662
-• Total Tokens: 47M
-• Display Cost: $290
-
-Reality Check:
-• Provider: iFlow (FREE unlimited)
-• Actual Payment: $0.00
-• What $290 Means: Amount you SAVED by using free models!
+```text
+1. cc/claude-opus-4-6
+2. glm/glm-4.7
+3. if/kimi-k2-thinking
 ```
 
-**Payment Rules:**
-- **Subscription providers** (Claude Code, Codex): Pay them directly via their websites
-- **Cheap providers** (GLM, MiniMax): Pay them directly, 8Router just routes
-- **FREE providers** (iFlow, Kiro, Qwen): Genuinely free forever, no hidden charges
-- **8Router**: Never charges anything, ever
+Cách này giữ được chất lượng ở lớp đầu, đẩy overflow sang lớp rẻ hơn và vẫn còn đường lui không tốn phí khi các lớp trên gặp giới hạn.
 
----
+## Hướng dẫn thiết lập
 
-## 🎯 Use Cases
-
-### Case 1: "I have Claude Pro subscription"
-
-**Problem:** Quota expires unused, rate limits during heavy coding
-
-**Solution:**
-```
-Combo: "maximize-claude"
-  1. cc/claude-opus-4-6        (use subscription fully)
-  2. glm/glm-4.7               (cheap backup when quota out)
-  3. if/kimi-k2-thinking       (free emergency fallback)
-
-Monthly cost: $20 (subscription) + ~$5 (backup) = $25 total
-vs. $20 + hitting limits = frustration
-```
-
-### Case 2: "I want zero cost"
-
-**Problem:** Can't afford subscriptions, need reliable AI coding
-
-**Solution:**
-```
-Combo: "free-forever"
-  1. gc/gemini-3-flash         (180K free/month)
-  2. if/kimi-k2-thinking       (unlimited free)
-  3. qw/qwen3-coder-plus       (unlimited free)
-
-Monthly cost: $0
-Quality: Production-ready models
-```
-
-### Case 3: "I need 24/7 coding, no interruptions"
-
-**Problem:** Deadlines, can't afford downtime
-
-**Solution:**
-```
-Combo: "always-on"
-  1. cc/claude-opus-4-6        (best quality)
-  2. cx/gpt-5.2-codex          (second subscription)
-  3. glm/glm-4.7               (cheap, resets daily)
-  4. minimax/MiniMax-M2.1      (cheapest, 5h reset)
-  5. if/kimi-k2-thinking       (free unlimited)
-
-Result: 5 layers of fallback = zero downtime
-Monthly cost: $20-200 (subscriptions) + $10-20 (backup)
-```
-
-### Case 4: "I want FREE AI in OpenClaw"
-
-**Problem:** Need AI assistant in messaging apps (WhatsApp, Telegram, Slack...), completely free
-
-**Solution:**
-```
-Combo: "openclaw-free"
-  1. if/glm-4.7                (unlimited free)
-  2. if/minimax-m2.1           (unlimited free)
-  3. if/kimi-k2-thinking       (unlimited free)
-
-Monthly cost: $0
-Access via: WhatsApp, Telegram, Slack, Discord, iMessage, Signal...
-```
-
----
-
-## ❓ Frequently Asked Questions
-
-<details>
-<summary><b>📊 Why does my dashboard show high costs?</b></summary>
-
-The dashboard tracks your token usage and displays **estimated costs** as if you were using paid APIs directly. This is **not actual billing** - it's a reference to show how much you're saving by using free models or existing subscriptions through 8Router.
-
-**Example:**
-- **Dashboard shows:** "$290 total cost"
-- **Reality:** You're using iFlow (FREE unlimited)
-- **Your actual cost:** **$0.00**
-- **What $290 means:** Amount you **saved** by using free models instead of paid APIs!
-
-The cost display is a "savings tracker" to help you understand your usage patterns and optimization opportunities.
-
-</details>
-
-<details>
-<summary><b>💳 Will I be charged by 8Router?</b></summary>
-
-**No.** 8Router is free, open-source software that runs on your own computer. It never charges you anything.
-
-**You only pay:**
-- ✅ **Subscription providers** (Claude Code $20/mo, Codex $20-200/mo) → Pay them directly on their websites
-- ✅ **Cheap providers** (GLM, MiniMax) → Pay them directly, 8Router just routes your requests
-- ❌ **8Router itself** → **Never charges anything, ever**
-
-8Router is a local proxy/router. It doesn't have your credit card, can't send invoices, and has no billing system. It's completely free software.
-
-</details>
-
-<details>
-<summary><b>🆓 Are FREE providers really unlimited?</b></summary>
-
-**Yes!** Providers marked as FREE (iFlow, Kiro, Qwen) are genuinely unlimited with **no hidden charges**. 
-
-These are free services offered by those respective companies:
-- **iFlow**: Free unlimited access to 8+ models via OAuth
-- **Kiro**: Free unlimited Claude models via AWS Builder ID  
-- **Qwen**: Free unlimited access to Qwen models via device auth
-
-8Router just routes your requests to them - there's no "catch" or future billing. They're truly free services, and 8Router makes them easy to use with fallback support.
-
-**Note:** Some subscription providers (Antigravity, GitHub Copilot) may have free preview periods that could become paid later, but this would be clearly announced by those providers, not 8Router.
-
-</details>
-
-<details>
-<summary><b>💰 How do I minimize my actual AI costs?</b></summary>
-
-**Free-First Strategy:**
-
-1. **Start with 100% free combo:**
-   ```
-   1. gc/gemini-3-flash (180K/month free from Google)
-   2. if/kimi-k2-thinking (unlimited free from iFlow)
-   3. qw/qwen3-coder-plus (unlimited free from Qwen)
-   ```
-   **Cost: $0/month**
-
-2. **Add cheap backup** only if you need it:
-   ```
-   4. glm/glm-4.7 ($0.6/1M tokens)
-   ```
-   **Additional cost: Only pay for what you actually use**
-
-3. **Use subscription providers last:**
-   - Only if you already have them
-   - 8Router helps maximize their value through quota tracking
-
-**Result:** Most users can operate at $0/month using only free tiers!
-
-</details>
-
-<details>
-<summary><b>📈 What if my usage suddenly spikes?</b></summary>
-
-8Router's smart fallback prevents surprise charges:
-
-**Scenario:** You're on a coding sprint and blow through your quotas
-
-**Without 8Router:**
-- ❌ Hit rate limit → Work stops → Frustration
-- ❌ Or: Accidentally rack up huge API bills
-
-**With 8Router:**
-- ✅ Subscription hits limit → Auto-fallback to cheap tier
-- ✅ Cheap tier gets expensive → Auto-fallback to free tier
-- ✅ Never stop coding → Predictable costs
-
-**You're in control:** Set spending limits per provider in dashboard, and 8Router respects them.
-
-</details>
-
----
-
-## 📖 Setup Guide
-
-<details>
-<summary><b>🔐 Subscription Providers (Maximize Value)</b></summary>
-
-### Claude Code (Pro/Max)
+### 1. Khởi động ứng dụng
 
 ```bash
-Dashboard → Providers → Connect Claude Code
-→ OAuth login → Auto token refresh
-→ 5-hour + weekly quota tracking
-
-Models:
-  cc/claude-opus-4-6
-  cc/claude-sonnet-4-5-20250929
-  cc/claude-haiku-4-5-20251001
+8router
 ```
 
-**Pro Tip:** Use Opus for complex tasks, Sonnet for speed. 8Router tracks quota per model!
+### 2. Mở dashboard
 
-### OpenAI Codex (Plus/Pro)
-
-```bash
-Dashboard → Providers → Connect Codex
-→ OAuth login (port 1455)
-→ 5-hour + weekly reset
-
-Models:
-  cx/gpt-5.2-codex
-  cx/gpt-5.1-codex-max
+```text
+http://localhost:20128/dashboard
 ```
 
-### Gemini CLI (FREE 180K/month!)
+### 3. Thêm provider
 
-```bash
-Dashboard → Providers → Connect Gemini CLI
-→ Google OAuth
-→ 180K completions/month + 1K/day
+Dùng dashboard để kết nối OAuth provider hoặc lưu API key.
 
-Models:
-  gc/gemini-3-flash-preview
-  gc/gemini-2.5-pro
-```
+### 4. Tạo combo
 
-**Best Value:** Huge free tier! Use this before paid tiers.
+Tạo danh sách model có thứ tự để fallback.
 
-### GitHub Copilot
+### 5. Trỏ tool về 8Router
 
-```bash
-Dashboard → Providers → Connect GitHub
-→ OAuth via GitHub
-→ Monthly reset (1st of month)
+Dùng:
 
-Models:
-  gh/gpt-5
-  gh/claude-4.5-sonnet
-  gh/gemini-3-pro
-```
+- Base URL: `http://localhost:20128/v1`
+- API key: key được dashboard hiển thị hoặc sinh ra
 
-</details>
-
-<details>
-<summary><b>💰 Cheap Providers (Backup)</b></summary>
-
-### GLM-4.7 (Daily reset, $0.6/1M)
-
-1. Sign up: [Zhipu AI](https://open.bigmodel.cn/)
-2. Get API key from Coding Plan
-3. Dashboard → Add API Key:
-   - Provider: `glm`
-   - API Key: `your-key`
-
-**Use:** `glm/glm-4.7`
-
-**Pro Tip:** Coding Plan offers 3× quota at 1/7 cost! Reset daily 10:00 AM.
-
-### MiniMax M2.1 (5h reset, $0.20/1M)
-
-1. Sign up: [MiniMax](https://www.minimax.io/)
-2. Get API key
-3. Dashboard → Add API Key
-
-**Use:** `minimax/MiniMax-M2.1`
-
-**Pro Tip:** Cheapest option for long context (1M tokens)!
-
-### Kimi K2 ($9/month flat)
-
-1. Subscribe: [Moonshot AI](https://platform.moonshot.ai/)
-2. Get API key
-3. Dashboard → Add API Key
-
-**Use:** `kimi/kimi-latest`
-
-**Pro Tip:** Fixed $9/month for 10M tokens = $0.90/1M effective cost!
-
-</details>
-
-<details>
-<summary><b>🆓 FREE Providers (Emergency Backup)</b></summary>
-
-### iFlow (8 FREE models)
-
-```bash
-Dashboard → Connect iFlow
-→ iFlow OAuth login
-→ Unlimited usage
-
-Models:
-  if/kimi-k2-thinking
-  if/qwen3-coder-plus
-  if/glm-4.7
-  if/minimax-m2
-  if/deepseek-r1
-```
-
-### Qwen (3 FREE models)
-
-```bash
-Dashboard → Connect Qwen
-→ Device code authorization
-→ Unlimited usage
-
-Models:
-  qw/qwen3-coder-plus
-  qw/qwen3-coder-flash
-```
-
-### Kiro (Claude FREE)
-
-```bash
-Dashboard → Connect Kiro
-→ AWS Builder ID, AWS IAM Identity Center, Google, GitHub
-→ Unlimited usage
-
-Models:
-  kr/claude-sonnet-4.5
-  kr/claude-haiku-4.5
-```
-
-</details>
-
-<details>
-<summary><b>🎨 Create Combos</b></summary>
-
-### Example 1: Maximize Subscription → Cheap Backup
-
-```
-Dashboard → Combos → Create New
-
-Name: premium-coding
-Models:
-  1. cc/claude-opus-4-6 (Subscription primary)
-  2. glm/glm-4.7 (Cheap backup, $0.6/1M)
-  3. minimax/MiniMax-M2.1 (Cheapest fallback, $0.20/1M)
-
-Use in CLI: premium-coding
-
-Monthly cost example (100M tokens):
-  80M via Claude (subscription): $0 extra
-  15M via GLM: $9
-  5M via MiniMax: $1
-  Total: $10 + your subscription
-```
-
-### Example 2: Free-Only (Zero Cost)
-
-```
-Name: free-combo
-Models:
-  1. gc/gemini-3-flash-preview (180K free/month)
-  2. if/kimi-k2-thinking (unlimited)
-  3. qw/qwen3-coder-plus (unlimited)
-
-Cost: $0 forever!
-```
-
-</details>
-
-<details>
-<summary><b>🔧 CLI Integration</b></summary>
-
-### Cursor IDE
-
-```
-Settings → Models → Advanced:
-  OpenAI API Base URL: http://localhost:20128/v1
-  OpenAI API Key: [from 8router dashboard]
-  Model: cc/claude-opus-4-6
-```
-
-Or use combo: `premium-coding`
+## Cấu hình nhanh thường dùng
 
 ### Claude Code
-
-Edit `~/.claude/config.json`:
 
 ```json
 {
@@ -869,113 +300,79 @@ Edit `~/.claude/config.json`:
 ```bash
 export OPENAI_BASE_URL="http://localhost:20128"
 export OPENAI_API_KEY="your-8router-api-key"
-
-codex "your prompt"
 ```
+
+### Cursor / Cline / Continue / Roo
+
+Dùng cấu hình OpenAI-compatible provider với:
+
+- Base URL: `http://localhost:20128/v1`
+- API key: `your-8router-api-key`
+- Model: model id trực tiếp hoặc tên combo
 
 ### OpenClaw
 
-**Option 1 — Dashboard (recommended):**
+OpenClaw hoạt động ổn nhất khi trỏ vào 8Router local. Nếu môi trường của bạn có vấn đề với IPv6 resolution, nên dùng `127.0.0.1` thay cho `localhost`.
 
-```
-Dashboard → CLI Tools → OpenClaw → Select Model → Apply
-```
+## Ví dụ tích hợp CLI
 
-**Option 2 — Manual:** Edit `~/.openclaw/openclaw.json`:
+Ngoài các cấu hình nhanh ở trên, phần tích hợp thực tế thường chỉ xoay quanh 3 giá trị:
+
+- Base URL của 8Router
+- API key do dashboard cấp hoặc sinh ra
+- Model trực tiếp hoặc tên combo
+
+Nếu một tool hỗ trợ custom OpenAI-compatible endpoint, thường có thể nối qua 8Router theo mẫu này.
+
+### Claude Code
 
 ```json
 {
-  "agents": {
-    "defaults": {
-      "model": {
-        "primary": "8router/if/glm-4.7"
-      }
-    }
-  },
-  "models": {
-    "providers": {
-      "8router": {
-        "baseUrl": "http://127.0.0.1:20128/v1",
-        "apiKey": "sk_8router",
-        "api": "openai-completions",
-        "models": [
-          {
-            "id": "if/glm-4.7",
-            "name": "glm-4.7"
-          }
-        ]
-      }
-    }
-  }
+  "anthropic_api_base": "http://localhost:20128/v1",
+  "anthropic_api_key": "your-8router-api-key"
 }
 ```
 
-> **Note:** OpenClaw only works with local 8Router. Use `127.0.0.1` instead of `localhost` to avoid IPv6 resolution issues.
-
-### Cline / Continue / RooCode
-
-```
-Provider: OpenAI Compatible
-Base URL: http://localhost:20128/v1
-API Key: [from dashboard]
-Model: cc/claude-opus-4-6
-```
-
-</details>
-
-<details>
-<summary><b>🚀 Deployment</b></summary>
-
-### VPS Deployment
+### Codex CLI
 
 ```bash
-# Clone and install
-git clone https://github.com/baines95/8router.git
-cd 8router
+export OPENAI_BASE_URL="http://localhost:20128"
+export OPENAI_API_KEY="your-8router-api-key"
+```
+
+### Cursor / Cline / Continue / Roo
+
+Dùng cấu hình OpenAI-compatible provider với:
+
+- Base URL: `http://localhost:20128/v1`
+- API key: `your-8router-api-key`
+- Model: model id trực tiếp hoặc tên combo
+
+### OpenClaw
+
+OpenClaw hoạt động ổn nhất khi trỏ vào 8Router local. Nếu môi trường của bạn có vấn đề với IPv6 resolution, nên dùng `127.0.0.1` thay cho `localhost`.
+
+## Triển khai
+
+### Phát triển cục bộ
+
+```bash
 npm install
+npm run dev
+```
+
+### Build production
+
+```bash
 npm run build
-
-# Configure
-export JWT_SECRET="your-secure-secret-change-this"
-export INITIAL_PASSWORD="your-password"
-export DATA_DIR="/var/lib/8router"
-export PORT="20128"
-export HOSTNAME="0.0.0.0"
-export NODE_ENV="production"
-export NEXT_PUBLIC_BASE_URL="http://localhost:20128"
-export NEXT_PUBLIC_CLOUD_URL="https://8router.com"
-export API_KEY_SECRET="endpoint-proxy-api-key-secret"
-export MACHINE_ID_SALT="endpoint-proxy-salt"
-
-# Start
 npm run start
-
-# Or use PM2
-npm install -g pm2
-pm2 start npm --name 8router -- start
-pm2 save
-pm2 startup
 ```
 
 ### Docker
 
 ```bash
-# Build image (from repository root)
 docker build -t 8router .
 
-# Run container (command used in current setup)
-docker run -d \
-  --name 8router \
-  -p 20128:20128 \
-  --env-file /root/dev/8router/.env \
-  -v 8router-data:/app/data \
-  -v 8router-usage:/root/.8router \
-  8router
-```
-
-Portable command (if you are already at repository root):
-
-```bash
 docker run -d \
   --name 8router \
   -p 20128:20128 \
@@ -985,147 +382,56 @@ docker run -d \
   8router
 ```
 
-Container defaults:
-- `PORT=20128`
-- `HOSTNAME=0.0.0.0`
+### Cloud worker
 
-Useful commands:
+Trong repo cũng có runtime Cloudflare Worker tại `cloud/`.
+
+Workflow thường dùng:
 
 ```bash
-docker logs -f 8router
-docker restart 8router
-docker stop 8router && docker rm 8router
+cd cloud
+npm install
+npm run dev
+npm run deploy
 ```
 
-### Environment Variables
+## Biến môi trường
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `JWT_SECRET` | `8router-default-secret-change-me` | JWT signing secret for dashboard auth cookie (**change in production**) |
-| `INITIAL_PASSWORD` | `123456` | First login password when no saved hash exists |
-| `DATA_DIR` | `~/.8router` | Main app database location (`db.json`) |
-| `PORT` | framework default | Service port (`20128` in examples) |
-| `HOSTNAME` | framework default | Bind host (Docker defaults to `0.0.0.0`) |
-| `NODE_ENV` | runtime default | Set `production` for deploy |
-| `BASE_URL` | `http://localhost:20128` | Server-side internal base URL used by cloud sync jobs |
-| `CLOUD_URL` | `https://8router.com` | Server-side cloud sync endpoint base URL |
-| `NEXT_PUBLIC_BASE_URL` | `http://localhost:3000` | Backward-compatible/public base URL (prefer `BASE_URL` for server runtime) |
-| `NEXT_PUBLIC_CLOUD_URL` | `https://8router.com` | Backward-compatible/public cloud URL (prefer `CLOUD_URL` for server runtime) |
-| `API_KEY_SECRET` | `endpoint-proxy-api-key-secret` | HMAC secret for generated API keys |
-| `MACHINE_ID_SALT` | `endpoint-proxy-salt` | Salt for stable machine ID hashing |
-| `ENABLE_REQUEST_LOGS` | `false` | Enables request/response logs under `logs/` |
-| `AUTH_COOKIE_SECURE` | `false` | Force `Secure` auth cookie (set `true` behind HTTPS reverse proxy) |
-| `REQUIRE_API_KEY` | `false` | Enforce Bearer API key on `/v1/*` routes (recommended for internet-exposed deploys) |
-| `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`, `NO_PROXY` | empty | Optional outbound proxy for upstream provider calls |
+| Biến | Mặc định | Mô tả |
+|------|----------|-------|
+| `JWT_SECRET` | `8router-default-secret-change-me` | Secret dùng để ký dashboard auth cookie |
+| `INITIAL_PASSWORD` | `123456` | Mật khẩu dashboard ban đầu khi chưa có hash đã lưu |
+| `DATA_DIR` | `~/.8router` | Nơi lưu database chính của ứng dụng |
+| `PORT` | framework default | Port service |
+| `HOSTNAME` | framework default | Host bind |
+| `NODE_ENV` | runtime default | Dùng `production` khi deploy |
+| `BASE_URL` | `http://localhost:20128` | Base URL nội bộ phía server |
+| `CLOUD_URL` | `https://8router.com` | Base URL của cloud sync endpoint phía server |
+| `NEXT_PUBLIC_BASE_URL` | `http://localhost:3000` | Thiết lập public/base URL để tương thích |
+| `NEXT_PUBLIC_CLOUD_URL` | `https://8router.com` | Thiết lập public cloud URL để tương thích |
+| `API_KEY_SECRET` | `endpoint-proxy-api-key-secret` | HMAC secret để sinh API key |
+| `MACHINE_ID_SALT` | `endpoint-proxy-salt` | Salt để hash stable machine ID |
+| `ENABLE_REQUEST_LOGS` | `false` | Bật request/translator logs dưới `logs/` |
+| `AUTH_COOKIE_SECURE` | `false` | Ép auth cookie dùng `Secure` khi chạy sau HTTPS |
+| `REQUIRE_API_KEY` | `false` | Bắt buộc Bearer API key trên `/v1/*` routes |
+| `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`, `NO_PROXY` | rỗng | Outbound proxy cho upstream calls |
 
-Notes:
-- Lowercase proxy variables are also supported: `http_proxy`, `https_proxy`, `all_proxy`, `no_proxy`.
-- `.env` is not baked into Docker image (`.dockerignore`); inject runtime config with `--env-file` or `-e`.
-- On Windows, `APPDATA` can be used for local storage path resolution.
-- `INSTANCE_NAME` appears in older docs/env templates, but is currently not used at runtime.
+Ghi chú:
 
-### Runtime Files and Storage
+- Các biến proxy dạng lowercase cũng được hỗ trợ.
+- Trong production, nên ưu tiên `BASE_URL` và `CLOUD_URL` cho hành vi runtime phía server.
+- `.env` không được đóng gói sẵn trong Docker image; nên inject config ở runtime.
 
-- Main app state: `${DATA_DIR}/db.json` (providers, combos, aliases, keys, settings), managed by `src/lib/localDb.ts`.
-- Usage history and logs: `~/.8router/usage.json` and `~/.8router/log.txt`, managed by `src/lib/usageDb.ts`.
-- Optional request/translator logs: `<repo>/logs/...` when `ENABLE_REQUEST_LOGS=true`.
-- Usage storage currently follows `~/.8router` path logic and is independent from `DATA_DIR`.
+## File runtime và storage
 
-</details>
+- Trạng thái chính của app: `${DATA_DIR}/db.json`
+- Lịch sử usage: `~/.8router/usage.json`
+- Log usage: `~/.8router/log.txt`
+- Request log tùy chọn: `<repo>/logs/...` khi `ENABLE_REQUEST_LOGS=true`
 
----
+## API reference
 
-## 📊 Available Models
-
-<details>
-<summary><b>View all available models</b></summary>
-
-**Claude Code (`cc/`)** - Pro/Max:
-- `cc/claude-opus-4-6`
-- `cc/claude-sonnet-4-5-20250929`
-- `cc/claude-haiku-4-5-20251001`
-
-**Codex (`cx/`)** - Plus/Pro:
-- `cx/gpt-5.2-codex`
-- `cx/gpt-5.1-codex-max`
-
-**Gemini CLI (`gc/`)** - FREE:
-- `gc/gemini-3-flash-preview`
-- `gc/gemini-2.5-pro`
-
-**GitHub Copilot (`gh/`)**:
-- `gh/gpt-5`
-- `gh/claude-4.5-sonnet`
-
-**GLM (`glm/`)** - $0.6/1M:
-- `glm/glm-4.7`
-
-**MiniMax (`minimax/`)** - $0.2/1M:
-- `minimax/MiniMax-M2.1`
-
-**iFlow (`if/`)** - FREE:
-- `if/kimi-k2-thinking`
-- `if/qwen3-coder-plus`
-- `if/deepseek-r1`
-
-**Qwen (`qw/`)** - FREE:
-- `qw/qwen3-coder-plus`
-- `qw/qwen3-coder-flash`
-
-**Kiro (`kr/`)** - FREE:
-- `kr/claude-sonnet-4.5`
-- `kr/claude-haiku-4.5`
-
-</details>
-
----
-
-## 🐛 Troubleshooting
-
-**"Language model did not provide messages"**
-- Provider quota exhausted → Check dashboard quota tracker
-- Solution: Use combo fallback or switch to cheaper tier
-
-**Rate limiting**
-- Subscription quota out → Fallback to GLM/MiniMax
-- Add combo: `cc/claude-opus-4-6 → glm/glm-4.7 → if/kimi-k2-thinking`
-
-**OAuth token expired**
-- Auto-refreshed by 8Router
-- If issues persist: Dashboard → Provider → Reconnect
-
-**High costs**
-- Check usage stats in Dashboard
-- Switch primary model to GLM/MiniMax
-- Use free tier (Gemini CLI, iFlow) for non-critical tasks
-
-**Dashboard opens on wrong port**
-- Set `PORT=20128` and `NEXT_PUBLIC_BASE_URL=http://localhost:20128`
-
-**First login not working**
-- Check `INITIAL_PASSWORD` in `.env`
-- If unset, fallback password is `123456`
-
-**No request logs under `logs/`**
-- Set `ENABLE_REQUEST_LOGS=true`
-
----
-
-## 🛠️ Tech Stack
-
-- **Language**: 100% TypeScript
-- **Runtime**: Node.js 20+
-- **Framework**: Next.js 16
-- **UI**: React 19 + Tailwind CSS 4
-- **Database**: LowDB (JSON file-based)
-- **Streaming**: Server-Sent Events (SSE)
-- **Auth**: OAuth 2.0 (PKCE) + JWT + API Keys
-
----
-
-## 📝 API Reference
-
-### Chat Completions
+### Chat completions
 
 ```bash
 POST http://localhost:20128/v1/chat/completions
@@ -1141,55 +447,215 @@ Content-Type: application/json
 }
 ```
 
-### List Models
+### List models
 
 ```bash
 GET http://localhost:20128/v1/models
 Authorization: Bearer your-api-key
-
-→ Returns all models + combos in OpenAI format
 ```
 
-## 📧 Support
+## Xử lý sự cố
 
-- **Website**: [8router.com](https://8router.com)
-- **GitHub**: [github.com/baines95/8router](https://github.com/baines95/8router)
-- **Issues**: [github.com/baines95/8router/issues](https://github.com/baines95/8router/issues)
+### Dashboard không mở đúng port mong muốn
 
----
+Đặt:
 
-## 👥 Contributors
+```bash
+PORT=20128
+NEXT_PUBLIC_BASE_URL=http://localhost:20128
+```
 
-Thanks to all contributors who helped make 8Router better!
+### Đăng nhập lần đầu thất bại
 
-[![Contributors](https://contrib.rocks/image?repo=baines95/8router&max=150&columns=15&anon=1&v=20260309)](https://github.com/baines95/8router/graphs/contributors)
+Kiểm tra `INITIAL_PASSWORD`. Nếu biến này chưa được đặt và chưa có password hash đã lưu, mật khẩu fallback là `123456`.
 
----
+### OAuth provider ngừng hoạt động
 
-## 📊 Star Chart
+Kết nối lại provider từ dashboard và kiểm tra session/token đang lưu.
 
-[![Star Chart](https://starchart.cc/baines95/8router.svg?variant=adaptive)](https://starchart.cc/baines95/8router)
+### Request lỗi sau khi hết quota hoặc bị rate-limit
 
+Tạo hoặc chỉnh combo để provider rẻ hơn hoặc miễn phí có thể takeover tự động.
 
+### Không thấy request logs
 
-## 🔀 Forks
+Đặt:
 
-**[OmniRoute](https://github.com/diegosouzapw/OmniRoute)** — A full-featured TypeScript fork of 8Router. Adds 36+ providers, 4-tier auto-fallback, multi-modal APIs (images, embeddings, audio, TTS), circuit breaker, semantic cache, LLM evaluations, and a polished dashboard. 368+ unit tests. Available via npm and Docker.
+```bash
+ENABLE_REQUEST_LOGS=true
+```
 
----
+## Tech stack
 
-## 🙏 Acknowledgments
+- TypeScript
+- Node.js
+- Next.js 16
+- React 19
+- Tailwind CSS 4
+- LowDB
+- Server-Sent Events (SSE)
+- OAuth 2.0, JWT và API keys
 
-Special thanks to **CLIProxyAPI** - the original Go implementation that inspired this JavaScript port.
+## Hỗ trợ
 
----
+- Website: [8router.com](https://8router.com)
+- GitHub: [github.com/baines95/8router](https://github.com/baines95/8router)
+- Issues: [github.com/baines95/8router/issues](https://github.com/baines95/8router/issues)
 
-## 📄 License
+## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT. Xem [LICENSE](./LICENSE).
 
----
+## Triển khai
 
-<div align="center">
-  <sub>Built with ❤️ for developers who code 24/7</sub>
-</div>
+### Phát triển cục bộ
+
+```bash
+npm install
+npm run dev
+```
+
+### Build production
+
+```bash
+npm run build
+npm run start
+```
+
+### Docker
+
+```bash
+docker build -t 8router .
+
+docker run -d \
+  --name 8router \
+  -p 20128:20128 \
+  --env-file ./.env \
+  -v 8router-data:/app/data \
+  -v 8router-usage:/root/.8router \
+  8router
+```
+
+### Cloud worker
+
+Trong repo cũng có runtime Cloudflare Worker tại `cloud/`.
+
+Workflow thường dùng:
+
+```bash
+cd cloud
+npm install
+npm run dev
+npm run deploy
+```
+
+## Biến môi trường
+
+| Biến | Mặc định | Mô tả |
+|------|----------|-------|
+| `JWT_SECRET` | `8router-default-secret-change-me` | Secret dùng để ký dashboard auth cookie |
+| `INITIAL_PASSWORD` | `123456` | Mật khẩu dashboard ban đầu khi chưa có hash đã lưu |
+| `DATA_DIR` | `~/.8router` | Nơi lưu database chính của ứng dụng |
+| `PORT` | framework default | Port service |
+| `HOSTNAME` | framework default | Host bind |
+| `NODE_ENV` | runtime default | Dùng `production` khi deploy |
+| `BASE_URL` | `http://localhost:20128` | Base URL nội bộ phía server |
+| `CLOUD_URL` | `https://8router.com` | Base URL của cloud sync endpoint phía server |
+| `NEXT_PUBLIC_BASE_URL` | `http://localhost:3000` | Thiết lập public/base URL để tương thích |
+| `NEXT_PUBLIC_CLOUD_URL` | `https://8router.com` | Thiết lập public cloud URL để tương thích |
+| `API_KEY_SECRET` | `endpoint-proxy-api-key-secret` | HMAC secret để sinh API key |
+| `MACHINE_ID_SALT` | `endpoint-proxy-salt` | Salt để hash stable machine ID |
+| `ENABLE_REQUEST_LOGS` | `false` | Bật request/translator logs dưới `logs/` |
+| `AUTH_COOKIE_SECURE` | `false` | Ép auth cookie dùng `Secure` khi chạy sau HTTPS |
+| `REQUIRE_API_KEY` | `false` | Bắt buộc Bearer API key trên `/v1/*` routes |
+| `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`, `NO_PROXY` | rỗng | Outbound proxy cho upstream calls |
+
+Ghi chú:
+
+- Các biến proxy dạng lowercase cũng được hỗ trợ.
+- Trong production, nên ưu tiên `BASE_URL` và `CLOUD_URL` cho hành vi runtime phía server.
+- `.env` không được đóng gói sẵn trong Docker image; nên inject config ở runtime.
+
+## File runtime và storage
+
+- Trạng thái chính của app: `${DATA_DIR}/db.json`
+- Lịch sử usage: `~/.8router/usage.json`
+- Log usage: `~/.8router/log.txt`
+- Request log tùy chọn: `<repo>/logs/...` khi `ENABLE_REQUEST_LOGS=true`
+
+## API reference
+
+### Chat completions
+
+```bash
+POST http://localhost:20128/v1/chat/completions
+Authorization: Bearer your-api-key
+Content-Type: application/json
+
+{
+  "model": "cc/claude-opus-4-6",
+  "messages": [
+    {"role": "user", "content": "Write a function to..."}
+  ],
+  "stream": true
+}
+```
+
+### List models
+
+```bash
+GET http://localhost:20128/v1/models
+Authorization: Bearer your-api-key
+```
+
+## Xử lý sự cố
+
+### Dashboard không mở đúng port mong muốn
+
+Đặt:
+
+```bash
+PORT=20128
+NEXT_PUBLIC_BASE_URL=http://localhost:20128
+```
+
+### Đăng nhập lần đầu thất bại
+
+Kiểm tra `INITIAL_PASSWORD`. Nếu biến này chưa được đặt và chưa có password hash đã lưu, mật khẩu fallback là `123456`.
+
+### OAuth provider ngừng hoạt động
+
+Kết nối lại provider từ dashboard và kiểm tra session/token đang lưu.
+
+### Request lỗi sau khi hết quota hoặc bị rate-limit
+
+Tạo hoặc chỉnh combo để provider rẻ hơn hoặc miễn phí có thể takeover tự động.
+
+### Không thấy request logs
+
+Đặt:
+
+```bash
+ENABLE_REQUEST_LOGS=true
+```
+
+## Tech stack
+
+- TypeScript
+- Node.js
+- Next.js 16
+- React 19
+- Tailwind CSS 4
+- LowDB
+- Server-Sent Events (SSE)
+- OAuth 2.0, JWT và API keys
+
+## Hỗ trợ
+
+- Website: [8router.com](https://8router.com)
+- GitHub: [github.com/baines95/8router](https://github.com/baines95/8router)
+- Issues: [github.com/baines95/8router/issues](https://github.com/baines95/8router/issues)
+
+## License
+
+MIT. Xem [LICENSE](./LICENSE).
