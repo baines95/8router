@@ -1,6 +1,7 @@
 import { getProviderConnections, validateApiKey, updateProviderConnection, getSettings, type ProviderConnection } from "@/lib/localDb";
 import { resolveConnectionProxyConfig } from "@/lib/network/connectionProxy";
 import { formatRetryAfter, checkFallbackError, isModelLockActive, buildModelLockUpdate, getEarliestModelLockUntil } from "@/lib/open-sse/services/accountFallback";
+import { BACKOFF_CONFIG } from "@/lib/open-sse/config/errorConfig";
 import { resolveProviderId, FREE_PROVIDERS } from "@/shared/constants/providers";
 import * as log from "../utils/logger";
 
@@ -184,7 +185,14 @@ export async function getProviderCredentials(provider: string, excludeConnection
  * Mark account+model as unavailable — locks modelLock_${model} in DB.
  * All errors (429, 401, 5xx, etc.) lock per model, not per account.
  */
-export async function markAccountUnavailable(connectionId: string, status: number, errorText: string, provider: string | null = null, model: string | null = null) {
+export async function markAccountUnavailable(
+  connectionId: string,
+  status: number,
+  errorText: string,
+  provider: string | null = null,
+  model: string | null = null,
+  resetsAtMs: number | null = null
+) {
   if (!connectionId || connectionId === "noauth") return { shouldFallback: false, cooldownMs: 0 };
   const connections = await getProviderConnections({ provider: provider || undefined });
   const conn = connections.find(c => c.id === connectionId);
@@ -193,8 +201,14 @@ export async function markAccountUnavailable(connectionId: string, status: numbe
   const { shouldFallback, cooldownMs, newBackoffLevel } = checkFallbackError(status, errorText, backoffLevel);
   if (!shouldFallback) return { shouldFallback: false, cooldownMs: 0 };
 
+  let effectiveCooldownMs = cooldownMs;
+  if (typeof resetsAtMs === "number" && Number.isFinite(resetsAtMs) && resetsAtMs > Date.now()) {
+    const resetCooldownMs = Math.max(0, Math.floor(resetsAtMs - Date.now()));
+    effectiveCooldownMs = Math.min(resetCooldownMs, BACKOFF_CONFIG.max);
+  }
+
   const reason = typeof errorText === "string" ? errorText.slice(0, 100) : "Provider error";
-  const lockUpdate = buildModelLockUpdate(model, cooldownMs);
+  const lockUpdate = buildModelLockUpdate(model, effectiveCooldownMs);
 
   await updateProviderConnection(connectionId, {
     ...lockUpdate,
@@ -207,13 +221,13 @@ export async function markAccountUnavailable(connectionId: string, status: numbe
 
   const lockKey = Object.keys(lockUpdate)[0];
   const connName = conn?.displayName || conn?.name || conn?.email || connectionId.slice(0, 8);
-  log.warn("AUTH", `${connName} locked ${lockKey} for ${Math.round(cooldownMs / 1000)}s [${status}]`);
+  log.warn("AUTH", `${connName} locked ${lockKey} for ${Math.round(effectiveCooldownMs / 1000)}s [${status}]`);
 
   if (provider && status && reason) {
     console.error(`❌ ${provider} [${status}]: ${reason}`);
   }
 
-  return { shouldFallback: true, cooldownMs };
+  return { shouldFallback: true, cooldownMs: effectiveCooldownMs };
 }
 
 /**
