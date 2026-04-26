@@ -4,6 +4,7 @@ import { isOpenAICompatibleProvider, isAnthropicCompatibleProvider } from "@/sha
 import { KiroService } from "@/lib/oauth/services/kiro";
 import { GEMINI_CONFIG } from "@/lib/oauth/constants/oauth";
 import { refreshGoogleToken, updateProviderCredentials, refreshKiroToken } from "@/sse/services/tokenRefresh";
+import { getModelsByProviderId } from "@/shared/constants/models";
 
 const GEMINI_CLI_MODELS_URL = "https://cloudcode-pa.googleapis.com/v1internal:fetchAvailableModels";
 
@@ -54,6 +55,35 @@ const resolveQwenModelsUrl = (connection: any): string => {
     return `${value.replace(/\/$/, "")}/models`;
   }
   return `https://${value.replace(/\/$/, "")}/v1/models`;
+};
+
+const mapStaticModels = (providerId: string) =>
+  getModelsByProviderId(providerId).map((model: any) => ({
+    id: model.id,
+    name: model.name || model.id,
+    type: model.type,
+  }));
+
+const buildStaticFallbackResponse = (connection: any, warning: string) => {
+  const staticModels = mapStaticModels(connection.provider);
+  if (!staticModels.length) return null;
+
+  return NextResponse.json({
+    provider: connection.provider,
+    connectionId: connection.id,
+    models: staticModels,
+    warning,
+  });
+};
+
+const returnDynamicOrStaticFallback = (connection: any, warning: string, status?: number) => {
+  const fallback = buildStaticFallbackResponse(connection, warning);
+  if (fallback) return fallback;
+
+  return NextResponse.json(
+    { error: warning },
+    { status: status || 502 }
+  );
 };
 
 // Provider models endpoints configuration
@@ -173,7 +203,7 @@ const PROVIDER_MODELS_CONFIG: Record<string, any> = {
 /**
  * GET /api/providers/[id]/models - Get models list from provider
  */
-export async function GET(request: Request, context: { params: Promise<{ id: string }> }): Promise<NextResponse> {
+export async function GET(_request: Request, context: { params: Promise<{ id: string }> }): Promise<NextResponse> {
   try {
     const { id } = await context.params;
     const connection: any = await getProviderConnectionById(id);
@@ -199,9 +229,10 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
       if (!response.ok) {
         const errorText = await response.text();
         console.log(`Error fetching models from ${connection.provider}:`, errorText);
-        return NextResponse.json(
-          { error: `Failed to fetch models: ${response.status}` },
-          { status: response.status }
+        return returnDynamicOrStaticFallback(
+          connection,
+          `Failed to fetch models: ${response.status}`,
+          response.status
         );
       }
 
@@ -240,9 +271,10 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
       if (!response.ok) {
         const errorText = await response.text();
         console.log(`Error fetching models from ${connection.provider}:`, errorText);
-        return NextResponse.json(
-          { error: `Failed to fetch models: ${response.status}` },
-          { status: response.status }
+        return returnDynamicOrStaticFallback(
+          connection,
+          `Failed to fetch models: ${response.status}`,
+          response.status
         );
       }
 
@@ -301,13 +333,10 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
         console.log("Failed to fetch Kiro models dynamically, falling back to static:", error.message);
       }
 
-      // Return empty dynamic list so UI falls back to static provider models.
-      return NextResponse.json({
-        provider: connection.provider,
-        connectionId: connection.id,
-        models: [],
-        warning,
-      });
+      return returnDynamicOrStaticFallback(
+        connection,
+        warning || "Failed to fetch Kiro models"
+      );
     }
 
     if (connection.provider === "gemini-cli") {
@@ -371,13 +400,10 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
         console.log("Failed to fetch Gemini CLI models dynamically, falling back to static:", error.message);
       }
 
-      // Return empty dynamic list so UI falls back to static provider models.
-      return NextResponse.json({
-        provider: connection.provider,
-        connectionId: connection.id,
-        models: [],
-        warning,
-      });
+      return returnDynamicOrStaticFallback(
+        connection,
+        warning || "Failed to fetch Gemini CLI models"
+      );
     }
 
     const config = PROVIDER_MODELS_CONFIG[connection.provider];
