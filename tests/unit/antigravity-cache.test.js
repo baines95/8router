@@ -87,12 +87,13 @@ async function callAg({ accessToken, projectId, sessionId, longText, userText })
 
 describe.skipIf(!ENABLE)("Antigravity cache behavior (real API)", () => {
   const conns = loadAgConnections();
+  const hasAgConnection = conns.length > 0;
 
   it("has at least one active AG connection with refreshToken", () => {
     expect(conns.length).toBeGreaterThan(0);
   });
 
-  it("same sessionId → cache hit on repeated call", async () => {
+  it.skipIf(!hasAgConnection)("same sessionId → cache hit on repeated call", async () => {
     const [acc] = conns;
     const token = await refreshAccessToken(acc.refreshToken);
     const sessionId = `test-same-${crypto.randomUUID()}`;
@@ -107,7 +108,7 @@ describe.skipIf(!ENABLE)("Antigravity cache behavior (real API)", () => {
     expect(r2.cachedTokens).toBeGreaterThanOrEqual(MIN_CACHE_TOKENS);
   }, 60000);
 
-  it("different sessionId (same account) → cache still hits (session-independent)", async () => {
+  it.skipIf(!hasAgConnection)("different sessionId (same account) → cache still hits (session-independent)", async () => {
     const [acc] = conns;
     const token = await refreshAccessToken(acc.refreshToken);
 
@@ -146,7 +147,7 @@ describe.skipIf(!ENABLE)("Antigravity cache behavior (real API)", () => {
   // Codex derives sessionId from hash(conversation history), keeping it
   // stable per-conversation. Test whether this strategy improves cache
   // hit rate vs random sessionId on AG with a fresh unique prompt.
-  it("codex-style sessionId vs random sessionId on unique prompt", async () => {
+  it.skipIf(!hasAgConnection)("codex-style sessionId vs random sessionId on unique prompt", async () => {
     const [acc] = conns;
     const token = await refreshAccessToken(acc.refreshToken);
 
@@ -194,7 +195,7 @@ describe.skipIf(!ENABLE)("Antigravity cache behavior (real API)", () => {
     // No strict comparison — just report. AG cache is session-independent per prior tests.
   }, 180000);
 
-  it("unique prompt (never seen) → explore when cache starts hitting", async () => {
+  it.skipIf(!hasAgConnection)("unique prompt (never seen) → explore when cache starts hitting", async () => {
     const [acc] = conns;
     const token = await refreshAccessToken(acc.refreshToken);
     // Unique marker to guarantee no one has cached this exact prompt before

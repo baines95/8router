@@ -1,6 +1,9 @@
 import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
 const TARGET_FILES = [
   "src/app/(dashboard)/dashboard/profile/sections/LocalModeSection.tsx",
@@ -43,7 +46,7 @@ describe("phosphor imports", () => {
     const violations = [];
 
     for (const relativeFile of TARGET_FILES) {
-      const fullPath = path.join(process.cwd(), relativeFile);
+      const fullPath = path.join(REPO_ROOT, relativeFile);
       const source = fs.readFileSync(fullPath, "utf8");
       const imports = extractPhosphorImports(source);
 

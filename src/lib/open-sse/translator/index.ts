@@ -6,17 +6,50 @@ import { filterToOpenAIFormat } from "./helpers/openaiHelper";
 import { normalizeThinkingConfig } from "../services/provider";
 import { cloakTools as cloakAntigravityTools } from "../utils/antigravityHelper";
 import { applyRtkFailOpen } from "../rtk";
+import "./request/claude-to-openai";
+import "./request/openai-to-claude";
+import "./request/gemini-to-openai";
+import "./request/openai-to-gemini";
+import "./request/openai-to-vertex";
+import "./request/antigravity-to-openai";
+import "./request/openai-responses";
+import "./request/openai-to-kiro";
+import "./request/openai-to-cursor";
+import "./request/openai-to-ollama";
+import "./response/claude-to-openai";
+import "./response/openai-to-claude";
+import "./response/gemini-to-openai";
+import "./response/openai-to-antigravity";
+import "./response/openai-responses";
+import "./response/kiro-to-openai";
+import "./response/cursor-to-openai";
+import "./response/ollama-to-openai";
 
-// Registry for translators
-const requestRegistry = new Map<string, Function>();
-const responseRegistry = new Map<string, Function>();
+type TranslatorRegistryStore = {
+  requestRegistry: Map<string, Function>;
+  responseRegistry: Map<string, Function>;
+};
 
-// Track initialization state
-let initialized = false;
+function getRegistryStore(): TranslatorRegistryStore {
+  const globalKey = "__openSseTranslatorRegistryStore";
+  const globalObject = globalThis as typeof globalThis & {
+    __openSseTranslatorRegistryStore?: TranslatorRegistryStore;
+  };
 
-// Register translator
+  if (!globalObject[globalKey]) {
+    globalObject[globalKey] = {
+      requestRegistry: new Map<string, Function>(),
+      responseRegistry: new Map<string, Function>(),
+    };
+  }
+
+  return globalObject[globalKey]!;
+}
+
 export function register(from: string, to: string, requestFn?: Function | null, responseFn?: Function | null): void {
   const key = `${from}:${to}`;
+  const { requestRegistry, responseRegistry } = getRegistryStore();
+
   if (requestFn) {
     requestRegistry.set(key, requestFn);
   }
@@ -25,31 +58,8 @@ export function register(from: string, to: string, requestFn?: Function | null, 
   }
 }
 
-// Lazy load translators
 function ensureInitialized(): void {
-  if (initialized) return;
-  initialized = true;
-
-  // Sync require pattern
-  require("./request/claude-to-openai");
-  require("./request/openai-to-claude");
-  require("./request/gemini-to-openai");
-  require("./request/openai-to-gemini");
-  require("./request/openai-to-vertex");
-  require("./request/antigravity-to-openai");
-  require("./request/openai-responses");
-  require("./request/openai-to-kiro");
-  require("./request/openai-to-cursor");
-  require("./request/openai-to-ollama");
-
-  require("./response/claude-to-openai");
-  require("./response/openai-to-claude");
-  require("./response/gemini-to-openai");
-  require("./response/openai-to-antigravity");
-  require("./response/openai-responses");
-  require("./response/kiro-to-openai");
-  require("./response/cursor-to-openai");
-  require("./response/ollama-to-openai");
+  getRegistryStore();
 }
 
 function stripContentTypes(body: any, stripList: string[] = []): void {
@@ -68,9 +78,6 @@ function stripContentTypes(body: any, stripList: string[] = []): void {
   }
 }
 
-/**
- * Translate request: source -> openai -> target
- */
 export function translateRequest(
   sourceFormat: string,
   targetFormat: string,
@@ -86,6 +93,8 @@ export function translateRequest(
   if (sourceFormat !== targetFormat) {
     ensureInitialized();
   }
+
+  const { requestRegistry } = getRegistryStore();
 
   let result = body;
   result = applyRtkFailOpen(result);
@@ -143,15 +152,13 @@ export function translateRequest(
   return result;
 }
 
-/**
- * Translate response chunk: target -> openai -> source
- */
 export function translateResponse(targetFormat: string, sourceFormat: string, chunk: any, state: any): any[] {
   ensureInitialized();
   if (sourceFormat === targetFormat) {
     return [chunk];
   }
 
+  const { responseRegistry } = getRegistryStore();
   let results: any[] = [chunk];
   let openaiResults: any[] | null = null;
 
