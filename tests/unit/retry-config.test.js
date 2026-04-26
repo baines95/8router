@@ -131,4 +131,67 @@ describe("BaseExecutor retry behavior", () => {
     expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 120);
     expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 220);
   });
+
+  it("does not retry 429 on same URL and falls back to next URL", async () => {
+    vi.mocked(proxyAwareFetch)
+      .mockResolvedValueOnce(makeResponse(429))
+      .mockResolvedValueOnce(makeResponse(200));
+
+    const executor = new BaseExecutor("test", {
+      baseUrls: [
+        "https://primary.example.com/v1/chat/completions",
+        "https://fallback.example.com/v1/chat/completions",
+      ],
+      retry: {
+        429: { attempts: 3, delayMs: 999 },
+      },
+    });
+
+    const result = await executor.execute({
+      model: "test-model",
+      body: { messages: [{ role: "user", content: "hello" }] },
+      stream: false,
+      credentials: { apiKey: "sk-test" },
+      proxyOptions: null,
+    });
+
+    expect(result.response.status).toBe(200);
+    expect(proxyAwareFetch).toHaveBeenCalledTimes(2);
+    expect(vi.mocked(proxyAwareFetch).mock.calls[0][0]).toBe(
+      "https://primary.example.com/v1/chat/completions"
+    );
+    expect(vi.mocked(proxyAwareFetch).mock.calls[1][0]).toBe(
+      "https://fallback.example.com/v1/chat/completions"
+    );
+    expect(setTimeout).not.toHaveBeenCalledWith(expect.any(Function), 999);
+  });
+
+  it("does not retry non-retriable status and returns response without fallback", async () => {
+    vi.mocked(proxyAwareFetch).mockResolvedValueOnce(makeResponse(400));
+
+    const executor = new BaseExecutor("test", {
+      baseUrls: [
+        "https://primary.example.com/v1/chat/completions",
+        "https://fallback.example.com/v1/chat/completions",
+      ],
+      retry: {
+        400: { attempts: 0, delayMs: 0 },
+      },
+    });
+
+    const result = await executor.execute({
+      model: "test-model",
+      body: { messages: [{ role: "user", content: "hello" }] },
+      stream: false,
+      credentials: { apiKey: "sk-test" },
+      proxyOptions: null,
+    });
+
+    expect(result.response.status).toBe(400);
+    expect(proxyAwareFetch).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(proxyAwareFetch).mock.calls[0][0]).toBe(
+      "https://primary.example.com/v1/chat/completions"
+    );
+    expect(setTimeout).not.toHaveBeenCalled();
+  });
 });

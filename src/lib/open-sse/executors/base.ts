@@ -139,6 +139,12 @@ export class BaseExecutor {
           signal
         }, proxyOptions);
 
+        if (this.shouldRetry(response.status, urlIndex)) {
+          log?.debug?.("RETRY", `${response.status} on ${url}, trying fallback ${urlIndex + 1}`);
+          lastStatus = response.status;
+          continue;
+        }
+
         // Retry based on status code config
         const policy = getPolicy(response.status);
         const statusRetryKey = `status:${response.status}`;
@@ -151,10 +157,8 @@ export class BaseExecutor {
           continue;
         }
 
-        if (this.shouldRetry(response.status, urlIndex)) {
-          log?.debug?.("RETRY", `${response.status} on ${url}, trying fallback ${urlIndex + 1}`);
+        if (response.status === HTTP_STATUS.RATE_LIMITED) {
           lastStatus = response.status;
-          continue;
         }
 
         return { response, url, headers, transformedBody };
