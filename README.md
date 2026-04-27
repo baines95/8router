@@ -205,6 +205,12 @@ ENABLE_REQUEST_LOGS=true
 - `Round-robin` nay là hard round-robin quota-aware thay vì còn giữ sticky behavior.
 - Log chọn account, skip reason, fallback reason, và cooldown context đã dễ đọc hơn.
 
+## v0.4.6-mini.2
+
+- Migrate toàn bộ `cloud/src` từ JavaScript sang TypeScript để đồng bộ với codebase chính hơn.
+- Thêm `cloud` typecheck bootstrap, chuyển Worker entry sang `src/index.ts`, và giữ nguyên các route cloud hiện có.
+- Khôi phục wiring cho `/{machineId}/v1/messages/count_tokens`, giữ compatibility cho `/testClaude`, và sửa sync merge để không làm rơi provider chỉ có ở Worker.
+
 ## License
 
 MIT. Xem [LICENSE](./LICENSE).
