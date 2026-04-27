@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 
-const ROOT_DIR = path.resolve(process.cwd(), "..");
+const ROOT_DIR = process.cwd();
 const read = (p) => fs.readFileSync(path.resolve(ROOT_DIR, p), "utf8");
 
 describe("endpoint typography contract", () => {
