@@ -14,6 +14,12 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -32,6 +38,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import { translate } from "@/i18n/runtime";
 import { isOpenAICompatibleProvider, isAnthropicCompatibleProvider } from "@/shared/constants/providers";
+import { getQuotaSnapshotState, type QuotaSnapshot } from "@/lib/usage/quotaSnapshot";
 
 interface Connection {
   id: string;
@@ -44,6 +51,7 @@ interface Connection {
   lastError?: string;
   providerSpecificData?: {
     proxyPoolId?: string | null;
+    quotaSnapshot?: QuotaSnapshot | null;
     [key: string]: any;
   };
   [key: string]: any;
@@ -58,6 +66,7 @@ interface EditConnectionModalProps {
   isOpen: boolean;
   connection: Connection | null;
   proxyPools: ProxyPool[];
+  autoPauseByQuota: boolean;
   onSave: (data: any) => Promise<void>;
   onClose: () => void;
 }
@@ -68,16 +77,18 @@ interface FormData {
   apiKey: string;
   proxyPoolId: string;
   isActive: boolean;
+  autoPausedUntil: string | null;
 }
 
-export default function EditConnectionModal({ isOpen, connection, proxyPools, onSave, onClose }: EditConnectionModalProps) {
+export default function EditConnectionModal({ isOpen, connection, proxyPools, autoPauseByQuota, onSave, onClose }: EditConnectionModalProps) {
   const NONE_PROXY_POOL_VALUE = "__none__";
-  const [formData, setFormData] = useState<FormData>({ 
-    name: "", 
-    priority: 1, 
+  const [formData, setFormData] = useState<FormData>({
+    name: "",
+    priority: 1,
     apiKey: "",
     proxyPoolId: NONE_PROXY_POOL_VALUE,
-    isActive: true
+    isActive: true,
+    autoPausedUntil: null,
   });
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<string | null>(null);
@@ -87,12 +98,15 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, on
 
   useEffect(() => {
     if (connection) {
-      setFormData({ 
-        name: connection.name || "", 
-        priority: connection.priority || 1, 
+      setFormData({
+        name: connection.name || "",
+        priority: connection.priority || 1,
         apiKey: "",
         proxyPoolId: connection.providerSpecificData?.proxyPoolId || NONE_PROXY_POOL_VALUE,
-        isActive: connection.isActive ?? true
+        isActive: connection.isActive ?? true,
+        autoPausedUntil: typeof connection.providerSpecificData?.autoPausedUntil === "string"
+          ? connection.providerSpecificData.autoPausedUntil
+          : null,
       });
       setTestResult(null);
       setValidationResult(null);
@@ -106,6 +120,14 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, on
     { value: NONE_PROXY_POOL_VALUE, label: translate("None") },
     ...(proxyPools || []).map((pool) => ({ value: pool.id, label: pool.name })),
   ];
+  const quotaSnapshotState = connection?.providerSpecificData?.quotaSnapshot
+    ? getQuotaSnapshotState(connection.providerSpecificData.quotaSnapshot)
+    : null;
+  const authorityAutoPausedUntil = quotaSnapshotState?.exhausted ? quotaSnapshotState.nextResetAt : null;
+  const statusLockedByAutoPause = autoPauseByQuota;
+  const autoPauseUntilLabel = authorityAutoPausedUntil
+    ? new Date(authorityAutoPausedUntil).toLocaleTimeString("vi-VN", { hour12: false })
+    : null;
 
   const handleTest = async () => {
     if (!connection?.provider) return;
@@ -135,11 +157,11 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, on
     if (!connection) return;
     setSaving(true);
     try {
-      const updates: any = { 
-        name: formData.name, 
+      const updates: any = {
+        name: formData.name,
         priority: formData.priority,
         isActive: formData.isActive,
-        proxyPoolId: formData.proxyPoolId === NONE_PROXY_POOL_VALUE ? null : formData.proxyPoolId
+        proxyPoolId: formData.proxyPoolId === NONE_PROXY_POOL_VALUE ? null : formData.proxyPoolId,
       };
       if (!isOAuth && formData.apiKey) {
         updates.apiKey = formData.apiKey;
@@ -169,15 +191,42 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, on
           <div className="flex items-center justify-between p-3 bg-muted/5 border border-border/50 rounded-none">
             <div className="flex items-center gap-2">
               <Power className={cn("size-4", formData.isActive ? "text-primary" : "text-muted-foreground")} weight="bold" />
-              <span className="text-xs font-medium">{translate("Status")}</span>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-medium">{translate("Status")}</span>
+                {statusLockedByAutoPause && (
+                  <span className="text-xs text-muted-foreground">
+                    {autoPauseUntilLabel
+                      ? translate("Auto paused until") + " " + autoPauseUntilLabel
+                      : translate("Managed automatically by quota")}
+                  </span>
+                )}
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">{formData.isActive ? translate("Active") : translate("Disabled")}</span>
-              <Switch 
-                checked={formData.isActive} 
-                onCheckedChange={(val) => setFormData({ ...formData, isActive: val })}
-                className="scale-[0.8] data-[state=checked]:bg-primary"
-              />
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <div className="inline-flex">
+                        <Switch
+                          checked={formData.isActive}
+                          onCheckedChange={(val) => setFormData({ ...formData, isActive: val })}
+                          disabled={statusLockedByAutoPause}
+                          className="scale-[0.8] data-[state=checked]:bg-primary"
+                        />
+                      </div>
+                    }
+                  />
+                  {statusLockedByAutoPause && (
+                    <TooltipContent>
+                      {autoPauseUntilLabel
+                        ? `${translate("Status is managed automatically by quota")}. ${translate("Auto paused until")} ${autoPauseUntilLabel}.`
+                        : `${translate("Status is managed automatically by quota")}. ${translate("It will be re-enabled after reset when available")}.`}
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
 

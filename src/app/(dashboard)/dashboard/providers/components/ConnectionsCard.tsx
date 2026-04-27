@@ -347,7 +347,7 @@ export default function ConnectionsCard({ providerId, isOAuth }: { providerId: s
  </Card>
 
  <AddApiKeyModal isOpen={showAddModal} provider={providerId} providerName={providerId} proxyPools={proxyPools} onClose={() => setShowAddModal(false)} onSave={async d => { await fetch("/api/providers", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ provider: providerId, ...d }) }); fetch_(); setShowAddModal(false); }} />
- <EditConnectionModal isOpen={showEditModal} connection={selectedConnection} proxyPools={proxyPools} onClose={() => setShowEditModal(false)} onSave={async d => { if (!selectedConnection) return; await fetch(`/api/providers/${selectedConnection.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) }); fetch_(); setShowEditModal(false); }} />
+ <EditConnectionModal isOpen={showEditModal} connection={selectedConnection} proxyPools={proxyPools} autoPauseByQuota={false} onClose={() => setShowEditModal(false)} onSave={async d => { if (!selectedConnection) return; await fetch(`/api/providers/${selectedConnection.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) }); fetch_(); setShowEditModal(false); }} />
  </>
  );
 }

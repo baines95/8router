@@ -3,6 +3,7 @@ import { resolveConnectionProxyConfig } from "@/lib/network/connectionProxy";
 import { formatRetryAfter, checkFallbackError, isModelLockActive, buildModelLockUpdate, getEarliestModelLockUntil } from "@/lib/open-sse/services/accountFallback";
 import { BACKOFF_CONFIG } from "@/lib/open-sse/config/errorConfig";
 import { resolveProviderId, FREE_PROVIDERS } from "@/shared/constants/providers";
+import { getQuotaSnapshotState, type QuotaSnapshot } from "@/lib/usage/quotaSnapshot";
 import * as log from "../utils/logger";
 
 // Mutex to prevent race conditions during account selection
@@ -96,6 +97,115 @@ function formatErrorDetail(errorText: string): string {
   return errorText.length > 100 ? errorText.slice(0, 100) : errorText;
 }
 
+function getAutoPauseState(connection: ProviderConnection | null | undefined): { autoPausedUntil: string | null; autoPauseReason: string | null } {
+  const providerSpecificData = connection?.providerSpecificData || {};
+  return {
+    autoPausedUntil: typeof providerSpecificData.autoPausedUntil === "string" ? providerSpecificData.autoPausedUntil : null,
+    autoPauseReason: typeof providerSpecificData.autoPauseReason === "string" ? providerSpecificData.autoPauseReason : null,
+  };
+}
+
+function isProviderAutoPauseEnabled(settings: any, providerId: string): boolean {
+  return settings?.providerStrategies?.[providerId]?.autoPauseByQuota === true;
+}
+
+function shouldAutoResumeConnection(connection: ProviderConnection | null | undefined, now: number, autoPauseEnabled: boolean): boolean {
+  if (!autoPauseEnabled || !connection || connection.isActive !== false) return false;
+  const { autoPausedUntil, autoPauseReason } = getAutoPauseState(connection);
+  if (autoPauseReason !== "quota" || !autoPausedUntil) return false;
+  const pausedUntilMs = Date.parse(autoPausedUntil);
+  return !Number.isNaN(pausedUntilMs) && pausedUntilMs <= now;
+}
+
+function getQuotaResetAtMs(quota: any): number | null {
+  const resetAt = quota?.resetAt;
+  if (typeof resetAt !== "string" || !resetAt) return null;
+  const resetAtMs = Date.parse(resetAt);
+  return Number.isNaN(resetAtMs) ? null : resetAtMs;
+}
+
+function isQuotaExhausted(quota: any): boolean {
+  if (!quota || typeof quota !== "object") return false;
+  const total = typeof quota.total === "number" ? quota.total : 0;
+  const used = typeof quota.used === "number" ? quota.used : 0;
+  if (total <= 0) return false;
+  return used >= total;
+}
+
+function getEarliestQuotaResetAt(quotas: any[] | undefined, now: number): string | null {
+  if (!Array.isArray(quotas)) return null;
+  const futureResetTimes = quotas
+    .filter(isQuotaExhausted)
+    .map(getQuotaResetAtMs)
+    .filter((value): value is number => value !== null && value > now)
+    .sort((a, b) => a - b);
+
+  return futureResetTimes.length > 0 ? new Date(futureResetTimes[0]).toISOString() : null;
+}
+
+export async function reconcileConnectionQuotaPause(
+  connection: Pick<ProviderConnection, "id" | "provider" | "isActive" | "providerSpecificData">,
+  input: { autoPauseByQuota: boolean; quotas?: any[]; quotaSnapshot?: QuotaSnapshot | null },
+  now: number = Date.now(),
+): Promise<{ action: "disabled" | "enabled" | "none"; autoPausedUntil: string | null }> {
+  if (!input.autoPauseByQuota) {
+    return { action: "none", autoPausedUntil: null };
+  }
+
+  const providerSpecificData = connection.providerSpecificData || {};
+  const snapshotState = input.quotaSnapshot
+    ? getQuotaSnapshotState(input.quotaSnapshot, now)
+    : null;
+  const earliestResetAt = snapshotState
+    ? (snapshotState.exhausted ? snapshotState.nextResetAt : null)
+    : getEarliestQuotaResetAt(input.quotas, now);
+
+  if (earliestResetAt && connection.isActive !== false) {
+    await updateProviderConnection(connection.id, {
+      isActive: false,
+      providerSpecificData: {
+        ...providerSpecificData,
+        autoPausedUntil: earliestResetAt,
+        autoPauseReason: "quota",
+      },
+    } as any);
+    return { action: "disabled", autoPausedUntil: earliestResetAt };
+  }
+
+  if (!earliestResetAt && shouldAutoResumeConnection(connection as ProviderConnection, now, true)) {
+    await updateProviderConnection(connection.id, {
+      isActive: true,
+      providerSpecificData: {
+        ...providerSpecificData,
+        autoPausedUntil: null,
+        autoPauseReason: null,
+      },
+    } as any);
+    return { action: "enabled", autoPausedUntil: null };
+  }
+
+  return { action: "none", autoPausedUntil: null };
+}
+
+async function autoResumePausedConnections(providerId: string, settings: any): Promise<void> {
+  const now = Date.now();
+  const autoPauseEnabled = isProviderAutoPauseEnabled(settings, providerId);
+  const allConnections = await getProviderConnections({ provider: providerId });
+  const resumableConnections = allConnections.filter(connection => shouldAutoResumeConnection(connection, now, autoPauseEnabled));
+
+  await Promise.all(resumableConnections.map(connection => {
+    const providerSpecificData = {
+      ...(connection.providerSpecificData || {}),
+      autoPausedUntil: null,
+      autoPauseReason: null,
+    };
+    return updateProviderConnection(connection.id, {
+      isActive: true,
+      providerSpecificData,
+    } as any);
+  }));
+}
+
 function shouldEmitClearLog(contextKey: string): boolean {
   const now = Date.now();
   const last = clearLogDedupeByContext.get(contextKey) || 0;
@@ -174,6 +284,8 @@ export async function getProviderCredentials(provider: string, excludeConnection
       return { id: "noauth", connectionName: "Public", isActive: true, accessToken: "public" };
     }
 
+    const settings = await getSettings();
+    await autoResumePausedConnections(providerId, settings);
     const connections = await getProviderConnections({ provider: providerId, isActive: true });
 
     if (connections.length === 0) {
@@ -181,7 +293,6 @@ export async function getProviderCredentials(provider: string, excludeConnection
       return null;
     }
 
-    const settings = await getSettings();
     // Per-provider strategy overrides global setting
     const providerOverride = (settings.providerStrategies || {})[providerId] || {};
     const strategy = providerOverride.fallbackStrategy || settings.comboStrategy || "fill-first";
@@ -324,17 +435,27 @@ export async function markAccountUnavailable(
   const lockKey = Object.keys(lockUpdate)[0];
   const cooldownUntil = (lockUpdate as any)[lockKey] || null;
 
+  const providerId = resolveProviderId(provider || conn?.provider || "unknown");
+  const settings = await getSettings();
+  const autoPause = isProviderAutoPauseEnabled(settings, providerId) && cooldownSource === "retry-after";
+  const nextProviderSpecificData = autoPause
+    ? {
+        ...(conn?.providerSpecificData || {}),
+        autoPausedUntil: cooldownUntil,
+        autoPauseReason: "quota",
+      }
+    : undefined;
+
   await updateProviderConnection(connectionId, {
     ...lockUpdate,
     testStatus: "unavailable",
     lastError: reason,
     errorCode: String(status),
     lastErrorAt: new Date().toISOString(),
-    backoffLevel: newBackoffLevel ?? backoffLevel
+    backoffLevel: newBackoffLevel ?? backoffLevel,
+    ...(autoPause ? { isActive: false, providerSpecificData: nextProviderSpecificData } : {}),
   } as any);
 
-  const providerId = resolveProviderId(provider || "unknown");
-  const settings = await getSettings();
   const providerOverride = (settings.providerStrategies || {})[providerId] || {};
   const authMode = providerOverride.fallbackStrategy || settings.comboStrategy || "fill-first";
   const requestTag = createRequestTag();

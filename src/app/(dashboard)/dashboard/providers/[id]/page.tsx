@@ -62,6 +62,12 @@ import {
  GitLabAuthModal,
  EditConnectionModal,
 } from "@/shared/components";
+import {
+ Tooltip,
+ TooltipContent,
+ TooltipProvider,
+ TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { 
   OAUTH_PROVIDERS, 
   APIKEY_PROVIDERS, 
@@ -151,6 +157,7 @@ export default function ProviderDetailPage() {
  const [bulkUpdatingProxy, setBulkUpdatingProxy] = useState(false);
  const [providerStrategy, setProviderStrategy] = useState<string | null>(null);
  const [providerStickyLimit, setProviderStickyLimit] = useState("");
+ const [providerAutoPauseByQuota, setProviderAutoPauseByQuota] = useState(false);
  // eslint-disable-next-line @typescript-eslint/no-unused-vars
  const [thinkingMode, setThinkingMode] = useState("auto");
  const [suggestedModels, setSuggestedModels] = useState<any[]>([]);
@@ -231,6 +238,7 @@ export default function ProviderDetailPage() {
  const override = (settingsData.providerStrategies || {})[providerId] || {};
  setProviderStrategy(override.fallbackStrategy || null);
  setProviderStickyLimit(override.stickyRoundRobinLimit != null ? String(override.stickyRoundRobinLimit) :"1");
+ setProviderAutoPauseByQuota(override.autoPauseByQuota === true);
  // Load per-provider thinking config
  const thinkingCfg = (settingsData.providerThinking || {})[providerId] || {};
  setThinkingMode(thinkingCfg.mode ||"auto");
@@ -318,6 +326,49 @@ export default function ProviderDetailPage() {
  const handleStickyLimitChange = (value: string) => {
  setProviderStickyLimit(value);
  saveProviderStrategy("round-robin", value);
+ };
+
+ const handleProviderAutoPauseToggle = async (enabled: boolean) => {
+ try {
+ setProviderAutoPauseByQuota(enabled);
+ const settingsRes = await fetch("/api/settings", { cache:"no-store"});
+ const settingsData = settingsRes.ok ? await settingsRes.json() : {};
+ const current = settingsData.providerStrategies || {};
+ const existing = current[providerId] || {};
+ const nextOverride = {
+ ...existing,
+ autoPauseByQuota: enabled,
+ };
+ const updated = {
+ ...current,
+ [providerId]: nextOverride,
+ };
+ const saveRes = await fetch("/api/settings", {
+ method:"PATCH",
+ headers: {"Content-Type":"application/json"},
+ body: JSON.stringify({ providerStrategies: updated }),
+ });
+ if (!saveRes.ok) {
+ const data = await saveRes.json().catch(() => ({}));
+ throw new Error(data.error || "Failed to save provider auto-pause setting");
+ }
+ if (enabled) {
+ const syncRes = await fetch(`/api/providers/${providerId}/quota-sync`, {
+ method:"POST",
+ headers: {"Content-Type":"application/json"},
+ });
+ if (!syncRes.ok) {
+ const data = await syncRes.json().catch(() => ({}));
+ throw new Error(data.error || "Failed to sync provider quota state");
+ }
+ await fetchConnections();
+ }
+ } catch (error) {
+ setProviderAutoPauseByQuota((prev) => !prev);
+ const message = error instanceof Error ? error.message : "Error saving provider auto-pause setting";
+ alert(message);
+ console.log("Error saving provider auto-pause setting:", error);
+ }
  };
 
  const saveThinkingConfig = async (mode: string) => {
@@ -437,12 +488,17 @@ export default function ProviderDetailPage() {
  headers: {"Content-Type":"application/json"},
  body: JSON.stringify(formData),
  });
- if (res.ok) {
+ if (!res.ok) {
+ const data = await res.json().catch(() => ({}));
+ throw new Error(data.error || "Failed to update connection");
+ }
  await fetchConnections();
  setShowEditModal(false);
- }
  } catch (error) {
+ const message = error instanceof Error ? error.message : "Failed to update connection";
+ alert(message);
  console.log("Error updating connection:", error);
+ throw error;
  }
  };
 
@@ -1123,6 +1179,24 @@ export default function ProviderDetailPage() {
  </div>
  )}
  </div>
+ <div className="flex items-center gap-2.5">
+ <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
+ {translate("Auto Pause")}
+ </span>
+ <Switch
+ checked={providerAutoPauseByQuota}
+ onCheckedChange={handleProviderAutoPauseToggle}
+ className="scale-75 data-[state=checked]:bg-primary"
+ />
+ <TooltipProvider>
+ <Tooltip>
+ <TooltipTrigger render={<Info className="size-3.5 text-muted-foreground opacity-50" weight="bold" />} />
+ <TooltipContent>
+ {translate("Automatically disable exhausted accounts until their quota reset is available.")}
+ </TooltipContent>
+ </Tooltip>
+ </TooltipProvider>
+ </div>
  </div>
  </CardHeader>
 
@@ -1263,6 +1337,7 @@ export default function ProviderDetailPage() {
  isOpen={showEditModal}
  connection={selectedConnection}
  proxyPools={proxyPools}
+ autoPauseByQuota={providerAutoPauseByQuota}
  onSave={handleUpdateConnection}
  onClose={() => setShowEditModal(false)}
  />

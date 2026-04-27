@@ -4,6 +4,7 @@ import "@/lib/open-sse/index";
 import { getProviderConnectionById, updateProviderConnection } from "@/lib/localDb";
 import { getUsageForProvider } from "@/lib/open-sse/services/usage";
 import { getExecutor } from "@/lib/open-sse/executors/index";
+import { buildQuotaSnapshot, type QuotaSnapshotApiResponse } from "@/lib/usage/quotaSnapshot";
 import { NextResponse } from "next/server";
 
 // Detect auth-expired messages returned by usage providers instead of throwing
@@ -144,7 +145,20 @@ export async function GET(request: Request, context: { params: Promise<{ connect
       }
     }
 
-    return NextResponse.json(usage);
+    const quotaSnapshot = buildQuotaSnapshot(connection.provider, usage, new Date().toISOString());
+    await updateProviderConnection(connection.id, {
+      providerSpecificData: {
+        ...connection.providerSpecificData,
+        quotaSnapshot,
+      },
+    });
+
+    const response: QuotaSnapshotApiResponse = {
+      plan: usage?.plan,
+      quotaSnapshot,
+    };
+
+    return NextResponse.json(response);
   } catch (error: any) {
     const provider = connection?.provider ?? "unknown";
     console.warn(`[Usage] ${provider}: ${error.message}`);

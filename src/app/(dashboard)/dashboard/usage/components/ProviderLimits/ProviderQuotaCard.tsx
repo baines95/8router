@@ -23,9 +23,10 @@ import { translate } from "@/i18n/runtime";
 
 interface Quota {
   name: string;
-  resetAt: string;
+  resetAt: string | null;
   used: number;
   total: number;
+  remainingPercentage?: number;
 }
 
 interface Connection {

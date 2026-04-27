@@ -22,9 +22,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import ProviderQuotaCard from "./ProviderQuotaCard";
 import QuotaAggregateSummary from "./QuotaAggregateSummary";
-import { parseQuotaData, calculatePercentage, getQuotaRemainingPercent } from "./utils";
+import { calculatePercentage, getQuotaRemainingPercent } from "./utils";
 import { EditConnectionModal } from "@/shared/components";
 import { USAGE_SUPPORTED_PROVIDERS } from "@/shared/constants/providers";
+import type { QuotaSnapshot } from "@/lib/usage/quotaSnapshot";
 
 const REFRESH_INTERVAL_MS = 60000;
 
@@ -40,7 +41,7 @@ interface LocalConnection {
 }
 
 interface QuotaData {
-  quotas: any[];
+  quotas: QuotaSnapshot["buckets"];
   plan?: string;
 }
 
@@ -74,7 +75,7 @@ export default function ProviderLimits() {
  }
  }, []);
 
- const fetchQuota = useCallback(async (connectionId: string, provider: string, isSilent = false) => {
+ const fetchQuota = useCallback(async (connectionId: string, isSilent = false) => {
  if (!isSilent) setLoading((prev) => ({ ...prev, [connectionId]: true }));
  try {
  const response = await fetch(`/api/usage/${connectionId}`);
@@ -83,8 +84,8 @@ export default function ProviderLimits() {
  setQuotaData((prev) => ({
  ...prev,
  [connectionId]: {
- quotas: parseQuotaData(provider, data),
- plan: data.plan,
+ quotas: data?.quotaSnapshot?.buckets || [],
+ plan: data?.plan,
  },
  }));
  setErrors((prev) => ({ ...prev, [connectionId]: null }));
@@ -103,7 +104,7 @@ export default function ProviderLimits() {
  try {
  const conns = await fetchConnections();
  const oauthConns = conns.filter((c: any) => USAGE_SUPPORTED_PROVIDERS.includes(c.provider) && c.authType === "oauth");
- await Promise.all(oauthConns.map((c: any) => fetchQuota(c.id, c.provider, isSilent)));
+ await Promise.all(oauthConns.map((c: any) => fetchQuota(c.id, isSilent)));
  } finally {
  setRefreshingAll(false);
  setIsSilentRefreshing(false);
@@ -226,6 +227,7 @@ export default function ProviderLimits() {
  isOpen={showEditModal}
  connection={selectedConnection as any}
  proxyPools={[]}
+ autoPauseByQuota={false}
  onSave={async () => {}}
  onClose={() => { setShowEditModal(false); setSelectedConnection(null); }}
  />

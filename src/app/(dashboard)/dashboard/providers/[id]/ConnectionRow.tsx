@@ -21,6 +21,7 @@ import {
 import { cn } from "@/lib/utils";
 import { translate } from "@/i18n/runtime";
 import CooldownTimer from "./CooldownTimer";
+import { getQuotaSnapshotState, type QuotaSnapshot } from "@/lib/usage/quotaSnapshot";
 
 interface Connection {
   id: string;
@@ -37,6 +38,7 @@ interface Connection {
     proxyPoolId?: string | null;
     connectionProxyEnabled?: boolean;
     connectionProxyUrl?: string;
+    quotaSnapshot?: QuotaSnapshot | null;
     [key: string]: any;
   };
   [key: string]: any;
@@ -118,6 +120,10 @@ export default function ConnectionRow({
     return () => { if (interval) clearInterval(interval); };
   }, [connection, modelLockUntil]);
 
+  const quotaSnapshotState = connection.providerSpecificData?.quotaSnapshot
+    ? getQuotaSnapshotState(connection.providerSpecificData.quotaSnapshot)
+    : null;
+  const quotaResetAt = quotaSnapshotState?.exhausted ? quotaSnapshotState.nextResetAt : null;
   const effectiveStatus = connection.testStatus === "unavailable" && !isCooldown ? "active" : connection.testStatus;
 
   const getStatusVariant = (): "success" | "error" | "default" => {
@@ -184,6 +190,11 @@ export default function ConnectionRow({
             )}
             {isCooldown && connection.isActive !== false && (
               <CooldownTimer until={modelLockUntil as string} />
+            )}
+            {quotaResetAt && (
+              <span className="text-[10px] text-muted-foreground font-medium" title={quotaResetAt}>
+                Quota reset {new Date(quotaResetAt).toLocaleTimeString("vi-VN", { hour12: false })}
+              </span>
             )}
             {connection.lastError && connection.isActive !== false && (
               <span className="max-w-[200px] truncate text-[10px] text-destructive font-medium" title={connection.lastError}>

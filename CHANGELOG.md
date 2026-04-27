@@ -1,3 +1,10 @@
+# v0.4.6-mini.2 (2026-04-27)
+
+## Thay đổi chính
+- Gom toàn bộ quota về một canonical authority chung bằng `quotaSnapshot`, lưu trực tiếp trên connection thay vì để UI và runtime tự diễn giải mỗi nơi một kiểu.
+- `GET /api/usage/[connectionId]` giờ persist và trả về quota authority mới; `POST /api/providers/[id]/quota-sync` cũng dùng cùng nguồn đó để auto-pause/auto-resume.
+- Dashboard quota, provider page, edit modal, và runtime auth cùng đọc chung reset/exhausted state, đồng thời loại bỏ nhánh parse quota cũ ở UI để tránh drift.
+
 # v0.4.6-mini.1 (2026-04-26)
 
 Bản phát hành này nâng version của fork từ `0.3.96` lên `0.4.6-mini.1` và mang về có chọn lọc một số thay đổi runtime/provider từ nhánh upstream `0.4.6`, không nhằm đạt full parity.
