@@ -9,6 +9,7 @@ import "open-sse/index";
 import { generatePKCE } from "./utils/pkce";
 import {
   CLAUDE_CONFIG,
+  OPENAI_CONFIG,
   CODEX_CONFIG,
   GEMINI_CONFIG,
   QWEN_CONFIG,
@@ -114,6 +115,63 @@ const PROVIDERS: Record<string, OAuthProviderHandler> = {
       refreshToken: tokens.refresh_token,
       expiresIn: tokens.expires_in,
       scope: tokens.scope,
+    }),
+  },
+
+  openai: {
+    config: OPENAI_CONFIG,
+    flowType: "authorization_code_pkce",
+    buildAuthUrl: (config, redirectUri, state, codeChallenge) => {
+      const params = new URLSearchParams({
+        client_id: config.clientId,
+        response_type: "code",
+        redirect_uri: redirectUri,
+        scope: config.scope,
+        code_challenge: codeChallenge || "",
+        code_challenge_method: config.codeChallengeMethod,
+        state,
+        ...config.extraParams,
+      });
+      return `${config.authorizeUrl}?${params.toString()}`;
+    },
+    exchangeToken: async (config, code, redirectUri, codeVerifier) => {
+      const response = await fetch(config.tokenUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Accept: "application/json",
+        },
+        body: new URLSearchParams({
+          grant_type: "authorization_code",
+          client_id: config.clientId,
+          code,
+          redirect_uri: redirectUri,
+          code_verifier: codeVerifier,
+        }),
+      });
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`OpenAI token exchange failed: ${error}`);
+      }
+      const tokens = await response.json();
+      return {
+        accessToken: tokens.access_token,
+        refreshToken: tokens.refresh_token,
+        idToken: tokens.id_token,
+        expiresIn: tokens.expires_in,
+        tokenType: tokens.token_type,
+        scope: tokens.scope,
+      };
+    },
+    mapTokens: (tokens) => ({
+      accessToken: tokens.access_token,
+      refreshToken: tokens.refresh_token,
+      expiresIn: tokens.expires_in,
+      scope: tokens.scope,
+      providerSpecificData: {
+        idToken: tokens.id_token,
+        tokenType: tokens.token_type,
+      },
     }),
   },
 
@@ -1135,14 +1193,15 @@ export function getProviderNames(): string[] {
 export function generateAuthData(providerName: string, redirectUri: string, meta?: any) {
   const provider = getProvider(providerName);
   const { codeVerifier, codeChallenge, state } = generatePKCE();
+  const safeMeta = providerName === "openai" ? undefined : meta;
 
   let authUrl: string | null = null;
   if (provider.flowType === "device_code") {
     authUrl = null;
   } else if (provider.flowType === "authorization_code_pkce") {
-    authUrl = provider.buildAuthUrl!(provider.config, redirectUri, state, codeChallenge, meta || {});
+    authUrl = provider.buildAuthUrl!(provider.config, redirectUri, state, codeChallenge, safeMeta || {});
   } else {
-    authUrl = provider.buildAuthUrl!(provider.config, redirectUri, state, undefined, meta || {});
+    authUrl = provider.buildAuthUrl!(provider.config, redirectUri, state, undefined, safeMeta || {});
   }
 
   return {

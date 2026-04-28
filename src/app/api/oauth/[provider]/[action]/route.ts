@@ -27,7 +27,8 @@ export async function GET(request: Request, context: { params: Promise<{ provide
       const reservedParams = new Set(["redirect_uri"]);
       const meta: Record<string, string> = {};
       searchParams.forEach((value, key) => { if (!reservedParams.has(key)) meta[key] = value; });
-      const authData = generateAuthData(provider, redirectUri, Object.keys(meta).length ? meta : undefined);
+      const passthroughMeta = Object.keys(meta).length ? meta : undefined;
+      const authData = generateAuthData(provider, redirectUri, provider === "openai" ? undefined : passthroughMeta);
       return NextResponse.json(authData);
     }
 

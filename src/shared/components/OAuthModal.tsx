@@ -1,14 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { 
-  CircleNotch as Loader2, 
-  ArrowSquareOut as ExternalLink, 
-  CheckCircle,
-  Copy,
-  Check,
-  WarningCircle,
-  ArrowClockwise
+import { useState, useEffect, useRef, useCallback } from "react";
+import {
+  CircleNotchIcon,
+  ArrowSquareOutIcon,
+  CheckCircleIcon,
+  CopyIcon,
+  CheckIcon,
+  WarningCircleIcon,
 } from "@phosphor-icons/react";
 import { Modal, Button, Input } from "@/shared/components";
 import { useCopyToClipboard } from "@/shared/hooks/useCopyToClipboard";
@@ -59,17 +58,12 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
   const { copied, copy } = useCopyToClipboard();
 
   // State for client-only values to avoid hydration mismatch
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isLocalhost, setIsLocalhost] = useState(false);
   const [placeholderUrl, setPlaceholderUrl] = useState("/callback?code=...");
   const callbackProcessedRef = useRef(false);
 
-  // Detect if running on localhost (client-side only)
+  // Detect client origin for callback placeholder
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setIsLocalhost(
-        window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-      );
       setPlaceholderUrl(`${window.location.origin}/callback?code=...`);
     }
   }, []);
@@ -172,10 +166,14 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
         setIsDeviceCode(true);
         setStep("waiting");
 
-        const res = await fetch(`/api/oauth/${provider}/authorize`, {
+        const redirectUri = `${window.location.origin}/callback`;
+        const authorizePayload = provider === "openai"
+          ? {}
+          : { ...(oauthMeta ? { meta: oauthMeta } : {}) };
+        const res = await fetch(`/api/oauth/${provider}/authorize?redirect_uri=${encodeURIComponent(redirectUri)}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...(oauthMeta ? { meta: oauthMeta } : {}) }),
+          body: JSON.stringify(authorizePayload),
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
@@ -187,12 +185,36 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
 
       setIsDeviceCode(false);
       setStep("waiting");
-      const res = await fetch(`/api/oauth/${provider}/authorize`);
+
+      const appPort = window.location.port || (window.location.protocol === "https:" ? "443" : "80");
+      let redirectUri = `${window.location.origin}/callback`;
+      if (provider === "codex") {
+        try {
+          const proxyRes = await fetch(`/api/oauth/codex/start-proxy?app_port=${appPort}`);
+          const proxyData = await proxyRes.json();
+          if (proxyData?.success) {
+            redirectUri = "http://localhost:1455/auth/callback";
+          }
+        } catch {
+          redirectUri = `${window.location.origin}/callback`;
+        }
+      }
+
+      const res = await fetch(`/api/oauth/${provider}/authorize?redirect_uri=${encodeURIComponent(redirectUri)}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
-      setAuthData(data);
+      setAuthData({ ...data, redirectUri });
       callbackProcessedRef.current = false;
+
+      if (provider === "openai") {
+        const parsed = new URL(data.authUrl);
+        const originator = parsed.searchParams.get("originator");
+        const hasCodexFlag = parsed.searchParams.has("codex_cli_simplified_flow");
+        if (originator !== "openai_native" || hasCodexFlag) {
+          throw new Error("Invalid OpenAI auth URL contract");
+        }
+      }
 
       // Open popup
       const width = 600;
@@ -312,7 +334,7 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
         {step === "waiting" && !isDeviceCode && (
           <div className="text-center py-6">
             <div className="size-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-              <Loader2 className="size-8 text-primary animate-spin" weight="bold" />
+              <CircleNotchIcon className="size-8 text-primary animate-spin" weight="bold" />
             </div>
             <h3 className="text-lg font-semibold mb-2">Waiting for Authorization</h3>
             <p className="text-sm text-muted-foreground mb-4 font-medium italic">
@@ -341,7 +363,7 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
                     disabled={!deviceLoginUrl}
                     className="size-8 rounded-none"
                   >
-                    {copied === "login_url" ? <Check className="size-4" weight="bold" /> : <Copy className="size-4" weight="bold" />}
+                    {copied === "login_url" ? <CheckIcon className="size-4" weight="bold" /> : <CopyIcon className="size-4" weight="bold" />}
                   </Button>
                   <Button
                     variant="ghost"
@@ -350,7 +372,7 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
                     disabled={!deviceLoginUrl}
                     className="size-8 rounded-none"
                   >
-                    <ExternalLink className="size-4" weight="bold" />
+                    <ArrowSquareOutIcon className="size-4" weight="bold" />
                   </Button>
                 </div>
               </div>
@@ -364,14 +386,14 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
                     onClick={() => copy(deviceData.user_code, "user_code")}
                     className="size-8 text-primary hover:bg-primary/20 rounded-none"
                   >
-                    {copied === "user_code" ? <Check className="size-4" weight="bold" /> : <Copy className="size-4" weight="bold" />}
+                    {copied === "user_code" ? <CheckIcon className="size-4" weight="bold" /> : <CopyIcon className="size-4" weight="bold" />}
                   </Button>
                 </div>
               </div>
             </div>
             {polling && (
               <div className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground animate-pulse">
-                <Loader2 className="size-3.5 animate-spin" weight="bold" />
+                <CircleNotchIcon className="size-3.5 animate-spin" weight="bold" />
                 Awaiting downstream validation...
               </div>
             )}
@@ -385,7 +407,7 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
               <div className="flex gap-2">
                 <Input value={authData?.authUrl || ""} readOnly className="flex-1 font-mono text-xs h-9 bg-muted/5 border-border/50 rounded-none opacity-60" />
                 <Button variant="outline" onClick={() => copy(authData?.authUrl || "", "auth_url")} className="h-9 px-4 text-[10px] font-bold uppercase tracking-widest rounded-none border-border/50 bg-background">
-                   {copied === "auth_url" ? <Check className="size-3.5 mr-1.5" weight="bold" /> : <Copy className="size-3.5 mr-1.5" weight="bold" />}
+                   {copied === "auth_url" ? <CheckIcon className="size-3.5 mr-1.5" weight="bold" /> : <CopyIcon className="size-3.5 mr-1.5" weight="bold" />}
                    Copy
                 </Button>
               </div>
@@ -418,7 +440,7 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
         {step === "success" && (
           <div className="text-center py-6">
             <div className="size-16 mx-auto mb-4 rounded-none bg-primary/10 border border-primary/20 flex items-center justify-center">
-              <CheckCircle className="size-8 text-primary" weight="bold" />
+              <CheckCircleIcon className="size-8 text-primary" weight="bold" />
             </div>
             <h3 className="text-lg font-bold tracking-tight text-foreground uppercase">Linked Successfully</h3>
             <p className="text-xs text-muted-foreground mb-6 font-medium italic opacity-60">
@@ -433,7 +455,7 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
         {step === "error" && (
           <div className="text-center py-6">
             <div className="size-16 mx-auto mb-4 rounded-none bg-destructive/5 border border-destructive/20 flex items-center justify-center">
-              <WarningCircle className="size-8 text-destructive" weight="bold" />
+              <WarningCircleIcon className="size-8 text-destructive" weight="bold" />
             </div>
             <h3 className="text-lg font-bold tracking-tight text-foreground uppercase">Connection Failed</h3>
             <p className="text-[10px] font-bold uppercase tracking-wide text-destructive mb-8 px-4">{error}</p>
