@@ -23,7 +23,6 @@ import {
 import ProviderQuotaCard from "./ProviderQuotaCard";
 import QuotaAggregateSummary from "./QuotaAggregateSummary";
 import { calculatePercentage, getQuotaRemainingPercent } from "./utils";
-import { EditConnectionModal } from "@/shared/components";
 import { USAGE_SUPPORTED_PROVIDERS } from "@/shared/constants/providers";
 import type { QuotaSnapshot } from "@/lib/usage/quotaSnapshot";
 
@@ -54,8 +53,6 @@ export default function ProviderLimits() {
  const [isSilentRefreshing, setIsSilentRefreshing] = useState(false);
  const [countdown, setCountdown] = useState(60);
  const [connectionsLoading, setConnectionsLoading] = useState(true);
- const [showEditModal, setShowEditModal] = useState(false);
- const [selectedConnection, setSelectedConnection] = useState<LocalConnection | null>(null);
  const [sortBy, setSortBy] = useState("provider");
 
  const isRefreshingRef = useRef(false);
@@ -215,22 +212,9 @@ export default function ProviderLimits() {
  isSilentRefreshing={isSilentRefreshing}
  error={errors[conn.id]}
  isInactive={conn.isActive === false}
- onEdit={() => {
- setSelectedConnection(conn);
- setShowEditModal(true);
- }}
  />
  ))}
  </div>
-
- <EditConnectionModal
- isOpen={showEditModal}
- connection={selectedConnection as any}
- proxyPools={[]}
- autoPauseByQuota={false}
- onSave={async () => {}}
- onClose={() => { setShowEditModal(false); setSelectedConnection(null); }}
- />
  </div>
  );
 }

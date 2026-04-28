@@ -1,20 +1,12 @@
 "use client";
 
 import React from "react";
-import { 
-  Spinner as Loader2, 
-  DotsThreeVertical as MoreVertical, 
-  WarningCircle as AlertCircle, 
-  Clock 
+import {
+  Spinner as Loader2,
+  WarningCircle as AlertCircle,
+  Clock
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import {
- DropdownMenu,
- DropdownMenuContent,
- DropdownMenuItem,
- DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import ProviderIcon from "@/shared/components/ProviderIcon";
@@ -42,7 +34,6 @@ interface ProviderQuotaCardProps {
   isSilentRefreshing?: boolean;
   error?: string | null;
   isInactive?: boolean;
-  onEdit?: () => void;
 }
 
 function QuotaRow({ quota }: { quota: Quota }) {
@@ -94,7 +85,6 @@ export default function ProviderQuotaCard({
  isSilentRefreshing,
  error,
  isInactive,
- onEdit,
 }: ProviderQuotaCardProps) {
  const conn = connection;
 
@@ -127,19 +117,6 @@ export default function ProviderQuotaCard({
  </div>
  </div>
 
- <div className="flex items-center gap-1">
- <DropdownMenu>
- <DropdownMenuTrigger render={
-   <Button variant="ghost" size="icon" className="size-7 text-muted-foreground/50 hover:text-foreground rounded-full h-7 w-7">
-     <MoreVertical className="size-3.5" weight="bold" />
-   </Button>
- } />
- <DropdownMenuContent align="end" className="rounded-none border-border/50 shadow-none bg-background/95 backdrop-blur-md">
- <DropdownMenuItem className="text-xs font-medium cursor-pointer py-2 rounded-none" onClick={() => onEdit?.()}>Settings</DropdownMenuItem>
- <DropdownMenuItem className="text-destructive text-xs font-medium cursor-pointer py-2 rounded-none">Disconnect</DropdownMenuItem>
- </DropdownMenuContent>
- </DropdownMenu>
- </div>
  </CardHeader>
 
  <CardContent className="px-3 pt-1.5 pb-2 flex-1 flex flex-col justify-center">
