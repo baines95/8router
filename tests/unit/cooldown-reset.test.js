@@ -70,8 +70,8 @@ describe("markAccountUnavailable cooldown reset timing", () => {
     expect(result.cooldownMs).toBe(45_000);
 
     const payload = vi.mocked(updateProviderConnection).mock.calls[0][1];
-    const lockExpiry = Date.parse(payload["modelLock_gpt-4o-mini"]);
-    expect(lockExpiry - nowMs).toBe(45_000);
+    const pausedUntil = Date.parse(payload.providerSpecificData?.autoPausedUntil);
+    expect(pausedUntil - nowMs).toBe(45_000);
   });
 
   it("caps reset-based cooldown at BACKOFF_CONFIG.max", async () => {
@@ -89,8 +89,8 @@ describe("markAccountUnavailable cooldown reset timing", () => {
     expect(result.cooldownMs).toBe(BACKOFF_CONFIG.max);
 
     const payload = vi.mocked(updateProviderConnection).mock.calls[0][1];
-    const lockExpiry = Date.parse(payload["modelLock_gpt-4o-mini"]);
-    expect(lockExpiry - nowMs).toBe(BACKOFF_CONFIG.max);
+    const pausedUntil = Date.parse(payload.providerSpecificData?.autoPausedUntil);
+    expect(pausedUntil - nowMs).toBe(BACKOFF_CONFIG.max);
   });
 
   it("keeps old backoff behavior when resetsAtMs is missing", async () => {
@@ -106,11 +106,11 @@ describe("markAccountUnavailable cooldown reset timing", () => {
     expect(result.cooldownMs).toBe(1_000);
 
     const payload = vi.mocked(updateProviderConnection).mock.calls[0][1];
-    const lockExpiry = Date.parse(payload["modelLock_gpt-4o-mini"]);
-    expect(lockExpiry - nowMs).toBe(1_000);
+    const pausedUntil = Date.parse(payload.providerSpecificData?.autoPausedUntil);
+    expect(pausedUntil - nowMs).toBe(1_000);
     expect(log.warn).toHaveBeenCalledWith(
       "AUTH",
-      expect.stringContaining(" LOCK provider=openai model=gpt-4o-mini mode=fill-first account=Primary (conn-1) status=429 lockKey=modelLock_gpt-4o-mini cooldownSource=backoff cooldownUntil="),
+      expect.stringContaining(" LOCK provider=openai model=gpt-4o-mini mode=fill-first account=Primary (conn-1) status=429 cooldownSource=backoff cooldownUntil="),
     );
   });
 
@@ -128,7 +128,7 @@ describe("markAccountUnavailable cooldown reset timing", () => {
 
     expect(log.warn).toHaveBeenCalledWith(
       "AUTH",
-      expect.stringContaining(" LOCK provider=openai model=gpt-4o-mini mode=fill-first account=Primary (conn-1) status=429 lockKey=modelLock_gpt-4o-mini cooldownSource=retry-after cooldownUntil="),
+      expect.stringContaining(" LOCK provider=openai model=gpt-4o-mini mode=fill-first account=Primary (conn-1) status=429 cooldownSource=retry-after cooldownUntil="),
     );
   });
 
@@ -145,8 +145,8 @@ describe("markAccountUnavailable cooldown reset timing", () => {
     expect(result.cooldownMs).toBe(1_000);
 
     const payload = vi.mocked(updateProviderConnection).mock.calls[0][1];
-    const lockExpiry = Date.parse(payload["modelLock_gpt-4o-mini"]);
-    expect(lockExpiry - nowMs).toBe(1_000);
+    const pausedUntil = Date.parse(payload.providerSpecificData?.autoPausedUntil);
+    expect(pausedUntil - nowMs).toBe(1_000);
   });
 
   it("keeps old backoff behavior when resetsAtMs equals now", async () => {
@@ -162,8 +162,8 @@ describe("markAccountUnavailable cooldown reset timing", () => {
     expect(result.cooldownMs).toBe(1_000);
 
     const payload = vi.mocked(updateProviderConnection).mock.calls[0][1];
-    const lockExpiry = Date.parse(payload["modelLock_gpt-4o-mini"]);
-    expect(lockExpiry - nowMs).toBe(1_000);
+    const pausedUntil = Date.parse(payload.providerSpecificData?.autoPausedUntil);
+    expect(pausedUntil - nowMs).toBe(1_000);
   });
 
   it("keeps old backoff behavior when resetsAtMs is not finite", async () => {
@@ -179,8 +179,8 @@ describe("markAccountUnavailable cooldown reset timing", () => {
     expect(result.cooldownMs).toBe(1_000);
 
     const payload = vi.mocked(updateProviderConnection).mock.calls[0][1];
-    const lockExpiry = Date.parse(payload["modelLock_gpt-4o-mini"]);
-    expect(lockExpiry - nowMs).toBe(1_000);
+    const pausedUntil = Date.parse(payload.providerSpecificData?.autoPausedUntil);
+    expect(pausedUntil - nowMs).toBe(1_000);
   });
 });
 
@@ -268,7 +268,6 @@ describe("account selection semantics regression harness", () => {
         displayName: "B",
         lastUsedAt: "2026-04-26T09:58:00.000Z",
         consecutiveUseCount: 0,
-        "modelLock_gpt-4o-mini": "2099-01-01T00:00:00.000Z",
       },
       {
         id: "acc-c",
@@ -325,15 +324,13 @@ describe("account selection semantics regression harness", () => {
     expect(selected?.connectionName).toBe("Healthy");
   });
 
-  it("cooldown visibility: success does not clear an active model lock before it expires", async () => {
-    const futureLock = new Date(nowMs + 60_000).toISOString();
+  it("cooldown visibility: success clears stale unavailable status under provider-level pause authority", async () => {
     vi.mocked(getProviderConnectionById).mockResolvedValue({
       id: "locked-acc",
       provider: "openai",
       displayName: "Locked",
       testStatus: "unavailable",
       lastError: "rate limit",
-      "modelLock_gpt-4o-mini": futureLock,
     });
 
     await clearAccountError(
@@ -343,24 +340,28 @@ describe("account selection semantics regression harness", () => {
           id: "locked-acc",
           testStatus: "unavailable",
           lastError: "rate limit",
-          "modelLock_gpt-4o-mini": futureLock,
         },
       },
       "gpt-4o-mini",
     );
 
-    expect(updateProviderConnection).not.toHaveBeenCalledWith(
+    expect(updateProviderConnection).toHaveBeenCalledWith(
       "locked-acc",
-      expect.objectContaining({ "modelLock_gpt-4o-mini": null }),
+      expect.objectContaining({
+        testStatus: "",
+        lastError: "",
+        providerSpecificData: expect.objectContaining({
+          autoPausedUntil: null,
+          autoPauseReason: null,
+        }),
+      }),
     );
-    expect(updateProviderConnection).not.toHaveBeenCalled();
 
     vi.mocked(getProviderConnections).mockResolvedValue([
       {
         id: "locked-acc",
         provider: "openai",
         displayName: "Locked",
-        "modelLock_gpt-4o-mini": futureLock,
       },
       {
         id: "healthy-acc",
@@ -373,9 +374,7 @@ describe("account selection semantics regression harness", () => {
     expect(selected?.connectionName).toBe("Healthy");
   });
 
-  it("re-reads latest connection state before clearing status so stale snapshots do not wipe newer locks", async () => {
-    const expiredLock = new Date(nowMs - 1_000).toISOString();
-    const futureLock = new Date(nowMs + 60_000).toISOString();
+  it("re-reads latest connection state and still clears stale unavailable status", async () => {
 
     vi.mocked(getProviderConnectionById).mockResolvedValue({
       id: "conn-1",
@@ -383,7 +382,6 @@ describe("account selection semantics regression harness", () => {
       displayName: "Primary",
       testStatus: "unavailable",
       lastError: "newer rate limit",
-      "modelLock_gpt-4o-mini": futureLock,
     });
 
     await clearAccountError(
@@ -395,35 +393,32 @@ describe("account selection semantics regression harness", () => {
           displayName: "Primary",
           testStatus: "unavailable",
           lastError: "stale error",
-          "modelLock_gpt-4o-mini": expiredLock,
         },
       },
       "gpt-4o-mini",
     );
 
     expect(getProviderConnectionById).toHaveBeenCalledWith("conn-1");
-    expect(updateProviderConnection).not.toHaveBeenCalledWith(
+    expect(updateProviderConnection).toHaveBeenCalledWith(
       "conn-1",
       expect.objectContaining({
-        testStatus: "active",
-        lastError: null,
-        lastErrorAt: null,
-        backoffLevel: 0,
+        testStatus: "",
+        lastError: "",
+        providerSpecificData: expect.objectContaining({
+          autoPausedUntil: null,
+          autoPauseReason: null,
+        }),
       }),
     );
-    expect(updateProviderConnection).not.toHaveBeenCalled();
   });
 
-  it("logs cleared lock keys when success clears expired locks", async () => {
+  it("logs clear events when success clears stale unavailable status", async () => {
     vi.mocked(getProviderConnectionById).mockResolvedValue({
       id: "conn-1",
       provider: "openai",
       displayName: "Primary",
       testStatus: "unavailable",
       lastError: "rate limit",
-      "modelLock_gpt-4o-mini": new Date(nowMs - 1_000).toISOString(),
-      "modelLock_gpt-4.1": new Date(nowMs - 500).toISOString(),
-      modelLock_gpt_4o: new Date(nowMs + 60_000).toISOString(),
     });
 
     await clearAccountError(
@@ -435,17 +430,14 @@ describe("account selection semantics regression harness", () => {
           displayName: "Primary",
           testStatus: "unavailable",
           lastError: "rate limit",
-          "modelLock_gpt-4o-mini": new Date(nowMs - 1_000).toISOString(),
-          "modelLock_gpt-4.1": new Date(nowMs - 500).toISOString(),
-          modelLock_gpt_4o: new Date(nowMs + 60_000).toISOString(),
         },
       },
       "gpt-4o-mini",
     );
 
-    expect(log.info).toHaveBeenCalledWith(
+    expect(log.info).not.toHaveBeenCalledWith(
       "AUTH",
-      expect.stringContaining(" CLEAR provider=openai model=gpt-4o-mini mode=fill-first account=Primary (conn-1) cleared=2 clearedKeys=modelLock_gpt-4o-mini,modelLock_gpt-4.1 remainingActiveLocks=1"),
+      expect.stringContaining(" CLEAR provider=openai model=gpt-4o-mini"),
     );
   });
 
@@ -676,14 +668,12 @@ describe("account selection semantics regression harness", () => {
   });
 
   it("logs balanced scan skip and select events for selection", async () => {
-    const futureLock = new Date(nowMs + 60_000).toISOString();
 
     vi.mocked(getProviderConnections).mockResolvedValue([
       {
         id: "locked-acc",
         provider: "openai",
         displayName: "Locked",
-        "modelLock_gpt-4o-mini": futureLock,
       },
       {
         id: "healthy-acc",
@@ -700,7 +690,7 @@ describe("account selection semantics regression harness", () => {
     );
     expect(log.info).toHaveBeenCalledWith(
       "AUTH",
-      expect.stringContaining(" SCAN provider=openai model=gpt-4o-mini mode=fill-first accounts=2 usable=1 skipped=1"),
+      expect.stringContaining(" SCAN provider=openai model=gpt-4o-mini mode=fill-first accounts=2 usable=2 skipped=0"),
     );
     expect(log.info).toHaveBeenCalledWith(
       "AUTH",
@@ -710,11 +700,11 @@ describe("account selection semantics regression harness", () => {
       "AUTH",
       expect.stringContaining(" SELECT account=Healthy (healthy-")
     );
-    expect(log.debug).toHaveBeenCalledWith(
+    expect(log.debug).not.toHaveBeenCalledWith(
       "AUTH",
       expect.stringContaining("⏭️ [r=")
     );
-    expect(log.debug).toHaveBeenCalledWith(
+    expect(log.debug).not.toHaveBeenCalledWith(
       "AUTH",
       expect.stringContaining(" SKIP count=1 [Locked (locked-a):model-locked@")
     );

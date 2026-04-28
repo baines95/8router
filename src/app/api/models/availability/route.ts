@@ -2,22 +2,20 @@ import { NextResponse } from "next/server";
 import {
   getProviderConnections,
   updateProviderConnection,
-  type ProviderConnection
 } from "@/lib/localDb";
 
-const MODEL_LOCK_PREFIX = "modelLock_";
+function getActiveAutoPause(connection: any) {
+  const until = connection?.providerSpecificData?.autoPausedUntil;
+  if (!until) return null;
 
-function getActiveModelLocks(connection: any) {
-  const now = Date.now();
-  return Object.entries(connection)
-    .filter(([key, value]) => key.startsWith(MODEL_LOCK_PREFIX) && value)
-    .map(([key, value]) => ({
-      key,
-      model: key.slice(MODEL_LOCK_PREFIX.length) || "__all",
-      until: value,
-      active: new Date(value as string).getTime() > now,
-    }))
-    .filter((lock) => lock.active);
+  const untilMs = new Date(until as string).getTime();
+  if (!Number.isFinite(untilMs) || untilMs <= Date.now()) return null;
+
+  return {
+    model: "__all",
+    until,
+    reason: connection?.providerSpecificData?.autoPauseReason ?? null,
+  };
 }
 
 export async function GET(): Promise<NextResponse> {
@@ -25,79 +23,76 @@ export async function GET(): Promise<NextResponse> {
     const connections = await getProviderConnections();
     const models: any[] = [];
 
-    for (const connection of connections) {
-      const locks = getActiveModelLocks(connection);
-      for (const lock of locks) {
-        models.push({
-          provider: connection.provider,
-          model: lock.model,
-          status: "cooldown",
-          until: lock.until,
-          connectionId: connection.id,
-          connectionName: connection.name || connection.email || connection.id,
-          lastError: connection.lastError || null,
-        });
-      }
+    for (const conn of connections as any[]) {
+      const activePause = getActiveAutoPause(conn);
+      if (!activePause) continue;
 
-      if (locks.length === 0 && connection.testStatus === "unavailable") {
-        models.push({
-          provider: connection.provider,
-          model: "__all",
-          status: "unavailable",
-          connectionId: connection.id,
-          connectionName: connection.name || connection.email || connection.id,
-          lastError: connection.lastError || null,
-        });
-      }
+      models.push({
+        provider: conn.provider,
+        model: activePause.model,
+        status: "cooldown",
+        cooldownUntil: activePause.until,
+        reason: activePause.reason,
+      });
     }
 
-    return NextResponse.json({
-      models,
-      unavailableCount: models.length,
-    });
+    return NextResponse.json({ models });
   } catch (error) {
-    console.error("[API] Failed to get model availability:", error);
+    console.error("[API] Failed to fetch provider pause availability:", error);
     return NextResponse.json(
-      { error: "Failed to fetch model availability" },
+      { error: "Failed to fetch provider pause availability" },
       { status: 500 },
     );
   }
 }
 
-export async function POST(request: Request): Promise<NextResponse> {
+export async function POST(req: Request): Promise<NextResponse> {
   try {
-    const { action, provider, model } = await request.json();
+    const body = await req.json().catch(() => ({}));
+    const action = body?.action as string | undefined;
+    const provider = body?.provider as string | undefined;
+    const model = body?.model as string | undefined;
 
-    if (action !== "clearCooldown" || !provider || !model) {
+    if (action !== "clearCooldown" || !provider) {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 });
     }
 
+    if (model && model !== "__all") {
+      return NextResponse.json(
+        { error: "Model-scoped clear is not supported for provider-level pause state" },
+        { status: 400 },
+      );
+    }
+
     const connections = await getProviderConnections({ provider });
-    const lockKey = `${MODEL_LOCK_PREFIX}${model}`;
 
     await Promise.all(
       connections
-        .filter((connection: any) => connection[lockKey])
+        .filter((connection: any) => connection?.providerSpecificData?.autoPausedUntil)
         .map((connection: any) =>
           updateProviderConnection(connection.id, {
-            [lockKey]: null,
+            providerSpecificData: {
+              ...(connection.providerSpecificData || {}),
+              autoPausedUntil: null,
+              autoPauseReason: null,
+            },
             ...(connection.testStatus === "unavailable"
               ? {
                   testStatus: "active",
-                  lastError: null,
-                  lastErrorAt: null,
+                  lastError: undefined,
+                  lastErrorAt: undefined,
                   backoffLevel: 0,
                 }
               : {}),
-          } as any),
+          }),
         ),
     );
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error("[API] Failed to clear model cooldown:", error);
+    console.error("[API] Failed to clear provider pause:", error);
     return NextResponse.json(
-      { error: "Failed to clear cooldown" },
+      { error: "Failed to clear provider pause" },
       { status: 500 },
     );
   }

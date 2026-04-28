@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Card, Badge } from "@/shared/components";
@@ -24,10 +24,12 @@ interface MediaProvider {
 }
 
 function getEffectiveStatus(conn: Connection) {
-  const isCooldown = Object.entries(conn).some(
-    ([k, v]) => k.startsWith("modelLock_") && v && new Date(v as string).getTime() > Date.now()
-  );
-  return conn.testStatus === "unavailable" && !isCooldown ? "active" : conn.testStatus;
+  const autoPausedUntil = conn?.providerSpecificData?.autoPausedUntil;
+  const autoPausedMs = autoPausedUntil ? new Date(autoPausedUntil as string).getTime() : NaN;
+  const isAutoPaused = Number.isFinite(autoPausedMs) && autoPausedMs > Date.now();
+
+  if (isAutoPaused) return "cooldown";
+  return conn.testStatus;
 }
 
 interface MediaProviderCardProps {

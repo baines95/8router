@@ -1,13 +1,10 @@
 import { getProviderConnections, getProviderConnectionById, validateApiKey, updateProviderConnection, getSettings, type ProviderConnection } from "@/lib/localDb";
 import { resolveConnectionProxyConfig } from "@/lib/network/connectionProxy";
-import { formatRetryAfter, checkFallbackError, isModelLockActive, buildModelLockUpdate, getEarliestModelLockUntil } from "@/lib/open-sse/services/accountFallback";
+import { formatRetryAfter, checkFallbackError } from "@/lib/open-sse/services/accountFallback";
 import { BACKOFF_CONFIG } from "@/lib/open-sse/config/errorConfig";
 import { resolveProviderId, FREE_PROVIDERS } from "@/shared/constants/providers";
 import { getQuotaSnapshotState, type QuotaSnapshot } from "@/lib/usage/quotaSnapshot";
 import * as log from "../utils/logger";
-
-// Mutex to prevent race conditions during account selection
-let selectionMutex = Promise.resolve();
 
 // Runtime selector memory (per provider+model) to avoid premature account flips
 const fillFirstPreferredConnectionByContext = new Map<string, string>();
@@ -280,15 +277,7 @@ export async function getProviderCredentials(provider: string, excludeConnection
   const excludeSet = excludeConnectionIds instanceof Set
     ? excludeConnectionIds
     : (excludeConnectionIds ? new Set([excludeConnectionIds]) : new Set<string>());
-  // Acquire mutex to prevent race conditions
-  const currentMutex = selectionMutex;
-  let resolveMutex!: () => void;
-  selectionMutex = new Promise(resolve => { resolveMutex = resolve as any; });
-
-  try {
-    await currentMutex;
-
-    // Resolve alias to provider ID (e.g., "kc" -> "kilocode")
+  // Resolve alias to provider ID (e.g., "kc" -> "kilocode")
     const providerId = resolveProviderId(provider);
 
     // Inject a virtual connection for no-auth free providers
@@ -316,15 +305,12 @@ export async function getProviderCredentials(provider: string, excludeConnection
     const skippedConnections = connections
       .map(c => {
         const excluded = excludeSet.has(c.id);
-        const locked = isModelLockActive(c, model);
         const quotaBlocked = isConnectionBlockedByQuotaSnapshot(c, now, autoPauseEnabled);
-        if (!excluded && !locked && !quotaBlocked) return null;
-        const cooldownUntil = locked
-          ? getEarliestModelLockUntil(c)
-          : (quotaBlocked ? getQuotaSnapshotResetAt(c, now, autoPauseEnabled) : null);
+        if (!excluded && !quotaBlocked) return null;
+        const cooldownUntil = quotaBlocked ? getQuotaSnapshotResetAt(c, now, autoPauseEnabled) : null;
         const reason = excluded
-          ? (locked ? "excluded+model-locked" : (quotaBlocked ? "excluded+quota-exhausted" : "excluded"))
-          : (locked ? "model-locked" : "quota-exhausted");
+          ? (quotaBlocked ? "excluded+quota-exhausted" : "excluded")
+          : "quota-exhausted";
         return { connection: c, reason, cooldownUntil };
       })
       .filter(Boolean) as Array<{ connection: ProviderConnection; reason: string; cooldownUntil: string | null }>;
@@ -332,7 +318,6 @@ export async function getProviderCredentials(provider: string, excludeConnection
     // Filter out model-locked, quota-exhausted and excluded connections
     const availableConnections = connections.filter(c => {
       if (excludeSet.has(c.id)) return false;
-      if (isModelLockActive(c, model)) return false;
       if (isConnectionBlockedByQuotaSnapshot(c, now, autoPauseEnabled)) return false;
       return true;
     });
@@ -343,23 +328,21 @@ export async function getProviderCredentials(provider: string, excludeConnection
     }
 
     if (availableConnections.length === 0) {
-      // Find earliest lock expiry across all connections for retry timing
-      const lockedConns = connections.filter(c => isModelLockActive(c, model));
-      const expiries = lockedConns.map(c => getEarliestModelLockUntil(c)).filter(Boolean) as string[];
-      const earliest = expiries.sort()[0] || null;
+      const quotaExpiries = skippedConnections
+        .map(s => s.cooldownUntil)
+        .filter(Boolean) as string[];
+      const earliest = quotaExpiries.sort()[0] || null;
       if (earliest) {
-        const earliestConn = lockedConns[0];
-        log.warn("AUTH", formatAuthEvent(requestTag, "EXHAUSTED", `reason=model-locked retryAfter=${formatRetryAfter(earliest)} cooldownUntil=${earliest} sampleAccount=${formatAccountRef(earliestConn)}`));
+        log.warn("AUTH", formatAuthEvent(requestTag, "EXHAUSTED", `reason=quota-exhausted retryAfter=${formatRetryAfter(earliest)} cooldownUntil=${earliest}`));
         return {
           connectionName: "",
           allRateLimited: true,
           retryAfter: earliest,
           retryAfterHuman: formatRetryAfter(earliest),
-          lastError: earliestConn?.lastError || undefined,
-          lastErrorCode: earliestConn?.errorCode || undefined
-        };
+        } as any;
       }
-      log.warn("AUTH", formatAuthEvent(requestTag, "EXHAUSTED", `reason=excluded-or-inactive`));
+
+      log.warn("AUTH", formatAuthEvent(requestTag, "EXHAUSTED", `reason=no-eligible-account`));
       return null;
     }
 
@@ -414,16 +397,12 @@ export async function getProviderCredentials(provider: string, excludeConnection
       // Include current status for optimization check
       testStatus: connection.testStatus,
       lastError: connection.lastError,
-      // Pass full connection for clearAccountError to read modelLock_* keys
       _connection: connection
     };
-  } finally {
-    if (resolveMutex) resolveMutex();
-  }
 }
 
 /**
- * Mark account+model as unavailable — locks modelLock_${model} in DB.
+ * Mark account as unavailable using unified pause/error state.
  * All errors (429, 401, 5xx, etc.) lock per model, not per account.
  */
 export async function markAccountUnavailable(
@@ -451,35 +430,30 @@ export async function markAccountUnavailable(
   }
 
   const reason = typeof errorText === "string" ? errorText.slice(0, 100) : "Provider error";
-  const lockUpdate = buildModelLockUpdate(model, effectiveCooldownMs);
-  const lockKey = Object.keys(lockUpdate)[0];
-  const cooldownUntil = (lockUpdate as any)[lockKey] || null;
+  const cooldownUntil = effectiveCooldownMs > 0 ? new Date(Date.now() + effectiveCooldownMs).toISOString() : null;
 
   const providerId = resolveProviderId(provider || conn?.provider || "unknown");
   const settings = await getSettings();
   const autoPause = isProviderAutoPauseEnabled(settings, providerId) && cooldownSource === "retry-after";
-  const nextProviderSpecificData = autoPause
-    ? {
-        ...(conn?.providerSpecificData || {}),
-        autoPausedUntil: cooldownUntil,
-        autoPauseReason: "quota",
-      }
-    : undefined;
-
   await updateProviderConnection(connectionId, {
-    ...lockUpdate,
     testStatus: "unavailable",
     lastError: reason,
     errorCode: String(status),
     lastErrorAt: new Date().toISOString(),
     backoffLevel: newBackoffLevel ?? backoffLevel,
-    ...(autoPause ? { isActive: false, providerSpecificData: nextProviderSpecificData } : {}),
+    providerSpecificData: {
+      ...(conn?.providerSpecificData || {}),
+      ...(autoPause
+        ? { autoPausedUntil: cooldownUntil, autoPauseReason: "quota" }
+        : { autoPausedUntil: cooldownUntil, autoPauseReason: null }),
+    },
+    ...(autoPause ? { isActive: false } : {}),
   } as any);
 
   const providerOverride = (settings.providerStrategies || {})[providerId] || {};
   const authMode = providerOverride.fallbackStrategy || settings.comboStrategy || "fill-first";
   const requestTag = createRequestTag();
-  log.warn("AUTH", formatAuthEvent(requestTag, "LOCK", `provider=${providerId} model=${formatModelLabel(model)} mode=${authMode} account=${formatAccountRef(conn)} status=${status} lockKey=${lockKey} cooldownSource=${cooldownSource} cooldownUntil=${formatCooldownUntil(cooldownUntil)} backoffLevel=${newBackoffLevel ?? backoffLevel} detail=${formatErrorDetail(reason)}`));
+  log.warn("AUTH", formatAuthEvent(requestTag, "LOCK", `provider=${providerId} model=${formatModelLabel(model)} mode=${authMode} account=${formatAccountRef(conn)} status=${status} cooldownSource=${cooldownSource} cooldownUntil=${formatCooldownUntil(cooldownUntil)} backoffLevel=${newBackoffLevel ?? backoffLevel} detail=${formatErrorDetail(reason)}`));
 
   if (provider && status && reason) {
     console.error(`❌ ${provider} [${status}]: ${reason}`);
@@ -495,51 +469,26 @@ export async function clearAccountError(connectionId: string, currentConnection:
   if (!connectionId || connectionId === "noauth") return;
   const snapshotConn = currentConnection._connection || currentConnection;
   const conn = await getProviderConnectionById(connectionId) || snapshotConn;
-  const now = Date.now();
-  const allLockKeys = Object.keys(conn).filter(k => k.startsWith("modelLock_"));
 
-  if (!conn.testStatus && !conn.lastError && allLockKeys.length === 0) return;
+  const providerSpecificData = (conn as any).providerSpecificData || {};
+  const hasUnifiedPause = Boolean(providerSpecificData.autoPausedUntil) || Boolean(providerSpecificData.autoPauseReason);
+  if (!conn.testStatus && !conn.lastError && !hasUnifiedPause) return;
 
-  // Keys to clear: expired locks only
-  const keysToClear = allLockKeys.filter(k => {
-    const expiry = (conn as any)[k];
-    return expiry && new Date(expiry).getTime() <= now;
+  await updateProviderConnection(connectionId, {
+    testStatus: "",
+    lastError: "",
+    providerSpecificData: {
+      ...providerSpecificData,
+      autoPausedUntil: null,
+      autoPauseReason: null,
+    },
   });
 
-  if (keysToClear.length === 0 && conn.testStatus !== "unavailable" && !conn.lastError) return;
-
-  // Check if any active locks remain after clearing
-  const remainingActiveLocks = allLockKeys.filter(k => {
-    if (keysToClear.includes(k)) return false;
-    const expiry = (conn as any)[k];
-    return expiry && new Date(expiry).getTime() > now;
-  });
-
-  const clearObj: Record<string, any> = Object.fromEntries(keysToClear.map(k => [k, null]));
-
-  // Only reset error state if no active locks remain
-  if (remainingActiveLocks.length === 0) {
-    Object.assign(clearObj, { testStatus: "active", lastError: null, lastErrorAt: null, backoffLevel: 0 });
-  }
-
-  if (Object.keys(clearObj).length === 0) return;
-
-  await updateProviderConnection(connectionId, clearObj);
-  const providerId = resolveProviderId(conn?.provider || snapshotConn?.provider || currentConnection?.provider || "unknown");
-  const settings = await getSettings();
-  const providerOverride = (settings.providerStrategies || {})[providerId] || {};
-  const authMode = providerOverride.fallbackStrategy || settings.comboStrategy || "fill-first";
-  const contextKey = `${connectionId}::${model || "__all"}`;
-  if (shouldEmitClearLog(contextKey)) {
-    const requestTag = createRequestTag();
-    const clearedKeys = keysToClear.join(",") || "none";
-    log.info("AUTH", formatAuthEvent(requestTag, "CLEAR", `provider=${providerId} model=${formatModelLabel(model)} mode=${authMode} account=${formatAccountRef(conn)} cleared=${keysToClear.length} clearedKeys=${clearedKeys} remainingActiveLocks=${remainingActiveLocks.length}`));
-  }
+  const providerId = snapshotConn.provider || conn.provider || "unknown";
+  const requestTag = getAuthRequestTag(new Set());
+  log.debug("AUTH", formatAuthEvent(requestTag, "CLEAR", `provider=${providerId} model=${formatModelLabel(model)} account=${formatAccountRef(conn)} cleared=unified`));
 }
 
-/**
- * Extract API key from request headers
- */
 export function extractApiKey(request: Request): string | null {
   // Check Authorization header first
   const authHeader = request.headers.get("Authorization");
