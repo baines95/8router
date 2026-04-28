@@ -67,6 +67,14 @@ Main parts:
 
 ## UI baseline conventions (dashboard/endpoint as canonical reference)
 
+## shadcn UI icon conventions
+
+- Dùng `@phosphor-icons/react` theo preset hiện tại trong `components.json` (`iconLibrary: phosphor`).
+- Ưu tiên export dạng `*Icon` (ví dụ `PlusIcon`, `MagnifyingGlassIcon`, `CaretRightIcon`) để bám chuẩn component shadcn mới.
+- Khi cần alias semantic trong UI, alias tại import (ví dụ `MagnifyingGlassIcon as SearchIcon`) thay vì trộn nhiều thư viện icon.
+- Tránh dùng `lucide-react` trong dashboard và shared dashboard components trừ khi có lý do tương thích bắt buộc.
+
+
 Dùng `/dashboard/endpoint` làm mẫu thị giác chuẩn khi restyle các trang dashboard khác.
 
 - Hierarchy chuẩn:

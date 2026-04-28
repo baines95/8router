@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Skeleton as ShadcnSkeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
+import { SpinnerGap } from "@phosphor-icons/react";
 
 interface SpinnerProps {
   size?: "sm" | "md" | "lg" | "xl";
@@ -20,7 +20,7 @@ export function Spinner({ size = "md", className }: SpinnerProps) {
   };
 
   return (
-    <Loader2
+    <SpinnerGap
       className={cn(
         "animate-spin text-primary",
         sizes[size],

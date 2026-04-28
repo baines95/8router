@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { 
   Dialog, 
   DialogContent, 
@@ -8,13 +8,13 @@ import {
   DialogTitle, 
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { 
-  Search, 
-  Layers, 
-  Check, 
-  Pencil as Edit2, 
-  SearchX,
-} from "lucide-react";
+import {
+  MagnifyingGlassIcon as Search,
+  StackIcon as Layers,
+  CheckIcon as Check,
+  PencilIcon as Edit2,
+  MagnifyingGlassIcon as SearchX,
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";

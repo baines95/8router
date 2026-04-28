@@ -7,17 +7,17 @@ import {
  ModelSelectModal,
 } from "@/shared/components";
 import { BaseToolCard } from "./";
-import { 
- ArrowRight, 
- StopCircle, 
- PlayCircle, 
- X, 
- Loader2,
- ShieldAlert,
+import {
+ ArrowRight,
+ StopCircle,
+ PlayCircle,
+ X,
+ CircleNotch as Loader2,
+ ShieldWarning as ShieldAlert,
  Info,
  CheckCircle as CheckCircle2,
  Circle
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { translate } from "@/i18n/runtime";
 

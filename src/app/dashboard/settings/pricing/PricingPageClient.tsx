@@ -1,16 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Plus, 
-  Cpu, 
-  Activity, 
-  Info, 
-  DollarSign,
-  ChevronRight,
-  Zap,
-  LayoutGrid
-} from "lucide-react";
+import {
+  Plus,
+  Cpu,
+  Pulse as Activity,
+  Info,
+  CurrencyDollar as DollarSign,
+  CaretRight as ChevronRight,
+  Lightning as Zap,
+  SquaresFour as LayoutGrid
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Copy, Check, FileCode } from "lucide-react";
+import { Copy, Check, FileCode } from "@phosphor-icons/react";
 import { translate } from "@/i18n/runtime";
 
 interface Config {
