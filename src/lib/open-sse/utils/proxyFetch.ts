@@ -196,6 +196,9 @@ async function createBypassRequest(parsedUrl: URL, realIP: string, options: any)
 
 export async function proxyAwareFetch(url: string | URL | Request, options: any = {}, proxyOptions: any = null): Promise<Response> {
   const targetUrl = typeof url === "string" ? url : url.toString();
+  const acceptHeader = String(options?.headers?.Accept || options?.headers?.accept || "").toLowerCase();
+  const isStreamingRequest = acceptHeader.includes("text/event-stream");
+  const fetchOptions = isStreamingRequest ? { ...options, bodyTimeout: 0 } : options;
 
   // Vercel relay: forward request via relay headers
   const vercelRelayUrl = normalizeString(proxyOptions?.vercelRelayUrl);
@@ -219,7 +222,7 @@ export async function proxyAwareFetch(url: string | URL | Request, options: any 
       // Proxy resolves DNS externally (not affected by /etc/hosts) — use proxy directly
       try {
         const dispatcher = await getDispatcher(proxyUrl);
-        return await (originalFetch as any)(url, { ...options, dispatcher });
+        return await (originalFetch as any)(url, { ...fetchOptions, dispatcher });
       } catch (proxyError: any) {
         if (proxyOptions?.strictProxy === true) {
           throw new Error(`[ProxyFetch] Proxy required but failed (strictProxy=true): ${proxyError.message}`);
@@ -247,11 +250,11 @@ export async function proxyAwareFetch(url: string | URL | Request, options: any 
         throw new Error(`[ProxyFetch] Proxy required but failed (strictProxy=true): ${proxyError.message}`);
       }
       console.warn(`[ProxyFetch] Proxy failed, falling back to direct: ${proxyError.message}`);
-      return (originalFetch as any)(url, options);
+      return (originalFetch as any)(url, fetchOptions);
     }
   }
 
-  return (originalFetch as any)(url, options);
+  return (originalFetch as any)(url, fetchOptions);
 }
 
 /**
