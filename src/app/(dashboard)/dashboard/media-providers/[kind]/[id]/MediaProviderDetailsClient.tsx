@@ -107,7 +107,7 @@ function EmbeddingExampleCard({ providerId }: { providerId: string }) {
  const [input, setInput] = useState("The quick brown fox jumps over the lazy dog");
  const [apiKey, setApiKey] = useState("");
  const [useTunnel, setUseTunnel] = useState(false);
- const [localEndpoint, setLocalEndpoint] = useState("");
+ const [localEndpoint] = useState(() => (typeof window !== "undefined" ? window.location.origin : ""));
  const [tunnelEndpoint, setTunnelEndpoint] = useState("");
  const [result, setResult] = useState<any>(null);
  const [running, setRunning] = useState(false);
@@ -116,9 +116,6 @@ function EmbeddingExampleCard({ providerId }: { providerId: string }) {
  const { copied: copiedRes, copy: copyRes } = useCopyToClipboard();
 
  useEffect(() => {
-   if (typeof window !== "undefined") {
-     setLocalEndpoint(window.location.origin);
-   }
  fetch("/api/keys").then((r) => r.json()).then((d) => { setApiKey((d.keys || []).find((k: any) => k.isActive !== false)?.key || ""); }).catch(() => {});
  fetch("/api/tunnel/status").then((r) => r.json()).then((d) => { if (d.publicUrl) setTunnelEndpoint(d.publicUrl); }).catch(() => {});
  }, []);
@@ -159,7 +156,7 @@ function EmbeddingExampleCard({ providerId }: { providerId: string }) {
  const resultJson = result ? JSON.stringify(result.data, null, 2) : "";
 
  return (
- <Card className="p-6 border-border/50 bg-background/50 shadow-none">
+ <Card className="p-6 border-border/50 bg-background/50 rounded-none shadow-none">
  <div className="flex items-center gap-2 mb-6">
  <Globe className="size-4 text-primary" weight="bold" />
  <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Interactive Explorer</h2>
@@ -171,7 +168,7 @@ function EmbeddingExampleCard({ providerId }: { providerId: string }) {
  <select
  value={selectedModel}
  onChange={(e) => setSelectedModel(e.target.value)}
- className="w-full h-9 px-3 text-xs font-bold bg-muted/10 border border-border/50 focus:outline-none focus:border-primary/50 transition-colors uppercase tracking-tight"
+ className="w-full h-9 px-3 text-xs font-bold bg-muted/10 border border-border/50 rounded-none focus:outline-none focus:border-primary/50 transition-colors uppercase tracking-tight"
  >
  {embeddingModels.map((m) => (
  <option key={m.id} value={m.id}>{m.name || m.id}</option>
@@ -184,13 +181,13 @@ function EmbeddingExampleCard({ providerId }: { providerId: string }) {
  <Input
  value={endpoint}
  readOnly
- className="flex-1 h-9 font-mono text-[11px] bg-muted/5 border-border/50 opacity-60 tabular-nums"
+ className="flex-1 h-9 font-mono text-[11px] bg-muted/5 border-border/50 rounded-none opacity-60 tabular-nums"
  />
  {tunnelEndpoint && (
  <button
  onClick={() => setUseTunnel((v) => !v)}
  className={cn(
- "flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 border transition-all h-9 shrink-0",
+ "flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-none border transition-all h-9 shrink-0",
  useTunnel ? "bg-primary/10 border-primary/30 text-primary" : "bg-muted/10 border-border/50 text-muted-foreground opacity-60 hover:opacity-100"
  )}
  >
@@ -207,7 +204,7 @@ function EmbeddingExampleCard({ providerId }: { providerId: string }) {
  value={apiKey}
  onChange={(e) => setApiKey(e.target.value)}
  placeholder="Establish connection key..."
- className="w-full h-9 font-mono text-[11px] bg-muted/5 border-border/50"
+ className="w-full h-9 font-mono text-[11px] bg-muted/5 border-border/50 rounded-none"
  />
  </Row>
 
@@ -216,7 +213,7 @@ function EmbeddingExampleCard({ providerId }: { providerId: string }) {
  <Input
  value={input}
  onChange={(e) => setInput(e.target.value)}
- className="w-full h-9 pr-10 text-sm bg-background border-border/60 focus-visible:ring-0 focus-visible:border-primary/50 transition-all font-medium"
+ className="w-full h-9 pr-10 text-sm bg-background border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-primary/50 transition-all font-medium"
  />
  {input && (
  <button
@@ -247,18 +244,18 @@ function EmbeddingExampleCard({ providerId }: { providerId: string }) {
  <Button
  onClick={handleRun}
  disabled={running || !input.trim() || !modelFull}
- className="h-7 px-4 bg-primary text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-none"
+ className="h-7 px-4 rounded-none bg-primary text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-none"
  >
  {running ? <RefreshCw className="size-3.5 animate-spin mr-1.5" weight="bold" /> : <Play className="size-3.5 mr-1.5" weight="fill" />}
  {running ? "Executing..." : "Execute"}
  </Button>
  </div>
  </div>
- <pre className="bg-black/90 p-4 text-[11px] font-mono text-primary/80 border border-white/5 overflow-x-auto whitespace-pre leading-relaxed shadow-inner">{curlSnippet}</pre>
+ <pre className="bg-black/90 p-4 rounded-none text-[11px] font-mono text-primary/80 border border-white/5 overflow-x-auto whitespace-pre leading-relaxed shadow-inner">{curlSnippet}</pre>
  </div>
 
  {error && (
- <div className="p-3 bg-destructive/5 border border-destructive/20 flex items-start gap-2">
+ <div className="p-3 bg-destructive/5 border border-destructive/20 rounded-none flex items-start gap-2">
  <X className="size-4 text-destructive mt-0.5" weight="bold" />
  <p className="text-xs font-bold text-destructive uppercase tracking-wide leading-tight">{error}</p>
  </div>
@@ -281,7 +278,7 @@ function EmbeddingExampleCard({ providerId }: { providerId: string }) {
  </Button>
  )}
  </div>
- <pre className="bg-muted/10 p-4 text-[11px] font-mono text-foreground/70 border border-border/40 overflow-x-auto whitespace-pre leading-relaxed shadow-inner italic">
+ <pre className="bg-muted/10 p-4 rounded-none text-[11px] font-mono text-foreground/70 border border-border/40 overflow-x-auto whitespace-pre leading-relaxed shadow-inner italic">
  {formatResultJson(result?.data)}
  </pre>
  </div>
@@ -296,7 +293,7 @@ function TtsExampleCard({ providerId }: { providerId: string }) {
  const config = (TTS_PROVIDER_CONFIG as any)[providerId] || TTS_PROVIDER_CONFIG["edge-tts"];
 
  const [selectedVoice, setSelectedVoice] = useState("");
- // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  
  const [selectedVoiceName, setSelectedVoiceName] = useState("");
  const [voiceId, setVoiceId] = useState("");
  const [countryVoices, setCountryVoices] = useState<any[]>([]);
@@ -312,7 +309,7 @@ function TtsExampleCard({ providerId }: { providerId: string }) {
  const [input, setInput] = useState("Hello, this is a text to speech test from the edge.");
  const [apiKey, setApiKey] = useState("");
  const [useTunnel, setUseTunnel] = useState(false);
- const [localEndpoint, setLocalEndpoint] = useState("");
+ const [localEndpoint] = useState(() => (typeof window !== "undefined" ? window.location.origin : ""));
  const [tunnelEndpoint, setTunnelEndpoint] = useState("");
  const [responseFormat, setResponseFormat] = useState("mp3");
  const [audioUrl, setAudioUrl] = useState("");
@@ -326,14 +323,12 @@ function TtsExampleCard({ providerId }: { providerId: string }) {
  const [languages, setLanguages] = useState<any[]>([]);
  const [modalLoading, setModalLoading] = useState(false);
  const [modalSearch, setModalSearch] = useState("");
- // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  
  const [modalError, setModalError] = useState("");
  const [byLang, setByLang] = useState<Record<string, any>>({});
 
  useEffect(() => {
-   if (typeof window !== "undefined") {
-     setLocalEndpoint(window.location.origin);
-   }
+ const timer = setTimeout(() => {
  fetch("/api/keys").then((r) => r.json()).then((d) => { setApiKey((d.keys || []).find((k: any) => k.isActive !== false)?.key || ""); }).catch(() => {});
  fetch("/api/tunnel/status").then((r) => r.json()).then((d) => { if (d.publicUrl) setTunnelEndpoint(d.publicUrl); }).catch(() => {});
 
@@ -350,15 +345,20 @@ function TtsExampleCard({ providerId }: { providerId: string }) {
  }
  }
  }
+ }, 0);
+ return () => clearTimeout(timer);
  }, [providerId, config]);
 
  useEffect(() => {
  if (!config.voicesPerModel || !selectedModel) return;
+ const timer = setTimeout(() => {
  const voices = getTtsVoicesForModel(providerId, selectedModel) || [];
  setCountryVoices(voices);
  if (voices.length) {
  setSelectedVoice(voices[0].id); setSelectedVoiceName(voices[0].name || voices[0].id);
  }
+ }, 0);
+ return () => clearTimeout(timer);
  }, [selectedModel, providerId, config]);
 
  const openModal = async () => {
@@ -429,7 +429,7 @@ function TtsExampleCard({ providerId }: { providerId: string }) {
 
  return (
  <>
- <Card className="p-6 border-border/50 bg-background/50 shadow-none">
+ <Card className="p-6 border-border/50 bg-background/50 rounded-none shadow-none">
  <div className="flex items-center gap-2 mb-6">
  <SpeakerHigh className="size-4 text-primary" weight="bold" />
  <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Acoustic Synthesis</h2>
@@ -440,18 +440,18 @@ function TtsExampleCard({ providerId }: { providerId: string }) {
  <Row label="Node Model">
  <div className="flex flex-col gap-2">
  {config.hasModelSelector && config.modelKey && (
- <select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} className="w-full h-9 px-3 text-xs font-bold bg-muted/10 border border-border/50 focus:outline-none focus:border-primary/50 uppercase tracking-tight">
+ <select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} className="w-full h-9 px-3 text-xs font-bold bg-muted/10 border border-border/50 rounded-none focus:outline-none focus:border-primary/50 uppercase tracking-tight">
  {(getModelsByProviderId(config.modelKey) || []).map((m) => (<option key={m.id} value={m.id}>{m.name || m.id}</option>))}
  </select>
  )}
  <div className="flex items-center gap-2">
  {config.hasBrowseButton && (
- <button onClick={openModal} className="flex-1 h-9 px-3 text-xs font-bold border border-border/50 bg-muted/10 font-mono truncate text-left hover:border-primary/50 transition-colors uppercase tabular-nums">
+ <button onClick={openModal} className="flex-1 h-9 px-3 text-xs font-bold border border-border/50 rounded-none bg-muted/10 font-mono truncate text-left hover:border-primary/50 transition-colors uppercase tabular-nums">
  {selectedLang ? (languages.find((l) => l.code === selectedLang)?.name || selectedLang) : "Select Spectrum"}
  </button>
  )}
  {config.hasVoiceIdInput && (
- <Input value={voiceId} onChange={(e) => { setVoiceId(e.target.value); setSelectedVoice(e.target.value); }} placeholder="Custom Voice Vector..." className="flex-1 h-9 font-mono text-[11px] bg-muted/5 border-border/50" />
+ <Input value={voiceId} onChange={(e) => { setVoiceId(e.target.value); setSelectedVoice(e.target.value); }} placeholder="Custom Voice Vector..." className="flex-1 h-9 font-mono text-[11px] bg-muted/5 border-border/50 rounded-none" />
  )}
  </div>
  </div>
@@ -461,7 +461,7 @@ function TtsExampleCard({ providerId }: { providerId: string }) {
  <Row label="Vocal Identity">
  <div className="flex flex-wrap gap-1.5">
  {countryVoices.map((v) => (
- <button key={v.id} onClick={() => { setSelectedVoice(v.id); setSelectedVoiceName(v.name); if (config.hasVoiceIdInput) setVoiceId(v.id); }} className={cn("px-2.5 py-1 text-[10px] border font-bold uppercase tracking-widest transition-all", selectedVoice === v.id ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20" : "bg-muted/10 border-border/50 text-muted-foreground opacity-60 hover:opacity-100 hover:border-border")}>
+ <button key={v.id} onClick={() => { setSelectedVoice(v.id); setSelectedVoiceName(v.name); if (config.hasVoiceIdInput) setVoiceId(v.id); }} className={cn("px-2.5 py-1 rounded-none text-[10px] border font-bold uppercase tracking-widest transition-all", selectedVoice === v.id ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20" : "bg-muted/10 border-border/50 text-muted-foreground opacity-60 hover:opacity-100 hover:border-border")}>
  {v.name}{v.gender ? ` · ${v.gender[0].toUpperCase()}` : ""}
  </button>
  ))}
@@ -471,13 +471,13 @@ function TtsExampleCard({ providerId }: { providerId: string }) {
 
  <Row label="Input Payload">
  <div className="relative group">
- <Input value={input} onChange={(e) => setInput(e.target.value)} className="w-full h-9 pr-10 text-sm bg-background border-border/60 focus-visible:ring-0 focus-visible:border-primary/50 transition-all font-medium" />
+ <Input value={input} onChange={(e) => setInput(e.target.value)} className="w-full h-9 pr-10 text-sm bg-background border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-primary/50 transition-all font-medium" />
  {input && (<button type="button" onClick={() => setInput("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground opacity-40 hover:opacity-100"><X className="size-4" weight="bold" /></button>)}
  </div>
  </Row>
 
  <Row label="Stream Format">
- <select value={responseFormat} onChange={(e) => setResponseFormat(e.target.value)} className="w-full h-9 px-3 text-[10px] font-bold uppercase tracking-widest bg-muted/10 border border-border/50 focus:outline-none focus:border-primary/50">
+ <select value={responseFormat} onChange={(e) => setResponseFormat(e.target.value)} className="w-full h-9 px-3 text-[10px] font-bold uppercase tracking-widest bg-muted/10 border border-border/50 rounded-none focus:outline-none focus:border-primary/50">
  <option value="mp3">Binary Octet (MP3)</option>
  <option value="json">Base64 Descriptor (JSON)</option>
  </select>
@@ -489,43 +489,43 @@ function TtsExampleCard({ providerId }: { providerId: string }) {
  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-40">Shell Manifest</span>
  <div className="flex items-center gap-2">
  <Button variant="ghost" size="sm" onClick={() => copyCurl(curlSnippet)} className="h-7 text-[10px] font-bold uppercase tracking-widest hover:bg-muted/50">{copiedCurl ? <Check className="size-3.5 text-emerald-500 mr-1.5" weight="bold" /> : <Copy className="size-3.5 mr-1.5" weight="bold" />}{copiedCurl ? "Copied" : "Copy Source"}</Button>
- <Button onClick={handleRun} disabled={running || !input.trim() || !modelFull} className="h-7 px-4 bg-primary text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-none">{running ? <RefreshCw className="size-3.5 animate-spin mr-1.5" weight="bold" /> : <Play className="size-3.5 mr-1.5" weight="fill" />}{running ? "Synthesizing..." : "Execute"}</Button>
+ <Button onClick={handleRun} disabled={running || !input.trim() || !modelFull} className="h-7 px-4 rounded-none bg-primary text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-none">{running ? <RefreshCw className="size-3.5 animate-spin mr-1.5" weight="bold" /> : <Play className="size-3.5 mr-1.5" weight="fill" />}{running ? "Synthesizing..." : "Execute"}</Button>
  </div>
  </div>
- <pre className="bg-black/90 p-4 text-[11px] font-mono text-primary/80 border border-white/5 overflow-x-auto whitespace-pre leading-relaxed shadow-inner">{curlSnippet}</pre>
+ <pre className="bg-black/90 p-4 rounded-none text-[11px] font-mono text-primary/80 border border-white/5 overflow-x-auto whitespace-pre leading-relaxed shadow-inner">{curlSnippet}</pre>
  </div>
 
- {error && (<div className="p-3 bg-destructive/5 border border-destructive/20 flex items-start gap-2"><X className="size-4 text-destructive mt-0.5" weight="bold" /><p className="text-xs font-bold text-destructive uppercase tracking-wide leading-tight">{error}</p></div>)}
+ {error && (<div className="p-3 bg-destructive/5 border border-destructive/20 rounded-none flex items-start gap-2"><X className="size-4 text-destructive mt-0.5" weight="bold" /><p className="text-xs font-bold text-destructive uppercase tracking-wide leading-tight">{error}</p></div>)}
 
  <div className="space-y-3 border-t border-border/40 pt-6">
  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-40 px-1">Acoustic Output {latency && <span className="text-primary opacity-100 ml-2">· {latency}ms SYNTHESIS</span>}</span>
  {audioUrl ? (
  <div className="flex flex-col gap-4">
- <audio controls src={audioUrl} className="w-full h-10 shadow-none border border-border/40 bg-muted/5" />
+ <audio controls src={audioUrl} className="w-full h-10 shadow-none border border-border/40 bg-muted/5 rounded-none" />
  <div className="flex gap-2">
- <a href={audioUrl} download="synthesis.mp3" className="flex-1 h-9 inline-flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest border border-border/50 bg-background hover:bg-muted/30 transition-all"><Download className="size-4" weight="bold" /> Download Stream</a>
+ <a href={audioUrl} download="synthesis.mp3" className="flex-1 h-9 inline-flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest border border-border/50 bg-background hover:bg-muted/30 transition-all rounded-none"><Download className="size-4" weight="bold" /> Download Stream</a>
  </div>
  {jsonResponse && (
  <div className="space-y-2">
  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-40 px-1">JSON Buffer</span>
- <pre className="bg-muted/10 p-4 text-[11px] font-mono text-foreground/70 border border-border/40 overflow-x-auto whitespace-pre leading-relaxed shadow-inner italic">{JSON.stringify({ format: jsonResponse.format, audio: jsonResponse.audio ? `${jsonResponse.audio.substring(0, 80)}...` : "" }, null, 2)}</pre>
+ <pre className="bg-muted/10 p-4 rounded-none text-[11px] font-mono text-foreground/70 border border-border/40 overflow-x-auto whitespace-pre leading-relaxed shadow-inner italic">{JSON.stringify({ format: jsonResponse.format, audio: jsonResponse.audio ? `${jsonResponse.audio.substring(0, 80)}...` : "" }, null, 2)}</pre>
  </div>
  )}
  </div>
- ) : (<pre className="bg-muted/10 p-4 text-[11px] font-mono text-muted-foreground opacity-30 border border-border/40 overflow-x-auto whitespace-pre leading-relaxed shadow-inner italic">{DEFAULT_TTS_RESPONSE_EXAMPLE}</pre>)}
+ ) : (<pre className="bg-muted/10 p-4 rounded-none text-[11px] font-mono text-muted-foreground opacity-30 border border-border/40 overflow-x-auto whitespace-pre leading-relaxed shadow-inner italic">{DEFAULT_TTS_RESPONSE_EXAMPLE}</pre>)}
  </div>
  </div>
  </Card>
 
  {modalOpen && (
  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setModalOpen(false)}>
- <div className="bg-background border border-border/50 w-full max-w-sm mx-4 flex flex-col max-h-[80vh] shadow-2xl scale-100 animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+ <div className="bg-background border border-border/50 rounded-none w-full max-w-sm mx-4 flex flex-col max-h-[80vh] shadow-2xl scale-100 animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
  <div className="flex items-center justify-between px-5 py-4 border-b border-border/50 bg-muted/5 shrink-0"><h3 className="text-xs font-bold uppercase tracking-widest text-foreground">Select Voice Spectrum</h3><button onClick={() => setModalOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors"><X className="size-4" weight="bold" /></button></div>
- <div className="px-5 py-3 border-b border-border/50 bg-muted/10 shrink-0"><Input autoFocus value={modalSearch} onChange={(e) => setModalSearch(e.target.value)} placeholder="Filter locales..." className="h-9 text-xs font-bold uppercase tracking-tight border-border/50 bg-background" /></div>
+ <div className="px-5 py-3 border-b border-border/50 bg-muted/10 shrink-0"><Input autoFocus value={modalSearch} onChange={(e) => setModalSearch(e.target.value)} placeholder="Filter locales..." className="h-9 text-xs font-bold uppercase tracking-tight rounded-none border-border/50 bg-background" /></div>
  <div className="overflow-y-auto flex-1 p-2 custom-scrollbar">
  {modalLoading ? (<p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-40 p-4 text-center animate-pulse">Syncing catalog...</p>) : (
  <div className="flex flex-col gap-0.5">
- {filteredLanguages.map((c) => (<button key={c.code} onClick={() => handlePickLanguage(c)} className={cn("flex items-center justify-between w-full px-4 py-2.5 text-left transition-colors border border-transparent", selectedLang === c.code ? "bg-primary/10 border-primary/20" : "hover:bg-muted/40")}>
+ {filteredLanguages.map((c) => (<button key={c.code} onClick={() => handlePickLanguage(c)} className={cn("flex items-center justify-between w-full px-4 py-2.5 rounded-none text-left transition-colors border border-transparent", selectedLang === c.code ? "bg-primary/10 border-primary/20" : "hover:bg-muted/40")}>
  <span className="text-xs font-bold uppercase tracking-tight text-foreground">{c.name}</span>
  <div className="flex items-center gap-3 shrink-0"><span className="text-[10px] font-medium text-muted-foreground opacity-60 tabular-nums">{c.voices.length} VOICES</span>{selectedLang === c.code && (<Check className="size-3.5 text-primary" weight="bold" />)}</div>
  </button>))}
@@ -544,12 +544,11 @@ function GenericExampleCard({ providerId, kind }: { providerId: string, kind: st
  const providerAlias = getProviderAlias(providerId);
  const kindConfig = MEDIA_PROVIDER_KINDS.find((k) => k.id === kind);
  const exConfig = KIND_EXAMPLE_CONFIG[kind];
- if (!kindConfig || !exConfig) return null;
 
- const [input, setInput] = useState(exConfig.defaultInput);
+ const [input, setInput] = useState(exConfig?.defaultInput || "");
  const [apiKey, setApiKey] = useState("");
  const [useTunnel, setUseTunnel] = useState(false);
- const [localEndpoint, setLocalEndpoint] = useState("");
+ const [localEndpoint] = useState(() => (typeof window !== "undefined" ? window.location.origin : ""));
  const [tunnelEndpoint, setTunnelEndpoint] = useState("");
  const [result, setResult] = useState<any>(null);
  const [running, setRunning] = useState(false);
@@ -558,12 +557,14 @@ function GenericExampleCard({ providerId, kind }: { providerId: string, kind: st
  const { copied: copiedRes, copy: copyRes } = useCopyToClipboard();
 
  useEffect(() => {
-   if (typeof window !== "undefined") {
-     setLocalEndpoint(window.location.origin);
-   }
+ const timer = setTimeout(() => {
  fetch("/api/keys").then((r) => r.json()).then((d) => { setApiKey((d.keys || []).find((k: any) => k.isActive !== false)?.key || ""); }).catch(() => {});
  fetch("/api/tunnel/status").then((r) => r.json()).then((d) => { if (d.publicUrl) setTunnelEndpoint(d.publicUrl); }).catch(() => {});
+ }, 0);
+ return () => clearTimeout(timer);
  }, []);
+
+ if (!kindConfig || !exConfig) return null;
 
  const endpoint = useTunnel ? tunnelEndpoint : localEndpoint;
  const apiPath = kindConfig.endpoint.path;
@@ -592,7 +593,7 @@ function GenericExampleCard({ providerId, kind }: { providerId: string, kind: st
  const resultJson = result ? JSON.stringify(result.data, null, 2) : "";
 
  return (
- <Card className="p-6 border-border/50 bg-background/50 shadow-none">
+ <Card className="p-6 border-border/50 bg-background/50 rounded-none shadow-none">
  <div className="flex items-center gap-2 mb-6">
  <Monitor className="size-4 text-primary" weight="bold" />
  <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Interactive Explorer</h2>
@@ -601,33 +602,33 @@ function GenericExampleCard({ providerId, kind }: { providerId: string, kind: st
  <div className="space-y-4">
  <Row label="Gateway Node">
  <div className="flex items-center gap-2">
- <Input value={endpoint} readOnly className="flex-1 h-9 font-mono text-[11px] bg-muted/5 border-border/50 opacity-60 tabular-nums" />
+ <Input value={endpoint} readOnly className="flex-1 h-9 font-mono text-[11px] bg-muted/5 border-border/50 rounded-none opacity-60 tabular-nums" />
  {tunnelEndpoint && (
- <button onClick={() => setUseTunnel((v) => !v)} className={cn("flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 border transition-all h-9 shrink-0", useTunnel ? "bg-primary/10 border-primary/30 text-primary" : "bg-muted/10 border-border/50 text-muted-foreground opacity-60 hover:opacity-100")}>
+ <button onClick={() => setUseTunnel((v) => !v)} className={cn("flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-none border transition-all h-9 shrink-0", useTunnel ? "bg-primary/10 border-primary/30 text-primary" : "bg-muted/10 border-border/50 text-muted-foreground opacity-60 hover:opacity-100")}>
  <WifiTetheringIcon className="size-3.5" weight="bold" /> Tunnel
  </button>
  )}
  </div>
  </Row>
  <Row label="Access Key">
- <Input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="Establish key..." className="w-full h-9 font-mono text-[11px] bg-muted/5 border-border/50" />
+ <Input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="Establish key..." className="w-full h-9 font-mono text-[11px] bg-muted/5 border-border/50 rounded-none" />
  </Row>
  <Row label={exConfig.inputLabel}>
  <div className="relative group">
- <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder={exConfig.inputPlaceholder} className="w-full h-9 pr-10 text-sm bg-background border-border/60 focus-visible:ring-0 focus-visible:border-primary/50 transition-all font-medium" />
+ <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder={exConfig.inputPlaceholder} className="w-full h-9 pr-10 text-sm bg-background border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-primary/50 transition-all font-medium" />
  {input && (<button type="button" onClick={() => setInput("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground opacity-40 hover:opacity-100"><X className="size-4" weight="bold" /></button>)}
  </div>
  </Row>
  </div>
 
  <div className="space-y-3">
- <div className="flex items-center justify-between px-1"><span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-40">Shell Manifest</span><div className="flex items-center gap-2"><Button variant="ghost" size="sm" onClick={() => copyCurl(curlSnippet)} className="h-7 text-[10px] font-bold uppercase tracking-widest hover:bg-muted/50">{copiedCurl ? <Check className="size-3.5 text-emerald-500 mr-1.5" weight="bold" /> : <Copy className="size-3.5 mr-1.5" weight="bold" />}{copiedCurl ? "Copied" : "Copy Source"}</Button><Button onClick={handleRun} disabled={running || !input.trim()} className="h-7 px-4 bg-primary text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-none">{running ? <RefreshCw className="size-3.5 animate-spin mr-1.5" weight="bold" /> : <Play className="size-3.5 mr-1.5" weight="fill" />}{running ? "Executing..." : "Execute"}</Button></div></div>
- <pre className="bg-black/90 p-4 text-[11px] font-mono text-primary/80 border border-white/5 overflow-x-auto whitespace-pre leading-relaxed shadow-inner">{curlSnippet}</pre>
+ <div className="flex items-center justify-between px-1"><span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-40">Shell Manifest</span><div className="flex items-center gap-2"><Button variant="ghost" size="sm" onClick={() => copyCurl(curlSnippet)} className="h-7 text-[10px] font-bold uppercase tracking-widest hover:bg-muted/50">{copiedCurl ? <Check className="size-3.5 text-emerald-500 mr-1.5" weight="bold" /> : <Copy className="size-3.5 mr-1.5" weight="bold" />}{copiedCurl ? "Copied" : "Copy Source"}</Button><Button onClick={handleRun} disabled={running || !input.trim()} className="h-7 px-4 rounded-none bg-primary text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-none">{running ? <RefreshCw className="size-3.5 animate-spin mr-1.5" weight="bold" /> : <Play className="size-3.5 mr-1.5" weight="fill" />}{running ? "Executing..." : "Execute"}</Button></div></div>
+ <pre className="bg-black/90 p-4 rounded-none text-[11px] font-mono text-primary/80 border border-white/5 overflow-x-auto whitespace-pre leading-relaxed shadow-inner">{curlSnippet}</pre>
  </div>
 
- {error && (<div className="p-3 bg-destructive/5 border border-destructive/20 flex items-start gap-2"><X className="size-4 text-destructive mt-0.5" weight="bold" /><p className="text-xs font-bold text-destructive uppercase tracking-wide leading-tight">{error}</p></div>)}
+ {error && (<div className="p-3 bg-destructive/5 border border-destructive/20 rounded-none flex items-start gap-2"><X className="size-4 text-destructive mt-0.5" weight="bold" /><p className="text-xs font-bold text-destructive uppercase tracking-wide leading-tight">{error}</p></div>)}
 
- <div className="space-y-3 border-t border-border/40 pt-6"><div className="flex items-center justify-between px-1"><span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-40">Telemetry Response {result && <span className="text-primary opacity-100 ml-2">· {result.latencyMs}ms LATENCY</span>}</span>{result && (<Button variant="ghost" size="sm" onClick={() => copyRes(resultJson)} className="h-7 text-[10px] font-bold uppercase tracking-widest hover:bg-muted/50">{copiedRes ? <Check className="size-3.5 text-emerald-500 mr-1.5" weight="bold" /> : <Copy className="size-3.5 mr-1.5" weight="bold" />}{copiedRes ? "Copied" : "Copy JSON"}</Button>)}</div><pre className="bg-muted/10 p-4 text-[11px] font-mono text-foreground/70 border border-border/40 overflow-x-auto whitespace-pre leading-relaxed shadow-inner italic">{result ? resultJson : exConfig.defaultResponse}</pre></div>
+ <div className="space-y-3 border-t border-border/40 pt-6"><div className="flex items-center justify-between px-1"><span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-40">Telemetry Response {result && <span className="text-primary opacity-100 ml-2">· {result.latencyMs}ms LATENCY</span>}</span>{result && (<Button variant="ghost" size="sm" onClick={() => copyRes(resultJson)} className="h-7 text-[10px] font-bold uppercase tracking-widest hover:bg-muted/50">{copiedRes ? <Check className="size-3.5 text-emerald-500 mr-1.5" weight="bold" /> : <Copy className="size-3.5 mr-1.5" weight="bold" />}{copiedRes ? "Copied" : "Copy JSON"}</Button>)}</div><pre className="bg-muted/10 p-4 rounded-none text-[11px] font-mono text-foreground/70 border border-border/40 overflow-x-auto whitespace-pre leading-relaxed shadow-inner italic">{result ? resultJson : exConfig.defaultResponse}</pre></div>
  </div>
  </Card>
  );
@@ -653,13 +654,13 @@ export default function MediaProviderDetailPage({ kind, providerId }: { kind: st
  </Link>
 
  <div className="flex items-center gap-5 mt-2">
- <div className="size-14 flex items-center justify-center shrink-0 border border-border/50 bg-muted/5 shadow-none" style={{ backgroundColor: `${provider.color}08` }}>
+ <div className="size-14 rounded-none flex items-center justify-center shrink-0 border border-border/50 bg-muted/5 shadow-none" style={{ backgroundColor: `${provider.color}08` }}>
  <ProviderIcon src={`/providers/${provider.id}.png`} alt={provider.name} size={36} className={cn("object-contain", (provider.id === "codex" || provider.id === "openai" || provider.id === "github") && "dark:invert")} fallbackText={provider.textIcon || provider.id.slice(0, 2).toUpperCase()} fallbackColor={provider.color} />
  </div>
  <div className="flex flex-col gap-0.5">
  <h1 className="text-2xl font-bold tracking-tight uppercase leading-none">{provider.name}</h1>
  <div className="flex items-center gap-2 mt-1.5">
- {kinds.map((k: string) => (<Badge key={k} variant="outline" className={cn("h-4 px-1.5 text-[9px] font-bold uppercase border-none tracking-widest", k === kind ? "bg-primary/10 text-primary" : "bg-muted/40 text-muted-foreground/60")}>{k}</Badge>))}
+ {kinds.map((k: string) => (<Badge key={k} variant="outline" className={cn("h-4 px-1.5 text-[9px] font-bold uppercase border-none rounded-none tracking-widest", k === kind ? "bg-primary/10 text-primary" : "bg-muted/40 text-muted-foreground/60")}>{k}</Badge>))}
  </div>
  </div>
  </div>
@@ -670,7 +671,7 @@ export default function MediaProviderDetailPage({ kind, providerId }: { kind: st
  <div className="space-y-4">
  <div className="flex items-center gap-2 px-1"><span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-40">Infrastructure Gateway</span><div className="h-px flex-1 bg-border/40"></div></div>
  {provider.noAuth ? (
- <Card className="p-4 border-primary/20 bg-primary/5 shadow-none"><div className="flex items-center gap-4"><div className="size-10 bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shrink-0"><CheckCircle className="size-6" weight="bold" /></div><div className="min-w-0"><p className="text-sm font-bold uppercase tracking-tight text-foreground">Stateless Protocol Active</p><p className="text-xs text-muted-foreground font-medium italic opacity-70">This infrastructure provider requires no authentication and is ready for traffic.</p></div></div></Card>
+ <Card className="p-4 border-primary/20 bg-primary/5 rounded-none shadow-none"><div className="flex items-center gap-4"><div className="size-10 rounded-none bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shrink-0"><CheckCircle className="size-6" weight="bold" /></div><div className="min-w-0"><p className="text-sm font-bold uppercase tracking-tight text-foreground">Stateless Protocol Active</p><p className="text-xs text-muted-foreground font-medium italic opacity-70">This infrastructure provider requires no authentication and is ready for traffic.</p></div></div></Card>
  ) : (<ConnectionsCard providerId={providerId} isOAuth={false} />)}
  </div>
 

@@ -24,7 +24,7 @@ function CallbackContent() {
       fullUrl: window.location.href,
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+     
     let relayed = false;
 
     // Check if this callback is from expected origin/port
@@ -66,7 +66,7 @@ function CallbackContent() {
       return;
     }
 
-    setStatus("success");
+    setTimeout(() => setStatus("success"), 0);
     setTimeout(() => {
       window.close();
       setTimeout(() => setStatus("done"), 500);

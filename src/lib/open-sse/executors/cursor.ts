@@ -24,7 +24,7 @@ const isCloudEnv = () => {
 let http2: any = null;
 if (!isCloudEnv()) {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+     
     http2 = require("http2");
   } catch {
     // http2 not available

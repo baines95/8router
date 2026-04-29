@@ -37,7 +37,7 @@ interface ModelRowProps {
 export default function ModelRow({
   model,
   fullModel,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   alias,
   copied,
   onCopy,

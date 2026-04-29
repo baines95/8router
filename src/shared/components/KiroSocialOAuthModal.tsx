@@ -69,8 +69,6 @@ export default function KiroSocialOAuthModal({ isOpen, provider, onSuccess, onCl
       }
 
       const code = url.searchParams.get("code");
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const state = url.searchParams.get("state");
       const errorParam = url.searchParams.get("error");
 
       if (errorParam) {

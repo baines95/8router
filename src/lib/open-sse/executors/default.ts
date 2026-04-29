@@ -205,7 +205,7 @@ export class DefaultExecutor extends BaseExecutor {
     return { accessToken: tokens.access_token, refreshToken: tokens.refresh_token || refreshToken, expiresIn: tokens.expires_in };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   async refreshKilocode(refreshToken: string) {
     return null;
   }

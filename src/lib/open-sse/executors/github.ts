@@ -99,7 +99,7 @@ export class GithubExecutor extends BaseExecutor {
     return !/gpt-5\.4/i.test(model);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   supportsThinking(model?: string) {
     return false;
   }

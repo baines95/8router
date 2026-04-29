@@ -69,7 +69,7 @@ export function fixToolUseOrdering(messages: any[]): any[] {
 export function prepareClaudeRequest(body: any, provider?: string | null, apiKey?: string | null, connectionId?: string | null): any {
   if (body.system && Array.isArray(body.system)) {
     body.system = body.system.map((block: any, i: number) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+       
       const { cache_control, ...rest } = block;
       if (i === body.system.length - 1) {
         return { ...rest, cache_control: { type: "ephemeral", ttl: "1h" } };
@@ -151,7 +151,7 @@ export function prepareClaudeRequest(body: any, provider?: string | null, apiKey
     }
 
     body.tools = body.tools.map((tool: any, i: number) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+       
       const { cache_control, ...rest } = tool;
       if (i === body.tools.length - 1) {
         return { ...rest, cache_control: { type: "ephemeral", ttl: "1h" } };

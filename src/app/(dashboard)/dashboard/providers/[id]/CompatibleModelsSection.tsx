@@ -195,7 +195,7 @@ export default function CompatibleModelsSection({ providerStorageAlias, provider
         return;
       }
       const models = data.models || [];
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+       
       let importedCount = 0;
       for (const model of models) {
         const modelId = model.id || model.name || model.model;

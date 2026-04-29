@@ -124,7 +124,7 @@ function convertMessages(messages: any[]) {
       if (msg.role === "assistant" && msg.tool_calls && msg.tool_calls.length > 0) {
         const assistantMsg: any = { role: "assistant", content: content || "" };
         assistantMsg.tool_calls = msg.tool_calls.map((tc: any) => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+           
           const { index, ...rest } = tc || {};
           return rest;
         });
@@ -162,10 +162,10 @@ function convertMessages(messages: any[]) {
   return result;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 export function buildCursorRequest(model: string, body: any, stream: boolean, credentials?: any) {
   const messages = convertMessages(body.messages || []);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   const { user, metadata, tool_choice, stream_options, system, ...rest } = body;
   return {
     ...rest,

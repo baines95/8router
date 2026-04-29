@@ -204,7 +204,12 @@ export default function ModelsCard({ providerId, kindFilter }: ModelsCardProps) 
     } catch (e) { console.log("ModelsCard fetch error:", e); }
   }, [providerId]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void fetchData();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [fetchData]);
 
   const handleSetAlias = async (modelId: string, alias: string) => {
     const fullModel = `${providerAlias}/${modelId}`;

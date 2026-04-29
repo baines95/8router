@@ -71,6 +71,7 @@ export default function ClaudeToolCard({
  const [customBaseUrl, setCustomBaseUrl] = useState("");
  const [ccFilterNaming, setCcFilterNaming] = useState(false);
  const hasInitializedModels = useRef(false);
+ const effectiveSelectedApiKey = selectedApiKey || apiKeys?.[0]?.key || "";
 
  const getConfigStatus = () => {
  if (!claudeStatus?.installed) return "not_configured";
@@ -95,7 +96,10 @@ export default function ClaudeToolCard({
 
  useEffect(() => {
  if (isExpanded && !claudeStatus) {
- checkStatus();
+ const timer = setTimeout(() => {
+ void checkStatus();
+ }, 0);
+ return () => clearTimeout(timer);
  }
  }, [isExpanded, claudeStatus]);
 
@@ -110,13 +114,8 @@ export default function ClaudeToolCard({
  }
  });
  }
- }, [isExpanded, claudeStatus, tool.defaultModels]);
+ }, [isExpanded, claudeStatus, tool.defaultModels, modelMappings, onModelMappingChange]);
 
- useEffect(() => {
- if (apiKeys?.length > 0 && !selectedApiKey) {
- setSelectedApiKey(apiKeys[0].key);
- }
- }, [apiKeys, selectedApiKey]);
 
  useEffect(() => {
  fetch("/api/models/alias").then(r => r.json()).then(d => setModelAliases(d.aliases || {}));
@@ -127,7 +126,7 @@ export default function ClaudeToolCard({
  setApplying(true);
  setMessage(null);
  try {
- const keyToUse = selectedApiKey?.trim() || (apiKeys?.length > 0 ? apiKeys[0].key : (cloudEnabled ? "" : "sk_8router"));
+ const keyToUse = effectiveSelectedApiKey?.trim() || (cloudEnabled ? "" : "sk_8router");
  const env: any = {
  ANTHROPIC_BASE_URL: getDisplayUrl(),
  ANTHROPIC_AUTH_TOKEN: keyToUse,

@@ -112,11 +112,6 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
     onMethodSelect("idc", { startUrl: idcStartUrl.trim(), region: idcRegion });
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleSocialLogin = (provider: string) => {
-    onMethodSelect("social", { provider });
-  };
-
   return (
     <Modal open={isOpen} title={translate("Connect Kiro")} onClose={onClose} size="lg">
       <div className="flex flex-col gap-4">

@@ -66,7 +66,7 @@ interface CombosPageClientProps {
 
 export default function CombosPageClient({ initialData }: CombosPageClientProps) {
  const [combos, setCombos] = useState<Combo[]>(initialData?.combos || []);
- // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  
  const [loading, setLoading] = useState(false);
  const [showCreateModal, setShowCreateModal] = useState(false);
  const [editingCombo, setEditingCombo] = useState<Combo | null>(null);

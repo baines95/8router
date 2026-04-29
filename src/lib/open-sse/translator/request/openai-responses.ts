@@ -15,7 +15,7 @@ const clampCallId = (id: any) => (typeof id === "string" && id.length > MAX_CALL
 /**
  * Convert OpenAI Responses API request to OpenAI Chat Completions format
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 export function openaiResponsesToOpenAIRequest(model: string, body: any, stream: boolean, credentials?: any) {
   if (!body.input) return body;
 
@@ -168,7 +168,7 @@ function normalizeToolParameters(params: any) {
 /**
  * Convert OpenAI Chat Completions to OpenAI Responses API format
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 export function openaiToOpenAIResponsesRequest(model: string, body: any, stream: boolean, credentials?: any) {
   // Body already in Responses API format (e.g. Cursor CLI calling /chat/completions with input[])
   if (body.input) return { ...body, model, stream: true };

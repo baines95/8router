@@ -142,8 +142,8 @@ function ConnectionRow({ connection, proxyPools, isOAuth, isFirst, isLast, onMov
  <div className={cn("p-3 flex items-center justify-between hover:bg-muted/10 transition-colors group border-b border-border/40 last:border-0", connection.isActive === false &&"opacity-60 grayscale")}>
  <div className="flex items-center gap-4 min-w-0 flex-1">
  <div className="flex flex-col gap-0.5 opacity-30 group-hover:opacity-100 transition-opacity">
- <Button variant="ghost" size="icon" className="size-5 hover:bg-muted" onClick={onMoveUp} disabled={isFirst}><CaretUp className="size-3"/></Button>
- <Button variant="ghost" size="icon" className="size-5 hover:bg-muted" onClick={onMoveDown} disabled={isLast}><CaretDown className="size-3"/></Button>
+ <Button variant="ghost" size="icon" className="size-5 rounded-md hover:bg-muted" onClick={onMoveUp} disabled={isFirst}><CaretUp className="size-3"/></Button>
+ <Button variant="ghost" size="icon" className="size-5 rounded-md hover:bg-muted" onClick={onMoveDown} disabled={isLast}><CaretDown className="size-3"/></Button>
  </div>
  <div className="size-8 rounded border border-border/50 bg-background flex items-center justify-center shrink-0 shadow-none">
  {isOAuth ? <Lock className="size-3.5 text-muted-foreground" weight="bold"/> : <Key className="size-3.5 text-muted-foreground" weight="bold"/>}
@@ -168,7 +168,7 @@ function ConnectionRow({ connection, proxyPools, isOAuth, isFirst, isLast, onMov
  <DropdownMenuTrigger render={
  <Button variant="ghost" size="icon" className={cn("size-8 rounded-full", hasAnyProxy ?"text-primary":"text-muted-foreground hover:text-primary")}><Network className="size-3.5"/></Button>
  } />
- <DropdownMenuContent align="end" className="w-48 shadow-none border-border/50">
+ <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-none border-border/50">
  <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Route Via Proxy</DropdownMenuLabel>
  <DropdownMenuSeparator />
  <DropdownMenuItem className="text-xs font-medium gap-2" onClick={() => onUpdateProxy(null)}>None {!boundProxyPoolId && <Check className="size-3 ml-auto"/>}</DropdownMenuItem>
@@ -288,7 +288,12 @@ export default function ConnectionsCard({ providerId, isOAuth }: { providerId: s
  } catch (e) { console.log(e); } finally { setLoading(false); }
  }, [providerId]);
 
- useEffect(() => { fetch_(); }, [fetch_]);
+ useEffect(() => {
+ const timer = setTimeout(() => {
+ void fetch_();
+ }, 0);
+ return () => clearTimeout(timer);
+ }, [fetch_]);
 
  const saveStrategy = async (strategy: string | null, stickyLimit: string) => {
  try {
@@ -303,7 +308,7 @@ export default function ConnectionsCard({ providerId, isOAuth }: { providerId: s
 
  return (
  <>
- <Card className="border-border/50 p-0 overflow-hidden shadow-none">
+ <Card className="border-border/50 p-0 overflow-hidden shadow-none rounded-lg">
  <CardHeader className="flex flex-row items-center justify-between px-3 py-2 border-b border-border/50 bg-muted/10">
  <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-50">Gateway Node Routing</CardTitle>
  <div className="flex items-center gap-4">
@@ -314,7 +319,7 @@ export default function ConnectionsCard({ providerId, isOAuth }: { providerId: s
  {providerStrategy === 'round-robin' && (
  <div className="flex items-center gap-2">
  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-40">Sticky</span>
- <Input type="number" min={1} value={providerStickyLimit} onChange={e => { setProviderStickyLimit(e.target.value); saveStrategy('round-robin', e.target.value); }} className="h-6 w-10 px-1 py-0.5 text-xs font-bold tabular-nums text-center bg-background border-border/50 shadow-none"/>
+ <Input type="number" min={1} value={providerStickyLimit} onChange={e => { setProviderStickyLimit(e.target.value); saveStrategy('round-robin', e.target.value); }} className="h-6 w-10 px-1 py-0.5 text-xs font-bold tabular-nums text-center bg-background border-border/50 rounded-none shadow-none"/>
  </div>
  )}
  </div>
@@ -342,7 +347,7 @@ export default function ConnectionsCard({ providerId, isOAuth }: { providerId: s
  )}
  </CardContent>
  <CardFooter className="px-3 py-1.5 bg-muted/5 border-t border-border/50 justify-end">
- <Button size="xs" variant="outline" className="font-bold tracking-widest bg-background border-border/60" onClick={() => setShowAddModal(true)}><Plus className="size-3 mr-1.5" weight="bold"/> ADD LINK</Button>
+ <Button size="xs" variant="outline" className="font-bold tracking-widest bg-background rounded-none border-border/60" onClick={() => setShowAddModal(true)}><Plus className="size-3 mr-1.5" weight="bold"/> ADD LINK</Button>
  </CardFooter>
  </Card>
 

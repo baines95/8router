@@ -57,7 +57,7 @@ export class QoderExecutor extends BaseExecutor {
     return headers;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   buildUrl(model: string, stream: boolean, urlIndex = 0, credentials = null) {
     return this.config.baseUrl;
   }
@@ -65,7 +65,7 @@ export class QoderExecutor extends BaseExecutor {
   /**
    * Inject stream_options for usage data on streaming requests
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   transformRequest(model: string, body: any, stream: boolean, credentials: any) {
     if (stream && body.messages && !body.stream_options) {
       body.stream_options = { include_usage: true };

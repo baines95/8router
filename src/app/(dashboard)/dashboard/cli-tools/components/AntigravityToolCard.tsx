@@ -44,7 +44,6 @@ export default function AntigravityToolCard({
  tool,
  isExpanded,
  onToggle,
- // eslint-disable-next-line @typescript-eslint/no-unused-vars
  baseUrl,
  apiKeys,
  activeProviders,
@@ -63,16 +62,8 @@ export default function AntigravityToolCard({
  const [modalOpen, setModalOpen] = useState(false);
  const [currentEditingAlias, setCurrentEditingAlias] = useState<string | null>(null);
  const [modelAliases, setModelAliases] = useState({});
+ const effectiveSelectedApiKey = selectedApiKey || apiKeys?.[0]?.key || "";
 
- useEffect(() => {
- if (apiKeys?.length > 0 && !selectedApiKey) {
- setSelectedApiKey(apiKeys[0].key);
- }
- }, [apiKeys, selectedApiKey]);
-
- useEffect(() => {
- if (initialStatus) setStatus(initialStatus);
- }, [initialStatus]);
 
  const loadSavedMappings = async () => {
  try {
@@ -114,11 +105,14 @@ export default function AntigravityToolCard({
 
  useEffect(() => {
  if (isExpanded) {
- if (!status) fetchStatus();
- loadSavedMappings();
- fetchModelAliases();
+ const timer = setTimeout(() => {
+ if (!status) void fetchStatus();
+ void loadSavedMappings();
+ void fetchModelAliases();
+ }, 0);
+ return () => clearTimeout(timer);
  }
- }, [isExpanded]);
+ }, [isExpanded, status]);
 
  const isWindows = typeof navigator !== "undefined" && navigator.userAgent?.includes("Windows");
 
@@ -145,8 +139,7 @@ export default function AntigravityToolCard({
  setMessage(null);
  setStartingStep("cert");
  try {
- const keyToUse = selectedApiKey?.trim()
- || (apiKeys?.length > 0 ? apiKeys[0].key : null)
+ const keyToUse = effectiveSelectedApiKey?.trim()
  || (!cloudEnabled ? "sk_8router" : null);
 
  const res = await fetch("/api/cli-tools/antigravity-mitm", {

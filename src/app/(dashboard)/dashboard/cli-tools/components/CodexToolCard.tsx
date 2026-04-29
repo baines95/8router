@@ -80,15 +80,12 @@ export default function CodexToolCard({
 
  useEffect(() => {
  if (isExpanded && !codexStatus) {
- checkStatus();
+ const timer = setTimeout(() => {
+ void checkStatus();
+ }, 0);
+ return () => clearTimeout(timer);
  }
  }, [isExpanded, codexStatus]);
-
- useEffect(() => {
- if (apiKeys?.length > 0 && !selectedApiKey) {
- setSelectedApiKey(apiKeys[0].key);
- }
- }, [apiKeys, selectedApiKey]);
 
  useEffect(() => {
  fetch("/api/models/alias").then(r => r.json()).then(d => setModelAliases(d.aliases || {}));

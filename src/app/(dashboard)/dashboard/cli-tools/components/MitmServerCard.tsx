@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -57,18 +57,9 @@ export default function MitmServerCard({ apiKeys, cloudEnabled, onStatusChange }
 
  const isWindows = typeof navigator !== "undefined" && navigator.userAgent?.includes("Windows");
  const isAdmin = status?.isAdmin !== false;
+ const effectiveSelectedApiKey = selectedApiKey || apiKeys?.[0]?.key || "";
 
- useEffect(() => {
- if (apiKeys?.length > 0 && !selectedApiKey) {
- setSelectedApiKey(apiKeys[0].key);
- }
- }, [apiKeys, selectedApiKey]);
-
- useEffect(() => {
- fetchStatus();
- }, []);
-
- const fetchStatus = async () => {
+ const fetchStatus = useCallback(async () => {
  try {
  const res = await fetch("/api/cli-tools/antigravity-mitm");
  if (res.ok) {
@@ -82,7 +73,14 @@ export default function MitmServerCard({ apiKeys, cloudEnabled, onStatusChange }
  } catch {
  setStatus({ running: false, certExists: false, dnsStatus: {} });
  }
- };
+ }, [onStatusChange]);
+
+ useEffect(() => {
+ const timer = setTimeout(() => {
+ void fetchStatus();
+ }, 0);
+ return () => clearTimeout(timer);
+ }, [fetchStatus]);
 
  const handleAction = (action: string) => {
  setActionError(null);
@@ -107,8 +105,7 @@ export default function MitmServerCard({ apiKeys, cloudEnabled, onStatusChange }
  body: JSON.stringify({ action: "trust-cert", sudoPassword: password }),
  });
  } else if (action === "start") {
- const keyToUse = selectedApiKey?.trim()
- || (apiKeys?.length > 0 ? apiKeys[0].key : null)
+ const keyToUse = effectiveSelectedApiKey?.trim()
  || (!cloudEnabled ? "sk_8router" : null);
  res = await fetch("/api/cli-tools/antigravity-mitm", {
  method: "POST",

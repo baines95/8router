@@ -8,7 +8,7 @@ import { FORMATS } from "../formats";
 /**
  * Convert Cursor response to OpenAI format
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 export function convertCursorToOpenAI(chunk: any, state: any) {
   if (!chunk) return null;
 

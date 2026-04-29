@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { Command } from "@phosphor-icons/react";
 
 export default function HowItWorks() {
   return (
@@ -58,12 +59,6 @@ export default function HowItWorks() {
                 The request is fulfilled by OpenAI, Anthropic, Gemini, or others instantly.
               </p>
             </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
           </div>
         </div>
       </div>

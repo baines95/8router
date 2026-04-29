@@ -60,21 +60,15 @@ export default function CopilotToolCard({
  const [modelList, setModelList] = useState<string[]>([]);
  const [modalOpen, setModalOpen] = useState(false);
 
- useEffect(() => {
- if (apiKeys?.length > 0 && !selectedApiKey) {
- setSelectedApiKey(apiKeys[0].key);
- }
- }, [apiKeys, selectedApiKey]);
-
- useEffect(() => {
- if (initialStatus) setStatus(initialStatus);
- }, [initialStatus]);
 
  useEffect(() => {
  if (status?.config && Array.isArray(status.config) && modelList.length === 0) {
  const entry = status.config.find((e: any) => e.name === "8Router");
  if (entry?.models?.length > 0) {
+ const timer = setTimeout(() => {
  setModelList(entry.models.map((m: any) => m.id));
+ }, 0);
+ return () => clearTimeout(timer);
  }
  }
  }, [status, modelList.length]);
@@ -104,10 +98,13 @@ export default function CopilotToolCard({
 
  useEffect(() => {
  if (isExpanded) {
- if (!status) checkStatus();
- fetchModelAliases();
+ const timer = setTimeout(() => {
+ if (!status) void checkStatus();
+ void fetchModelAliases();
+ }, 0);
+ return () => clearTimeout(timer);
  }
- }, [isExpanded]);
+ }, [isExpanded, status]);
 
  const getConfigStatus = () => {
  if (!status) return "not_configured";
@@ -118,6 +115,7 @@ export default function CopilotToolCard({
  };
 
  const configStatus = getConfigStatus();
+ const effectiveSelectedApiKey = selectedApiKey || apiKeys?.[0]?.key || "";
  const getEffectiveBaseUrl = () => baseUrl.endsWith("/v1") ? baseUrl : `${baseUrl}/v1`;
 
  const addModel = () => {
@@ -133,7 +131,7 @@ export default function CopilotToolCard({
  setApplying(true);
  setMessage(null);
  try {
- const keyToUse = (selectedApiKey && selectedApiKey.trim())
+ const keyToUse = (effectiveSelectedApiKey && effectiveSelectedApiKey.trim())
  ? selectedApiKey
  : (!cloudEnabled ? "sk_8router" : selectedApiKey);
 
@@ -178,7 +176,7 @@ export default function CopilotToolCard({
  };
 
  const getManualConfigs = () => {
- const keyToUse = (selectedApiKey && selectedApiKey.trim())
+ const keyToUse = (effectiveSelectedApiKey && effectiveSelectedApiKey.trim())
  ? selectedApiKey
  : (!cloudEnabled ? "sk_8router" : "<API_KEY_FROM_DASHBOARD>");
  const effectiveBaseUrl = getEffectiveBaseUrl();

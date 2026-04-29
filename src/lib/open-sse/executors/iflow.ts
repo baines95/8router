@@ -83,7 +83,7 @@ export class IFlowExecutor extends BaseExecutor {
    * @param {object} credentials - Provider credentials
    * @returns {string} API URL
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   buildUrl(model: string, stream: boolean, urlIndex = 0, credentials = null) {
     return this.config.baseUrl;
   }
@@ -96,7 +96,7 @@ export class IFlowExecutor extends BaseExecutor {
    * @param {object} credentials - Provider credentials
    * @returns {object} Transformed body
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   transformRequest(model: string, body: any, stream: boolean, credentials: any) {
     // Inject stream_options for streaming requests to get usage data
     if (stream && body.messages && !body.stream_options) {

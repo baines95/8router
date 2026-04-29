@@ -34,7 +34,7 @@ export async function callCloudWithMachineId(request: Request) {
 }
 
 // Function to periodically sync provider data to cloud (now a no-op)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 export function startProviderSync(cloudUrl: string, intervalMs = 900000) { // Default 15 minutes
   console.log("Frontend sync is disabled. Use backend sync instead.");
   return null;

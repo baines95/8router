@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 
 interface ProviderIconProps {
   src?: string;
@@ -38,13 +39,14 @@ export default function ProviderIcon({
   }
 
   return (
-    <img
+    <Image
       src={src}
-      alt={alt}
+      alt={alt || "provider"}
       width={size}
       height={size}
       className={className}
       onError={() => setErrored(true)}
+      unoptimized
     />
   );
 }

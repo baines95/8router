@@ -28,13 +28,13 @@ export function filterToOpenAIFormat(body: any) {
         
         // Only keep valid OpenAI content types
         if (VALID_OPENAI_CONTENT_TYPES.includes(block.type)) {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+           
           const { signature, cache_control, ...cleanBlock } = block;
           filteredContent.push(cleanBlock);
         } else if (block.type === "tool_use") {
           continue;
         } else if (block.type === "tool_result") {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+           
           const { signature, cache_control, ...cleanBlock } = block;
           filteredContent.push(cleanBlock);
         }

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
+import Image from "next/image";
 import { 
  Plus, 
  Play, 
@@ -395,7 +396,7 @@ export default function ProvidersPage() {
  </EmptyHeader>
  <EmptyContent>
  <EmptyTitle>No providers found</EmptyTitle>
- <EmptyDescription>Try adjusting your search or filters to find what you're looking for.</EmptyDescription>
+ <EmptyDescription>Try adjusting your search or filters to find what you&apos;re looking for.</EmptyDescription>
  </EmptyContent>
  <Button variant="outline" size="sm" onClick={() => { setActiveCategory("all"); setSearchQuery(""); }}>
  Clear all filters
@@ -508,16 +509,20 @@ function NewProviderCard({ provider, stats, testingMode, onToggle, onTest }: {
  <CardHeader className="flex flex-row items-center justify-between space-y-0 px-3 py-2 border-b border-border/50">
  <div className="flex items-center gap-2.5 min-w-0">
  <div className="size-8 rounded border border-border/40 bg-background flex items-center justify-center p-1.5 shrink-0 group-hover:border-primary/30 transition-colors">
- <img 
- src={getIconPath()} 
- alt={provider.name} 
+ <Image
+ src={getIconPath()}
+ alt={provider.name}
+ width={32}
+ height={32}
  className={cn(
  "size-full object-contain",
  (provider.id === "codex" || provider.id === "openai" || provider.id === "github") && "dark:invert"
  )}
- onError={(e: any) => {
- e.target.style.display = 'none';
- e.target.nextSibling.style.display = 'flex';
+ unoptimized
+ onError={(e) => {
+ const target = e.currentTarget;
+ target.style.display = "none";
+ target.nextElementSibling?.setAttribute("style", "display:flex");
  }}
  />
  <div className="hidden size-full items-center justify-center text-[10px] font-medium" style={{ color: provider.color }}>

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { 
  Card, 
  CardContent, 
@@ -134,7 +135,7 @@ export default function BaseToolCard({
  <div className="flex items-center gap-4 min-w-0">
  <div className="relative size-10 flex-shrink-0 bg-background border border-border/50 p-1.5 flex items-center justify-center shadow-none">
  {tool.image ? (
- <img src={tool.image} alt={tool.name} width={28} height={28} className="object-contain" />
+ <Image src={tool.image} alt={tool.name} width={28} height={28} className="object-contain" />
  ) : (
  <IconComponent className="text-muted-foreground size-5" weight="bold" />
  )}

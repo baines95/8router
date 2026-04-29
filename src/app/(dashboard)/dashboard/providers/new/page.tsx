@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { 
@@ -157,16 +158,20 @@ export default function NewProviderPage() {
               <CardHeader className="p-5 pb-2">
                 <div className="flex items-center justify-between mb-4">
                   <div className="size-12 bg-background border border-border/50 flex items-center justify-center p-2.5 group-hover:scale-110 transition-transform duration-300 shadow-none">
-                    <img 
-                      src={`/providers/${provider.id}.png`} 
-                      alt={provider.name} 
+                    <Image
+                      src={`/providers/${provider.id}.png`}
+                      alt={provider.name}
+                      width={48}
+                      height={48}
                       className={cn(
                         "size-full object-contain",
                         (provider.id === "codex" || provider.id === "openai" || provider.id === "github") && "dark:invert"
                       )}
-                      onError={(e: any) => {
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'flex';
+                      unoptimized
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        target.style.display = "none";
+                        target.nextElementSibling?.setAttribute("style", "display:flex");
                       }}
                     />
                     <div className="hidden size-full items-center justify-center">

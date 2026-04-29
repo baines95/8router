@@ -32,7 +32,7 @@ export function convertResponsesApiFormat(body: any) {
 
   // Group items by conversation turn
   let currentAssistantMsg: any = null;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   let pendingToolCalls: any[] = [];
   let pendingToolResults: any[] = [];
 

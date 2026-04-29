@@ -99,18 +99,22 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, au
 
   useEffect(() => {
     if (connection) {
-      setFormData({
-        name: connection.name || "",
-        priority: connection.priority || 1,
-        apiKey: "",
-        proxyPoolId: connection.providerSpecificData?.proxyPoolId || NONE_PROXY_POOL_VALUE,
-        isActive: connection.isActive ?? true,
-        autoPausedUntil: typeof connection.providerSpecificData?.autoPausedUntil === "string"
-          ? connection.providerSpecificData.autoPausedUntil
-          : null,
-      });
-      setTestResult(null);
-      setValidationResult(null);
+      const timer = window.setTimeout(() => {
+        setFormData({
+          name: connection.name || "",
+          priority: connection.priority || 1,
+          apiKey: "",
+          proxyPoolId: connection.providerSpecificData?.proxyPoolId || NONE_PROXY_POOL_VALUE,
+          isActive: connection.isActive ?? true,
+          autoPausedUntil: typeof connection.providerSpecificData?.autoPausedUntil === "string"
+            ? connection.providerSpecificData.autoPausedUntil
+            : null,
+        });
+        setTestResult(null);
+        setValidationResult(null);
+      }, 0);
+
+      return () => window.clearTimeout(timer);
     }
   }, [connection, isOpen]);
 

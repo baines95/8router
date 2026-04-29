@@ -55,14 +55,14 @@ function MediaProviderCard({ provider, kind, connections }: MediaProviderCardPro
   const allDisabled = total > 0 && providerConns.every((c) => c.isActive === false);
 
   const renderStatus = () => {
-    if (isNoAuth) return <Badge className="bg-primary/10 text-primary border-none h-5 text-[10px] font-bold uppercase">READY</Badge>;
-    if (allDisabled) return <Badge variant="secondary" className="border-none h-5 text-[10px] font-bold uppercase opacity-40">DISABLED</Badge>;
+    if (isNoAuth) return <Badge className="bg-primary/10 text-primary border-none h-5 text-[10px] font-bold uppercase rounded-none">READY</Badge>;
+    if (allDisabled) return <Badge variant="secondary" className="border-none h-5 text-[10px] font-bold uppercase rounded-none opacity-40">DISABLED</Badge>;
     if (total === 0) return <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">No connections</span>;
     return (
       <>
-        {connected > 0 && <Badge className="bg-primary/10 text-primary border-none h-5 text-[10px] font-bold uppercase">{connected} Connected</Badge>}
-        {error > 0 && <Badge variant="destructive" className="border-none h-5 text-[10px] font-bold uppercase">{error} Error</Badge>}
-        {connected === 0 && error === 0 && <Badge variant="outline" className="border-border/50 text-muted-foreground h-5 text-[10px] font-bold uppercase">{total} Added</Badge>}
+        {connected > 0 && <Badge className="bg-primary/10 text-primary border-none h-5 text-[10px] font-bold uppercase rounded-none">{connected} Connected</Badge>}
+        {error > 0 && <Badge variant="destructive" className="border-none h-5 text-[10px] font-bold uppercase rounded-none">{error} Error</Badge>}
+        {connected === 0 && error === 0 && <Badge variant="outline" className="border-border/50 text-muted-foreground h-5 text-[10px] font-bold uppercase rounded-none">{total} Added</Badge>}
       </>
     );
   };
@@ -71,13 +71,13 @@ function MediaProviderCard({ provider, kind, connections }: MediaProviderCardPro
     <Link href={`/dashboard/media-providers/${kind}/${provider.id}`} className="group">
       <Card
         className={cn(
-          "h-full hover:bg-muted/10 transition-all border-border/50 shadow-none p-4",
+          "h-full hover:bg-muted/10 transition-all border-border/50 shadow-none rounded-none p-4",
           allDisabled && "opacity-50 grayscale"
         )}
       >
         <div className="flex items-center gap-4">
           <div
-            className="size-10 border border-border/50 bg-background flex items-center justify-center shrink-0 shadow-none"
+            className="size-10 rounded-none border border-border/50 bg-background flex items-center justify-center shrink-0 shadow-none"
             style={{ backgroundColor: `${provider.color?.length && provider.color.length > 7 ? provider.color : (provider.color ?? "#888") + "08"}` }}
           >
             <ProviderIcon
@@ -108,8 +108,6 @@ export default function MediaProviderKindPage({ kind }: { kind: string }) {
   const [connections, setConnections] = useState<Connection[]>([]);
 
   const kindConfig = MEDIA_PROVIDER_KINDS.find((k) => k.id === kind);
-  if (!kindConfig) return notFound();
-
   const providers = getProvidersByKind(kind);
 
   useEffect(() => {
@@ -118,6 +116,8 @@ export default function MediaProviderKindPage({ kind }: { kind: string }) {
       .then((d) => setConnections(d.connections || []))
       .catch(() => {});
   }, []);
+
+  if (!kindConfig) return notFound();
 
   return (
     <div className="mx-auto max-w-7xl flex flex-col gap-6 py-6 px-4">
@@ -136,7 +136,7 @@ export default function MediaProviderKindPage({ kind }: { kind: string }) {
       </header>
 
       {providers.length === 0 ? (
-        <div className="text-center py-20 border border-dashed border-border/30 bg-muted/5 opacity-40 grayscale flex flex-col items-center justify-center gap-3">
+        <div className="text-center py-20 border border-dashed border-border/30 rounded-none bg-muted/5 opacity-40 grayscale flex flex-col items-center justify-center gap-3">
           <ProviderIcon size={48} className="opacity-20" />
           <p className="text-xs font-bold uppercase tracking-[0.3em]">No providers provisioned for {kindConfig.label}</p>
         </div>

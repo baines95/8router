@@ -43,7 +43,7 @@ function getPassword(provided: string | null | undefined): string | null {
 function checkIsAdmin(): boolean {
   if (!isWin) return true;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+     
     require("child_process").execSync("net session >nul 2>&1", { windowsHide: true });
     return true;
   } catch {

@@ -23,7 +23,7 @@ function colorLine(line: string) {
 
 export default function ConsoleLogClient() {
   const [logs, setLogs] = useState<string[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   const [connected, setConnected] = useState(false);
   const logRef = useRef<HTMLDivElement>(null);
 

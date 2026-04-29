@@ -158,7 +158,7 @@ export default function ProviderDetailPage() {
  const [providerStrategy, setProviderStrategy] = useState<string | null>(null);
  const [providerStickyLimit, setProviderStickyLimit] = useState("");
  const [providerAutoPauseByQuota, setProviderAutoPauseByQuota] = useState(false);
- // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  
  const [thinkingMode, setThinkingMode] = useState("auto");
  const [suggestedModels, setSuggestedModels] = useState<any[]>([]);
  const [kiloFreeModels, setKiloFreeModels] = useState<Model[]>([]);
@@ -185,7 +185,7 @@ export default function ProviderDetailPage() {
  const models = getModelsByProviderId(providerId);
  const providerAlias = getProviderAlias(providerId);
  
- // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  
  const thinkingConfig = (AI_PROVIDERS as any)[providerId]?.thinkingConfig || THINKING_CONFIG.extended;
  
  const providerStorageAlias = isCompatible ? providerId : providerAlias;
@@ -392,15 +392,19 @@ export default function ProviderDetailPage() {
  }
  };
 
- // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  
  const handleThinkingModeChange = (mode: string) => {
  setThinkingMode(mode);
  saveThinkingConfig(mode);
  };
 
  useEffect(() => {
+ const timer = window.setTimeout(() => {
  fetchConnections();
  fetchAliases();
+ }, 0);
+
+ return () => window.clearTimeout(timer);
  }, [fetchConnections, fetchAliases]);
 
  // Fetch suggested models from provider's public API (if configured)
@@ -543,10 +547,10 @@ export default function ProviderDetailPage() {
  };
 
  const selectedConnections = connections.filter((conn) => selectedConnectionIds.includes(conn.id));
- // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  
  const allSelected = connections.length > 0 && selectedConnectionIds.length === connections.length;
 
- // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  
  const toggleSelectConnection = (connectionId: string) => {
  setSelectedConnectionIds((prev) => (
  prev.includes(connectionId)
@@ -555,7 +559,7 @@ export default function ProviderDetailPage() {
  ));
  };
 
- // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  
  const toggleSelectAllConnections = () => {
  if (allSelected) {
  setSelectedConnectionIds([]);
@@ -570,11 +574,15 @@ export default function ProviderDetailPage() {
  };
 
  useEffect(() => {
+ const timer = window.setTimeout(() => {
  setSelectedConnectionIds((prev) => {
  const next = prev.filter((id) => connections.some((conn) => conn.id === id));
  if (next.length === prev.length) return prev;
  return next;
  });
+ }, 0);
+
+ return () => window.clearTimeout(timer);
  }, [connections]);
 
  const selectedProxySummary = (() => {
@@ -589,7 +597,7 @@ export default function ProviderDetailPage() {
  return"Selected connections have mixed proxy bindings";
  })();
 
- // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  
  const openBulkProxyModal = () => {
  if (selectedConnections.length === 0) return;
  const uniquePoolIds = [...new Set(selectedConnections.map((conn) => conn.providerSpecificData?.proxyPoolId ||"__none__"))];
@@ -639,7 +647,7 @@ export default function ProviderDetailPage() {
  };
 
 
- // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  
  const isSelected = (connectionId: string) => selectedConnectionIds.includes(connectionId);
 
  const connectionsList = (

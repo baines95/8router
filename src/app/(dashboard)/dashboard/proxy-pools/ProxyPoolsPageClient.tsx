@@ -90,7 +90,7 @@ function normalizeFormData(data: Partial<ProxyPool> = {}) {
 
 export default function ProxyPoolsPageClient({ initialData }: ProxyPoolsPageClientProps) {
   const [proxyPools, setProxyPools] = useState<ProxyPool[]>(initialData?.proxyPools || []);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   const [loading, setLoading] = useState(false);
   const [showFormModal, setShowFormModal] = useState(false);
   const [showBatchImportModal, setShowBatchImportModal] = useState(false);

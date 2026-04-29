@@ -39,7 +39,7 @@ export function geminiToOpenAIResponse(chunk: any, state: any) {
       // Handle thought signature (thinking mode)
       if (hasThoughtSig) {
         const hasTextContent = part.text !== undefined && part.text !== "";
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+         
         const hasFunctionCall = !!part.functionCall;
         
         if (hasTextContent) {

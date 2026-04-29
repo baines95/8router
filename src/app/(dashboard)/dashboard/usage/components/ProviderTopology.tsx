@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState, useCallback, useRef } from "react";
+import Image from "next/image";
 import {
  ReactFlow,
  Handle,
@@ -56,7 +57,7 @@ function ProviderNode({ data }: NodeProps<any>) {
  style={{ backgroundColor: `${color}15` }}
  >
  {!imgError ? (
- <img src={imageUrl} alt={label} className="w-6 h-6 object-contain" onError={() => setImgError(true)} />
+ <Image src={imageUrl} alt={label} width={24} height={24} className="w-6 h-6 object-contain" onError={() => setImgError(true)} />
  ) : (
  <span className="text-sm font-medium" style={{ color }}>{textIcon}</span>
  )}
@@ -91,7 +92,7 @@ function RouterNode({ data }: NodeProps<any>) {
  <Handle type="source" position={Position.Left} id="left" className="!bg-transparent !border-0 !w-0 !h-0"/>
  <Handle type="source" position={Position.Right} id="right" className="!bg-transparent !border-0 !w-0 !h-0"/>
 
- <img src="/favicon.svg" alt="8Router" className="w-6 h-6 mr-2"/>
+ <Image src="/favicon.svg" alt="8Router" width={24} height={24} className="w-6 h-6 mr-2"/>
  <span className="text-sm font-medium text-primary">8Router</span>
  {activeCount > 0 && (
  <span className="ml-2 px-1.5 py-0.5 rounded-full bg-primary text-white text-xs font-medium">
@@ -218,7 +219,7 @@ export default function ProviderTopology({ providers = [], activeRequests = [], 
 
  const { nodes, edges } = useMemo(
  () => buildLayout(providers, activeSet, lastSet, errorSet),
- [providers, activeKey, lastKey, errorKey]
+ [providers, activeSet, lastSet, errorSet]
  );
 
  // Stable key — only remount when provider list changes

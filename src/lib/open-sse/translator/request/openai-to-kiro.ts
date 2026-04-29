@@ -293,7 +293,7 @@ function convertMessages(messages: any[], tools: any[], model: string) {
 /**
  * Build Kiro payload from OpenAI format
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 export function buildKiroPayload(model: string, body: any, _stream: boolean, credentials?: any) {
   const messages = body.messages || [];
   const tools = body.tools || [];

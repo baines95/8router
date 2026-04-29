@@ -43,12 +43,10 @@ export default function MitmToolCard({
  serverRunning,
  dnsActive,
  hasCachedPassword,
- // eslint-disable-next-line @typescript-eslint/no-unused-vars
  apiKeys,
  activeProviders,
  hasActiveProviders,
  modelAliases = {},
- // eslint-disable-next-line @typescript-eslint/no-unused-vars
  cloudEnabled,
  onDnsChange,
 }: MitmToolCardProps) {
@@ -61,6 +59,8 @@ export default function MitmToolCard({
  const [modelMappings, setModelMappings] = useState<Record<string, string>>({});
  const [modalOpen, setModalOpen] = useState(false);
  const [currentEditingAlias, setCurrentEditingAlias] = useState<string | null>(null);
+ void apiKeys;
+ void cloudEnabled;
 
  const isWindows = typeof navigator !== "undefined" && navigator.userAgent?.includes("Windows");
 
@@ -75,7 +75,12 @@ export default function MitmToolCard({
  }, [tool.id]);
 
  useEffect(() => {
- if (isExpanded) loadSavedMappings();
+ if (isExpanded) {
+ const timer = setTimeout(() => {
+ void loadSavedMappings();
+ }, 0);
+ return () => clearTimeout(timer);
+ }
  }, [isExpanded, loadSavedMappings]);
 
  const saveMappings = useCallback(async (mappings: Record<string, string>) => {

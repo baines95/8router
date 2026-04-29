@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { LOCALES, LOCALE_COOKIE, normalizeLocale } from "@/i18n/config";
 import { reloadTranslations } from "@/i18n/runtime";
@@ -75,13 +75,13 @@ export default function LanguageSwitcher({ className = "", isOpen: controlledOpe
   const isControlled = typeof controlledOpen === "boolean";
   const isOpen = isControlled ? controlledOpen : internalOpen;
   
-  const setIsOpen = (value: boolean) => {
+  const setIsOpen = useCallback((value: boolean) => {
     if (isControlled) {
       if (!value && onClose) onClose();
     } else {
       setInternalOpen(value);
     }
-  };
+  }, [isControlled, onClose]);
 
   useEffect(() => {
     void (async () => { setLocale(getLocaleFromCookie()); })();
@@ -98,7 +98,7 @@ export default function LanguageSwitcher({ className = "", isOpen: controlledOpe
       document.addEventListener("mousedown", handleClickOutside);
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }
-  }, [isOpen]);
+  }, [isOpen, setIsOpen]);
 
   const handleSetLocale = async (nextLocale: string) => {
     if (nextLocale === locale || isPending) return;

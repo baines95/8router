@@ -150,8 +150,8 @@ export default function RequestDetailsTab() {
  } catch (error) { console.error(error); } finally { setLoading(false); }
  }, [pagination.page, pagination.pageSize, filters]);
 
- useEffect(() => { fetchProviders(); }, [fetchProviders]);
- useEffect(() => { fetchDetails(); }, [fetchDetails]);
+ useEffect(() => { queueMicrotask(() => { void fetchProviders(); }); }, [fetchProviders]);
+ useEffect(() => { queueMicrotask(() => { void fetchDetails(); }); }, [fetchDetails]);
 
  return (
  <div className="flex flex-col gap-6">

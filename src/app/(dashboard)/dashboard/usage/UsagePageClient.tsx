@@ -173,11 +173,11 @@ export default function UsagePageClient() {
     ? tabFromUrl
     : "overview";
 
-  const handleTabChange = (value: string) => {
+  const handleTabChange = useCallback((value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("tab", value);
     router.push(`/dashboard/usage?${params.toString()}`, { scroll: false });
-  };
+  }, [searchParams, router]);
 
   useEffect(() => {
     const handleSwitchTab = (event: Event) => {
@@ -186,7 +186,7 @@ export default function UsagePageClient() {
     };
     window.addEventListener("switch-tab", handleSwitchTab);
     return () => window.removeEventListener("switch-tab", handleSwitchTab);
-  }, [searchParams, router]);
+  }, [handleTabChange]);
 
   return (
     <SettingsPageShell className="max-w-7xl w-full p-6">
@@ -322,14 +322,15 @@ function UsageDashboard() {
   const sortOrder = (searchParams.get("sortOrder") as "asc" | "desc") || "asc";
 
   useEffect(() => {
-    setLoading(true);
-    fetch(`/api/usage/stats?period=${period}`)
-      .then((r) => r.ok ? r.json() : null)
-      .then((data) => {
-        if (data) setStats((prev) => ({ ...prev, ...data }));
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    queueMicrotask(() => {
+      fetch(`/api/usage/stats?period=${period}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => {
+          if (data) setStats((prev) => ({ ...prev, ...data }));
+        })
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    });
   }, [period]);
 
   useEffect(() => {

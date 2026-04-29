@@ -110,8 +110,10 @@ export default function ProviderLimits() {
  }, [fetchConnections, fetchQuota]);
 
  useEffect(() => {
+ queueMicrotask(() => {
  setConnectionsLoading(true);
  refreshAll(false).finally(() => setConnectionsLoading(false));
+ });
  refreshIntervalRef.current = setInterval(() => refreshAll(true), REFRESH_INTERVAL_MS);
  countdownIntervalRef.current = setInterval(() => setCountdown(p => (p <= 1 ? 60 : p - 1)), 1000);
  return () => {

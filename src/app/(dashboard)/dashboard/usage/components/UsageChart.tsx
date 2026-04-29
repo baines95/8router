@@ -59,7 +59,7 @@ export default function UsageChart({ period = "7d", viewMode = "tokens" }: Usage
  }, [period]);
 
  useEffect(() => {
- fetchData();
+ queueMicrotask(() => { void fetchData(); });
  }, [fetchData]);
 
  const hasData = data.some((d) => d.tokens > 0 || d.cost > 0);

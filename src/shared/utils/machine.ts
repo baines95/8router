@@ -7,7 +7,7 @@ export async function getMachineId(): Promise<string> {
 
 // Keep sync functions for backward compatibility but make them no-ops
 // (Frontend sync is disabled - use backend sync instead)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 export async function syncProviderDataToCloud(cloudUrl: string): Promise<boolean> {
   console.log("Frontend sync is disabled. Use backend sync instead.");
   return Promise.resolve(true);
