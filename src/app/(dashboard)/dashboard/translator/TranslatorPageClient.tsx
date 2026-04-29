@@ -253,7 +253,7 @@ export default function TranslatorPage() {
 
  {isExpanded && (
  <>
- <div className="border border-border/50 rounded-lg overflow-hidden">
+ <div className="border border-border/50 overflow-hidden">
  <Editor
  height="400px"
  defaultLanguage={step.lang === "text" ? "plaintext" : "json"}

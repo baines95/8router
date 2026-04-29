@@ -34,7 +34,7 @@ function PassthroughModelRow({ modelId, fullModel, copied, onCopy, onDeleteAlias
  :"text-muted-foreground";
 
  return (
- <div className={cn("flex items-center gap-3 p-1.5 rounded-none border transition-colors hover:bg-muted/50", borderClass)}>
+ <div className={cn("flex items-center gap-3 p-1.5 border transition-colors hover:bg-muted/50", borderClass)}>
  <div className={cn("shrink-0", iconClass)}>
  {testStatus ==="ok" ? (
  <CheckCircle className="size-3.5" weight="bold" />
@@ -49,11 +49,11 @@ function PassthroughModelRow({ modelId, fullModel, copied, onCopy, onDeleteAlias
  <p className="text-xs font-semibold truncate tracking-tight">{modelId}</p>
 
  <div className="flex items-center gap-1 mt-0.5">
- <code className="text-[10px] text-muted-foreground font-mono bg-muted px-1 py-0.5 rounded-none leading-none truncate max-w-[180px]">{fullModel}</code>
+ <code className="text-[10px] text-muted-foreground font-mono bg-muted px-1 py-0.5 leading-none truncate max-w-[180px]">{fullModel}</code>
  <div className="relative group/btn">
  <button
  onClick={() => onCopy(fullModel, `model-${modelId}`)}
- className="p-0.5 hover:bg-accent rounded-none text-muted-foreground hover:text-foreground"
+ className="p-0.5 hover:bg-accent text-muted-foreground hover:text-foreground"
  >
  {copied === `model-${modelId}` ? (
  <Check className="size-3.5 text-primary" weight="bold" />
@@ -61,7 +61,7 @@ function PassthroughModelRow({ modelId, fullModel, copied, onCopy, onDeleteAlias
  <Copy className="size-3.5" weight="bold" />
  )}
  </button>
- <span className="pointer-events-none absolute top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-tighter bg-popover text-popover-foreground px-1.5 py-0.5 rounded-none border border-border/50 shadow-none opacity-0 group-hover/btn:opacity-100 transition-opacity z-10">
+ <span className="pointer-events-none absolute top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-tighter bg-popover text-popover-foreground px-1.5 py-0.5 border border-border/50 shadow-none opacity-0 group-hover/btn:opacity-100 transition-opacity z-10">
  {copied === `model-${modelId}` ? translate("Copied!") : translate("Copy")}
  </span>
  </div>
@@ -70,7 +70,7 @@ function PassthroughModelRow({ modelId, fullModel, copied, onCopy, onDeleteAlias
  <button
  onClick={onTest}
  disabled={isTesting}
- className="p-0.5 hover:bg-accent rounded-none text-muted-foreground hover:text-foreground transition-colors"
+ className="p-0.5 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
  >
  {isTesting ? (
  <Spinner className="size-3.5 animate-spin" />
@@ -78,7 +78,7 @@ function PassthroughModelRow({ modelId, fullModel, copied, onCopy, onDeleteAlias
  <Flask className="size-3.5" weight="bold" />
  )}
  </button>
- <span className="pointer-events-none absolute top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-tighter bg-popover text-popover-foreground px-1.5 py-0.5 rounded-none border border-border/50 shadow-none opacity-0 group-hover/btn:opacity-100 transition-opacity z-10">
+ <span className="pointer-events-none absolute top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-tighter bg-popover text-popover-foreground px-1.5 py-0.5 border border-border/50 shadow-none opacity-0 group-hover/btn:opacity-100 transition-opacity z-10">
  {isTesting ? translate("Testing...") : translate("Test")}
  </span>
  </div>
@@ -89,7 +89,7 @@ function PassthroughModelRow({ modelId, fullModel, copied, onCopy, onDeleteAlias
  {/* Delete button */}
  <button
  onClick={onDeleteAlias}
- className="p-1 hover:bg-destructive/10 rounded-none text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+ className="p-1 hover:bg-destructive/10 text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
  title="Remove model"
  >
  <Trash className="size-3.5" weight="bold" />
@@ -172,7 +172,7 @@ export default function PassthroughModelsSection({ providerAlias, modelAliases, 
  onChange={(e) => setNewModel(e.target.value)}
  onKeyDown={(e) => e.key ==="Enter"&& handleAdd()}
  placeholder="anthropic/claude-3-opus"
- className="h-8 text-xs bg-muted/10 border-border/50 rounded-none shadow-none"
+ className="h-8 text-xs bg-muted/10 border-border/50 shadow-none"
  />
  </div>
  <Button
@@ -180,7 +180,7 @@ export default function PassthroughModelsSection({ providerAlias, modelAliases, 
  variant="outline"
  onClick={handleAdd}
  disabled={!newModel.trim() || adding}
- className="gap-1.5 font-bold uppercase tracking-wider rounded-none h-8"
+ className="gap-1.5 font-bold uppercase tracking-wider h-8"
  >
  <Plus className="size-3" weight="bold" data-icon="inline-start" />
  {adding ? translate("Adding...") : translate("Add")}

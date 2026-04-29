@@ -68,7 +68,7 @@ function QuotaRow({ quota }: { quota: Quota }) {
  
  <Progress 
  value={remaining} 
- className="h-0.5 bg-muted/20 rounded-none"
+ className="h-0.5 bg-muted/20"
  indicatorClassName={cn(
  "transition-all duration-700 ease-out opacity-50",
  isCritical ? "bg-destructive" : isLow ? "bg-amber-500" : "bg-primary"
@@ -90,13 +90,13 @@ export default function ProviderQuotaCard({
 
  return (
  <Card className={cn(
- "border-border/50 shadow-none overflow-hidden transition-all p-0 py-0 bg-transparent hover:bg-muted/10 rounded-none h-full",
+ "border-border/50 shadow-none overflow-hidden transition-all p-0 py-0 bg-transparent hover:bg-muted/10 h-full",
  isInactive && "opacity-60 grayscale",
  isSilentRefreshing && "bg-muted/5"
  )}>
  <CardHeader className="flex flex-row items-center justify-between space-y-0 px-3 py-2 border-b border-border/50 bg-muted/10">
  <div className="flex items-center gap-2.5">
- <div className="flex size-8 items-center justify-center rounded-none bg-background border border-border/50">
+ <div className="flex size-8 items-center justify-center bg-background border border-border/50">
  <ProviderIcon
  src={`/providers/${conn.provider}.png`}
  alt={conn.provider}

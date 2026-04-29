@@ -18,7 +18,7 @@ export default function HowItWorks() {
           
           {/* Step 1: CLI & SDKs */}
           <div className="flex flex-col gap-6 relative group">
-            <div className="w-24 h-24 rounded-2xl bg-card border border-border/50 flex items-center justify-center transition-colors z-10 mx-auto md:mx-0 group-hover:border-border">
+            <div className="w-24 h-24 bg-card border border-border/50 flex items-center justify-center transition-colors z-10 mx-auto md:mx-0 group-hover:border-border">
               <span className="material-symbols-outlined text-4xl text-muted-foreground">terminal</span>
             </div>
             <div>
@@ -31,7 +31,7 @@ export default function HowItWorks() {
 
           {/* Step 2: 8Router Hub */}
           <div className="flex flex-col gap-6 relative group md:items-center md:text-center">
-            <div className="w-24 h-24 rounded-2xl bg-card border-2 border-primary flex items-center justify-center z-10 mx-auto">
+            <div className="w-24 h-24 bg-card border-2 border-primary flex items-center justify-center z-10 mx-auto">
               <span className="material-symbols-outlined text-4xl text-primary animate-pulse">hub</span>
             </div>
             <div>
@@ -44,7 +44,7 @@ export default function HowItWorks() {
 
           {/* Step 3: AI Providers */}
           <div className="flex flex-col gap-6 relative group md:items-end md:text-right">
-            <div className="w-24 h-24 rounded-2xl bg-card border border-border/50 flex items-center justify-center transition-colors z-10 mx-auto md:mx-0 group-hover:border-border">
+            <div className="w-24 h-24 bg-card border border-border/50 flex items-center justify-center transition-colors z-10 mx-auto md:mx-0 group-hover:border-border">
               <div className="grid grid-cols-2 gap-2">
                 <div className="w-6 h-6 rounded bg-muted"></div>
                 <div className="w-6 h-6 rounded bg-muted"></div>

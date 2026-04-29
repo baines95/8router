@@ -137,7 +137,7 @@ export default function ModelAvailabilityBadge() {
  </button>
 
  {expanded && (
- <div className="absolute top-full right-0 mt-2 w-72 bg-background/95 backdrop-blur-md border border-border/40 rounded-xl z-50 overflow-hidden shadow-none">
+ <div className="absolute top-full right-0 mt-2 w-72 bg-background/95 backdrop-blur-md border border-border/40 z-50 overflow-hidden shadow-none">
  <div className="flex items-center justify-between px-3 py-2.5 border-b border-border/40 bg-muted/5">
  <div className="flex items-center gap-2">
  {isHealthy ? (
@@ -149,7 +149,7 @@ export default function ModelAvailabilityBadge() {
  </div>
  <button
  onClick={fetchStatus}
- className="p-1 rounded-md hover:bg-muted/10 text-muted-foreground hover:text-foreground transition-colors"
+ className="p-1 hover:bg-muted/10 text-muted-foreground hover:text-foreground transition-colors"
  title="Refresh"
  >
  <RefreshCw className="size-3.5" />
@@ -174,7 +174,7 @@ export default function ModelAvailabilityBadge() {
  return (
  <div
  key={`${m.provider}-${m.model}`}
- className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/5 border border-transparent hover:border-border/40 transition-colors"
+ className="flex items-center justify-between px-2 py-1.5 bg-muted/5 border border-transparent hover:border-border/40 transition-colors"
  >
  <div className="flex items-center gap-2 min-w-0">
  <StatusIcon

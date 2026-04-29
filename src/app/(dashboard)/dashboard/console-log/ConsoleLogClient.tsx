@@ -83,7 +83,7 @@ export default function ConsoleLogClient() {
         </div>
       </header>
 
-      <Card className="border-border/50 overflow-hidden bg-black shadow-none rounded-md">
+      <Card className="border-border/50 overflow-hidden bg-black shadow-none">
         <div
           ref={logRef}
           className="p-4 text-xs font-mono tabular-nums h-[calc(100vh-320px)] overflow-y-auto custom-scrollbar bg-black/40 shadow-inner"

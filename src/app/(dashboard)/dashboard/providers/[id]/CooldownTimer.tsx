@@ -37,7 +37,7 @@ export default function CooldownTimer({ until }: CooldownTimerProps) {
   if (!remaining) return null;
 
   return (
-    <span className="flex items-center gap-1 text-[10px] text-muted-foreground font-bold tabular-nums uppercase tracking-tight bg-muted/40 px-1 py-0.5 rounded-none border border-border/40">
+    <span className="flex items-center gap-1 text-[10px] text-muted-foreground font-bold tabular-nums uppercase tracking-tight bg-muted/40 px-1 py-0.5 border border-border/40">
       <HourglassLow className="size-3" weight="bold" />
       {remaining}
     </span>

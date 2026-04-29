@@ -59,7 +59,7 @@ export function ModelRow({
 
   return (
     <div className={cn(
-      "group px-3 py-2 rounded-lg border bg-background/50 hover:bg-muted/10 transition-colors",
+      "group px-3 py-2 border bg-background/50 hover:bg-muted/10 transition-colors",
       borderColor
     )}>
       <div className="flex items-center gap-2">
@@ -113,7 +113,7 @@ export function ModelRow({
               {copied === `model-${model.id}` ? translate("Copied!") : translate("Copy")}
             </span>
           </div>
-          {isFree && <span className="text-[9px] font-black tracking-widest text-primary bg-primary/10 px-1.5 py-0.5 rounded-none uppercase">FREE</span>}
+          {isFree && <span className="text-[9px] font-black tracking-widest text-primary bg-primary/10 px-1.5 py-0.5 uppercase">FREE</span>}
           {isCustom && (
             <button 
               onClick={onDeleteAlias} 
@@ -151,7 +151,7 @@ function AddCustomModelModal({ isOpen, onSave, onClose }: AddCustomModelModalPro
         <div className="space-y-2">
           <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 px-1">Model ID</label>
           <input
-            className="w-full h-10 px-3 py-2 text-sm border border-border/50 rounded-none bg-muted/5 focus:outline-none focus:border-primary/50 transition-colors font-mono"
+            className="w-full h-10 px-3 py-2 text-sm border border-border/50 bg-muted/5 focus:outline-none focus:border-primary/50 transition-colors font-mono"
             value={modelId}
             onChange={(e) => setModelId(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSave()}
@@ -160,8 +160,8 @@ function AddCustomModelModal({ isOpen, onSave, onClose }: AddCustomModelModalPro
           />
         </div>
         <div className="flex gap-2 pt-2">
-          <Button onClick={handleSave} className="flex-1 rounded-none font-bold text-[10px] uppercase tracking-widest h-10" disabled={!modelId.trim()}>Add Model</Button>
-          <Button onClick={onClose} variant="ghost" className="flex-1 rounded-none font-bold text-[10px] uppercase tracking-widest h-10 border border-border/50">Cancel</Button>
+          <Button onClick={handleSave} className="flex-1 font-bold text-[10px] uppercase tracking-widest h-10" disabled={!modelId.trim()}>Add Model</Button>
+          <Button onClick={onClose} variant="ghost" className="flex-1 font-bold text-[10px] uppercase tracking-widest h-10 border border-border/50">Cancel</Button>
         </div>
       </div>
     </Modal>
@@ -268,7 +268,7 @@ export default function ModelsCard({ providerId, kindFilter }: ModelsCardProps) 
 
   return (
     <>
-      <Card className="border-border/50 bg-background/50 p-4 rounded-none shadow-none">
+      <Card className="border-border/50 bg-background/50 p-4 shadow-none">
         <div className="flex items-center justify-between mb-4 pb-2 border-b border-border/40">
           <h2 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-50">Intelligence Registry{kindFilter ? ` — ${kindFilter.toUpperCase()}` : ""}</h2>
         </div>
@@ -317,7 +317,7 @@ export default function ModelsCard({ providerId, kindFilter }: ModelsCardProps) 
             variant="outline"
             size="sm"
             onClick={() => setShowAddCustomModel(true)}
-            className="h-auto border-dashed py-2 px-3 text-[10px] font-bold uppercase tracking-widest rounded-none border-border/60 hover:bg-primary/5 hover:text-primary transition-all"
+            className="h-auto border-dashed py-2 px-3 text-[10px] font-bold uppercase tracking-widest border-border/60 hover:bg-primary/5 hover:text-primary transition-all"
           >
             <Plus className="size-3.5 mr-1.5" weight="bold" />
             Add Intelligence

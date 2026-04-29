@@ -57,14 +57,7 @@ export default function CLIToolsPageClient({ machineId }: CLIToolsPageClientProp
  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
  const [toolStatuses, setToolStatuses] = useState<Record<string, any>>({});
 
- useEffect(() => {
- fetchConnections();
- loadCloudSettings();
- fetchApiKeys();
- fetchAllStatuses();
- }, []);
-
- const fetchAllStatuses = async () => {
+ async function fetchAllStatuses() {
  try {
  const entries = await Promise.all(
  Object.entries(STATUS_ENDPOINTS).map(async ([toolId, url]) => {
@@ -81,9 +74,9 @@ export default function CLIToolsPageClient({ machineId }: CLIToolsPageClientProp
  } catch (error) {
  console.error("Error fetching tool statuses:", error);
  }
- };
+ }
 
- const loadCloudSettings = async () => {
+ async function loadCloudSettings() {
  try {
  const [settingsRes, tunnelRes] = await Promise.all([
  fetch("/api/settings"),
@@ -101,9 +94,9 @@ export default function CLIToolsPageClient({ machineId }: CLIToolsPageClientProp
  } catch (error) {
  console.error("Error loading settings:", error);
  }
- };
+ }
 
- const fetchApiKeys = async () => {
+ async function fetchApiKeys() {
  try {
  const res = await fetch("/api/keys");
  if (res.ok) {
@@ -113,9 +106,9 @@ export default function CLIToolsPageClient({ machineId }: CLIToolsPageClientProp
  } catch (error) {
  console.error("Error fetching API keys:", error);
  }
- };
+ }
 
- const fetchConnections = async () => {
+ async function fetchConnections() {
  try {
  const res = await fetch("/api/providers");
  const data = await res.json();
@@ -127,7 +120,18 @@ export default function CLIToolsPageClient({ machineId }: CLIToolsPageClientProp
  } finally {
  setLoading(false);
  }
- };
+ }
+
+ useEffect(() => {
+ void (async () => {
+ await Promise.all([
+ fetchConnections(),
+ loadCloudSettings(),
+ fetchApiKeys(),
+ fetchAllStatuses(),
+ ]);
+ })();
+ }, []);
 
  const getActiveProviders = () => connections.filter(c => c.isActive !== false);
 

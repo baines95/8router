@@ -214,7 +214,7 @@ export default function OpenClawToolCard({
  >
  <div className="space-y-6">
  {!openclawStatus?.installed && (
- <div className="bg-muted/10 border border-border/50 rounded-xl p-4 flex items-start gap-3">
+ <div className="bg-muted/10 border border-border/50 p-4 flex items-start gap-3">
  <Info className="size-5 text-muted-foreground shrink-0 mt-0.5" weight="bold" />
  <p className="text-[11px] text-muted-foreground font-medium leading-relaxed italic">
  {translate("Open Claw CLI not detected. Settings will be written manually.")}
@@ -236,10 +236,10 @@ export default function OpenClawToolCard({
  value={getDisplayUrl()} 
  onChange={(e) => setCustomBaseUrl(e.target.value)} 
  placeholder="http://localhost:20128"
- className="h-9 text-xs rounded-none border-border/50 bg-muted/5 focus-visible:ring-0 focus-visible:border-primary/50 transition-colors"
+ className="h-9 text-xs border-border/50 bg-muted/5 focus-visible:ring-0 focus-visible:border-primary/50 transition-colors"
  />
  {customBaseUrl && customBaseUrl !== getLocalBaseUrl() && (
- <Button variant="ghost" size="icon" onClick={() => setCustomBaseUrl("")} className="size-9 text-muted-foreground hover:text-primary transition-colors border border-border/50 rounded-none bg-muted/5">
+ <Button variant="ghost" size="icon" onClick={() => setCustomBaseUrl("")} className="size-9 text-muted-foreground hover:text-primary transition-colors border border-border/50 bg-muted/5">
  <RotateCcw className="size-3.5" weight="bold" />
  </Button>
  )}
@@ -256,14 +256,14 @@ export default function OpenClawToolCard({
  <select 
  value={selectedApiKey} 
  onChange={(e) => setSelectedApiKey(e.target.value)} 
- className="w-full h-9 px-3 bg-muted/5 border border-border/50 rounded-none text-xs font-bold focus:outline-none focus:border-primary/50 transition-colors"
+ className="w-full h-9 px-3 bg-muted/5 border border-border/50 text-xs font-bold focus:outline-none focus:border-primary/50 transition-colors"
  >
  {apiKeys.map((key) => (
  <option key={key.id} value={key.key}>{key.key}</option>
  ))}
  </select>
  ) : (
- <div className="h-9 flex items-center px-3 bg-muted/10 border border-border/50 border-dashed rounded-none text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
+ <div className="h-9 flex items-center px-3 bg-muted/10 border border-border/50 border-dashed text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
  {cloudEnabled ? translate("NO ACTIVE KEYS") : "sk_8router (INTERNAL)"}
  </div>
  )}
@@ -281,19 +281,19 @@ export default function OpenClawToolCard({
  value={selectedModel} 
  onChange={(e) => setSelectedModel(e.target.value)} 
  placeholder="provider/model-id"
- className="h-9 text-xs rounded-none border-border/50 bg-muted/5 focus-visible:ring-0 focus-visible:border-primary/50 transition-colors flex-1"
+ className="h-9 text-xs border-border/50 bg-muted/5 focus-visible:ring-0 focus-visible:border-primary/50 transition-colors flex-1"
  />
  <Button 
  variant="outline" 
  size="sm" 
  onClick={() => { setAgentModalFor(null); setModalOpen(true); }} 
  disabled={!hasActiveProviders}
- className="h-9 px-3 text-[10px] font-bold uppercase tracking-widest rounded-none border-border/50 bg-muted/5 hover:bg-muted/10 transition-colors"
+ className="h-9 px-3 text-[10px] font-bold uppercase tracking-widest border-border/50 bg-muted/5 hover:bg-muted/10 transition-colors"
  >
  {translate("Select")}
  </Button>
  {selectedModel && (
- <Button variant="ghost" size="icon" onClick={() => setSelectedModel("")} className="size-9 rounded-none text-muted-foreground hover:text-destructive transition-colors border border-border/50 bg-muted/5">
+ <Button variant="ghost" size="icon" onClick={() => setSelectedModel("")} className="size-9 text-muted-foreground hover:text-destructive transition-colors border border-border/50 bg-muted/5">
  <X className="size-4" weight="bold" />
  </Button>
  )}
@@ -321,14 +321,14 @@ export default function OpenClawToolCard({
  value={agentModels[agent.id] || ""}
  onChange={(e) => setAgentModels(prev => ({ ...prev, [agent.id]: e.target.value }))}
  placeholder={`Inherit Default (${selectedModel.split('/').pop() || "none"})`}
- className="h-8 text-[10px] rounded-none border-border/50 bg-background focus-visible:ring-0 focus-visible:border-primary/50 transition-colors flex-1"
+ className="h-8 text-[10px] border-border/50 bg-background focus-visible:ring-0 focus-visible:border-primary/50 transition-colors flex-1"
  />
  <Button 
  variant="outline" 
  size="xs" 
  onClick={() => { setAgentModalFor(agent.id); setModalOpen(true); }} 
  disabled={!hasActiveProviders}
- className="h-8 px-2 text-[9px] font-bold uppercase tracking-widest rounded-none border-border/50 bg-background"
+ className="h-8 px-2 text-[9px] font-bold uppercase tracking-widest border-border/50 bg-background"
  >
  {translate("Set")}
  </Button>

@@ -217,11 +217,11 @@ export default function CopilotToolCard({
  hasActiveProviders={activeProviders?.length > 0 && modelList.length > 0}
  >
  <div className="space-y-6">
- <div className="flex items-start gap-3 p-4 bg-primary/10 border border-primary/20 rounded-xl">
+ <div className="flex items-start gap-3 p-4 bg-primary/10 border border-primary/20">
  <Info className="text-primary size-5 shrink-0 mt-0.5" weight="bold" />
  <div className="space-y-1">
  <p className="text-xs font-bold text-primary uppercase tracking-widest">
- {translate("Registry modification")}: <code className="px-1.5 py-0.5 bg-primary/10 rounded-none font-mono text-[10px]">chatLanguageModels.json</code>
+ {translate("Registry modification")}: <code className="px-1.5 py-0.5 bg-primary/10 font-mono text-[10px]">chatLanguageModels.json</code>
  </p>
  <p className="text-[11px] text-primary/80 font-medium leading-relaxed italic">
  {translate("Please restart VS Code after applying changes for the models to appear.")}
@@ -239,12 +239,12 @@ export default function CopilotToolCard({
  <select 
  value={selectedApiKey} 
  onChange={(e) => setSelectedApiKey(e.target.value)} 
- className="w-full h-9 px-3 bg-muted/5 border border-border/50 rounded-none text-xs font-bold focus:outline-none focus:border-primary/50 transition-all"
+ className="w-full h-9 px-3 bg-muted/5 border border-border/50 text-xs font-bold focus:outline-none focus:border-primary/50 transition-all"
  >
  {apiKeys.map((key) => <option key={key.id} value={key.key}>{key.key}</option>)}
  </select>
  ) : (
- <div className="h-9 flex items-center px-3 bg-muted/10 border border-border/50 border-dashed rounded-none text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">
+ <div className="h-9 flex items-center px-3 bg-muted/10 border border-border/50 border-dashed text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">
  {cloudEnabled ? translate("No keys found") : "sk_8router (Internal)"}
  </div>
  )}
@@ -256,12 +256,12 @@ export default function CopilotToolCard({
  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-40">{translate("Intelligence Inventory")} ({modelList.length})</span>
  </div>
  
- <div className="flex flex-wrap gap-2 min-h-[40px] p-3 bg-muted/5 border border-border/40 rounded-none">
+ <div className="flex flex-wrap gap-2 min-h-[40px] p-3 bg-muted/5 border border-border/40">
  {modelList.length === 0 ? (
  <p className="text-[10px] text-muted-foreground italic opacity-40 uppercase tracking-widest flex items-center h-full w-full justify-center">Inventory is empty</p>
  ) : (
  modelList.map((id) => (
- <Badge key={id} variant="secondary" className="h-6 gap-1 pr-1 pl-2 font-mono text-[10px] bg-primary/10 text-primary border-none rounded-none group">
+ <Badge key={id} variant="secondary" className="h-6 gap-1 pr-1 pl-2 font-mono text-[10px] bg-primary/10 text-primary border-none group">
  {id}
  <button onClick={() => removeModel(id)} className="p-0.5 hover:bg-primary/20 rounded-full transition-colors opacity-0 group-hover:opacity-100">
  <X className="size-3" weight="bold" />
@@ -277,14 +277,14 @@ export default function CopilotToolCard({
  onChange={(e) => setModelInput(e.target.value)} 
  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addModel(); } }}
  placeholder="provider/model-id"
- className="h-9 text-xs rounded-none border-border/50 bg-muted/5 flex-1 font-mono focus-visible:ring-0 focus-visible:border-primary/50"
+ className="h-9 text-xs border-border/50 bg-muted/5 flex-1 font-mono focus-visible:ring-0 focus-visible:border-primary/50"
  />
  <Button 
  variant="outline"
  size="sm"
  onClick={() => setModalOpen(true)} 
  disabled={!activeProviders?.length}
- className="h-9 px-4 text-[10px] font-bold uppercase tracking-widest rounded-none border-border/50 bg-background hover:bg-muted/10 transition-colors"
+ className="h-9 px-4 text-[10px] font-bold uppercase tracking-widest border-border/50 bg-background hover:bg-muted/10 transition-colors"
  >
  {translate("Select")}
  </Button>
@@ -293,7 +293,7 @@ export default function CopilotToolCard({
  size="icon"
  onClick={addModel} 
  disabled={!modelInput.trim()} 
- className="h-9 w-9 rounded-none border-border/50 bg-muted/5"
+ className="h-9 w-9 border-border/50 bg-muted/5"
  >
  <Plus className="size-4" weight="bold" />
  </Button>

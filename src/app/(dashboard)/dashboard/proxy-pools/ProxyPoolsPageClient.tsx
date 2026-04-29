@@ -66,9 +66,9 @@ interface ProxyPoolsPageClientProps {
 }
 
 function getStatusBadge(status?: string) {
-  if (status === "active") return <Badge className="h-5 rounded-md border-none bg-primary/10 text-[10px] text-primary">Active</Badge>;
-  if (status === "error") return <Badge variant="destructive" className="h-5 rounded-md border-none text-[10px]">Error</Badge>;
-  return <Badge variant="outline" className="h-5 rounded-md border-border/50 text-[10px] text-muted-foreground opacity-70">{status || "Unknown"}</Badge>;
+  if (status === "active") return <Badge className="h-5 border-none bg-primary/10 text-[10px] text-primary">Active</Badge>;
+  if (status === "error") return <Badge variant="destructive" className="h-5 border-none text-[10px]">Error</Badge>;
+  return <Badge variant="outline" className="h-5 border-border/50 text-[10px] text-muted-foreground opacity-70">{status || "Unknown"}</Badge>;
 }
 
 function formatDateTime(value?: string | null) {
@@ -245,13 +245,13 @@ export default function ProxyPoolsPageClient({ initialData }: ProxyPoolsPageClie
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="h-8 rounded-md border-border/50 bg-background px-3 text-xs font-medium" onClick={() => setShowVercelModal(true)}>
+          <Button variant="outline" size="sm" className="h-8 border-border/50 bg-background px-3 text-xs font-medium" onClick={() => setShowVercelModal(true)}>
             <CloudArrowUp className="mr-1.5 size-3.5" weight="bold"/> Vercel Relay
           </Button>
-          <Button variant="outline" size="sm" className="h-8 rounded-md border-border/50 bg-background px-3 text-xs font-medium" onClick={() => setShowBatchImportModal(true)}>
+          <Button variant="outline" size="sm" className="h-8 border-border/50 bg-background px-3 text-xs font-medium" onClick={() => setShowBatchImportModal(true)}>
             <Upload className="mr-1.5 size-3.5" weight="bold"/> Batch Import
           </Button>
-          <Button size="sm" className="h-8 rounded-md px-5 text-xs font-medium shadow-none" onClick={() => { setEditingProxyPool(null); setFormData(normalizeFormData()); setShowFormModal(true); }}>
+          <Button size="sm" className="h-8 px-5 text-xs font-medium shadow-none" onClick={() => { setEditingProxyPool(null); setFormData(normalizeFormData()); setShowFormModal(true); }}>
             <Plus className="mr-1.5 size-3.5" weight="bold"/> New Hub
           </Button>
         </div>
@@ -265,7 +265,7 @@ export default function ProxyPoolsPageClient({ initialData }: ProxyPoolsPageClie
       </div>
 
       {/* Main List */}
-      <Card className="border-border/50 overflow-hidden shadow-none rounded-none bg-background/50">
+      <Card className="border-border/50 overflow-hidden shadow-none bg-background/50">
         <CardHeader className="border-b border-border/50 bg-muted/10 px-4 py-3">
           <CardTitle className="text-xs font-medium text-muted-foreground">Active Egress Registry</CardTitle>
         </CardHeader>
@@ -283,8 +283,8 @@ export default function ProxyPoolsPageClient({ initialData }: ProxyPoolsPageClie
                     <div className="flex items-center gap-2.5 flex-wrap">
                       <span className="text-sm font-medium text-foreground">{pool.name}</span>
                       {getStatusBadge(pool.testStatus)}
-                      {pool.type === "vercel" && <Badge className="h-4 rounded-md border-none bg-primary/10 px-1.5 text-[10px] text-primary">Vercel edge</Badge>}
-                      <Badge variant="outline" className="h-4 rounded-md border-border/50 px-1.5 text-[10px] tabular-nums text-muted-foreground">{pool.boundConnectionCount || 0} links</Badge>
+                      {pool.type === "vercel" && <Badge className="h-4 border-none bg-primary/10 px-1.5 text-[10px] text-primary">Vercel edge</Badge>}
+                      <Badge variant="outline" className="h-4 border-border/50 px-1.5 text-[10px] tabular-nums text-muted-foreground">{pool.boundConnectionCount || 0} links</Badge>
                     </div>
                     <code className="text-xs font-mono text-muted-foreground truncate block opacity-60 tabular-nums">{pool.proxyUrl}</code>
                     <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
@@ -297,13 +297,13 @@ export default function ProxyPoolsPageClient({ initialData }: ProxyPoolsPageClie
                   </div>
 
                   <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all shrink-0">
-                    <Button variant="ghost" size="icon" className="size-8 rounded-none hover:bg-primary/10 hover:text-primary border border-transparent hover:border-primary/20" onClick={() => handleTest(pool.id)} disabled={testingId === pool.id} title="Health Check">
+                    <Button variant="ghost" size="icon" className="size-8 hover:bg-primary/10 hover:text-primary border border-transparent hover:border-primary/20" onClick={() => handleTest(pool.id)} disabled={testingId === pool.id} title="Health Check">
                       {testingId === pool.id ? <RefreshCw className="size-3.5 animate-spin" weight="bold"/> : <Play className="size-3.5" weight="bold"/>}
                     </Button>
-                    <Button variant="ghost" size="icon" className="size-8 rounded-none hover:bg-muted/50 border border-transparent hover:border-border/50" onClick={() => { setEditingProxyPool(pool); setFormData(normalizeFormData(pool)); setShowFormModal(true); }} title="Configure">
+                    <Button variant="ghost" size="icon" className="size-8 hover:bg-muted/50 border border-transparent hover:border-border/50" onClick={() => { setEditingProxyPool(pool); setFormData(normalizeFormData(pool)); setShowFormModal(true); }} title="Configure">
                       <Edit2 className="size-3.5" weight="bold"/>
                     </Button>
-                    <Button variant="ghost" size="icon" className="size-8 rounded-none hover:bg-destructive/10 hover:text-destructive border border-transparent hover:border-destructive/20" onClick={() => handleDelete(pool)} title="De-provision">
+                    <Button variant="ghost" size="icon" className="size-8 hover:bg-destructive/10 hover:text-destructive border border-transparent hover:border-destructive/20" onClick={() => handleDelete(pool)} title="De-provision">
                       <Trash className="size-3.5" weight="bold"/>
                     </Button>
                   </div>
@@ -318,7 +318,7 @@ export default function ProxyPoolsPageClient({ initialData }: ProxyPoolsPageClie
       
       {/* Form Modal */}
       <Dialog open={showFormModal} onOpenChange={setShowFormModal}>
-        <DialogContent className="sm:max-w-md border-border/50 shadow-none rounded-none p-6">
+        <DialogContent className="sm:max-w-md border-border/50 shadow-none p-6">
           <DialogHeader className="mb-4">
             <DialogTitle className="text-lg font-bold tracking-tight uppercase">{editingProxyPool ? "Configure Hub" : "Provision Hub"}</DialogTitle>
             <DialogDescription className="text-xs font-medium italic opacity-60">Manage your egress infrastructure parameters.</DialogDescription>
@@ -326,18 +326,18 @@ export default function ProxyPoolsPageClient({ initialData }: ProxyPoolsPageClie
           <div className="space-y-5 py-2">
             <div className="grid gap-2">
               <Label htmlFor="pool-name" className="px-1 text-xs text-muted-foreground">Node Identity</Label>
-              <Input id="pool-name" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder="US-WEST-EXIT-01" className="h-10 rounded-none border-border/50 bg-muted/5 text-sm"/>
+              <Input id="pool-name" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder="US-WEST-EXIT-01" className="h-10 border-border/50 bg-muted/5 text-sm"/>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="pool-url" className="px-1 text-xs text-muted-foreground">Egress URL</Label>
-              <Input id="pool-url" value={formData.proxyUrl} onChange={e => setFormData({ ...formData, proxyUrl: e.target.value })} placeholder="http://user:pass@host:port" className="font-mono text-xs h-10 rounded-none border-border/50 bg-muted/5"/>
+              <Input id="pool-url" value={formData.proxyUrl} onChange={e => setFormData({ ...formData, proxyUrl: e.target.value })} placeholder="http://user:pass@host:port" className="font-mono text-xs h-10 border-border/50 bg-muted/5"/>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="pool-noproxy" className="px-1 text-xs text-muted-foreground">Bypass Manifest (No Proxy)</Label>
-              <Input id="pool-noproxy" value={formData.noProxy} onChange={e => setFormData({ ...formData, noProxy: e.target.value })} placeholder="localhost, 127.0.0.1" className="font-mono text-xs h-10 rounded-none border-border/50 bg-muted/5"/>
+              <Input id="pool-noproxy" value={formData.noProxy} onChange={e => setFormData({ ...formData, noProxy: e.target.value })} placeholder="localhost, 127.0.0.1" className="font-mono text-xs h-10 border-border/50 bg-muted/5"/>
             </div>
             
-            <div className="flex items-center justify-between p-3 rounded-none border border-border/50 bg-muted/10">
+            <div className="flex items-center justify-between p-3 border border-border/50 bg-muted/10">
               <div className="space-y-0.5">
                 <Label className="text-xs font-medium">Strict Routing</Label>
                 <p className="text-[10px] text-muted-foreground font-medium italic">Enforce hub usage, fail fast on error.</p>
@@ -345,7 +345,7 @@ export default function ProxyPoolsPageClient({ initialData }: ProxyPoolsPageClie
               <Switch checked={formData.strictProxy} onCheckedChange={v => setFormData({ ...formData, strictProxy: v })} className="scale-75 data-[state=checked]:bg-primary" />
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-none border border-border/50 bg-muted/10">
+            <div className="flex items-center justify-between p-3 border border-border/50 bg-muted/10">
               <div className="space-y-0.5">
                 <Label className="text-xs font-medium">Service Status</Label>
               </div>
@@ -353,20 +353,20 @@ export default function ProxyPoolsPageClient({ initialData }: ProxyPoolsPageClie
             </div>
           </div>
           <DialogFooter className="gap-2 sm:gap-2 mt-4 p-0">
-            <Button variant="outline" className="h-10 flex-1 rounded-md border-border/50 text-xs font-medium" onClick={() => setShowFormModal(false)}>Cancel</Button>
-            <Button className="h-10 flex-1 rounded-md text-xs font-medium shadow-none" onClick={handleSave} disabled={saving}>{saving ? "Saving..." : "Commit Hub"}</Button>
+            <Button variant="outline" className="h-10 flex-1 border-border/50 text-xs font-medium" onClick={() => setShowFormModal(false)}>Cancel</Button>
+            <Button className="h-10 flex-1 text-xs font-medium shadow-none" onClick={handleSave} disabled={saving}>{saving ? "Saving..." : "Commit Hub"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Vercel Modal */}
       <Dialog open={showVercelModal} onOpenChange={setShowVercelModal}>
-        <DialogContent className="sm:max-w-md border-border/50 shadow-none rounded-none p-6">
+        <DialogContent className="sm:max-w-md border-border/50 shadow-none p-6">
           <DialogHeader className="mb-4">
             <DialogTitle className="text-lg font-bold tracking-tight uppercase">Provision Vercel Relay</DialogTitle>
             <DialogDescription className="text-xs font-medium italic opacity-60">Leverage Vercel Edge Network for identity obfuscation.</DialogDescription>
           </DialogHeader>
-          <div className="bg-primary/10 border border-primary/20 p-4 rounded-none flex gap-3 mb-2">
+          <div className="bg-primary/10 border border-primary/20 p-4 flex gap-3 mb-2">
             <Info className="size-5 text-primary shrink-0 mt-0.5" weight="bold"/>
             <div className="space-y-1">
               <p className="text-xs font-medium text-primary">Edge Obfuscation</p>
@@ -376,15 +376,15 @@ export default function ProxyPoolsPageClient({ initialData }: ProxyPoolsPageClie
           <div className="space-y-5 py-2">
             <div className="grid gap-2">
               <Label className="px-1 text-xs text-muted-foreground">Vercel Authority Token</Label>
-              <Input type="password" value={vercelForm.vercelToken} onChange={e => setVercelForm({ ...vercelForm, vercelToken: e.target.value })} className="h-10 rounded-none border-border/50 bg-muted/5 font-mono text-sm" />
+              <Input type="password" value={vercelForm.vercelToken} onChange={e => setVercelForm({ ...vercelForm, vercelToken: e.target.value })} className="h-10 border-border/50 bg-muted/5 font-mono text-sm" />
             </div>
             <div className="grid gap-2">
               <Label className="px-1 text-xs text-muted-foreground">Namespace / Project Name</Label>
-              <Input value={vercelForm.projectName} onChange={e => setVercelForm({ ...vercelForm, projectName: e.target.value })} className="h-10 rounded-none border-border/50 bg-muted/5 font-mono text-sm uppercase" />
+              <Input value={vercelForm.projectName} onChange={e => setVercelForm({ ...vercelForm, projectName: e.target.value })} className="h-10 border-border/50 bg-muted/5 font-mono text-sm uppercase" />
             </div>
           </div>
           <DialogFooter className="mt-4 p-0">
-            <Button className="h-10 w-full rounded-md text-xs font-medium shadow-none" onClick={handleVercelDeploy} disabled={deploying || !vercelForm.vercelToken.trim()}>
+            <Button className="h-10 w-full text-xs font-medium shadow-none" onClick={handleVercelDeploy} disabled={deploying || !vercelForm.vercelToken.trim()}>
               {deploying ? "Deploying Core..." : "Initiate Provisioning"}
             </Button>
           </DialogFooter>
@@ -393,22 +393,22 @@ export default function ProxyPoolsPageClient({ initialData }: ProxyPoolsPageClie
 
       {/* Batch Import Modal */}
       <Dialog open={showBatchImportModal} onOpenChange={setShowBatchImportModal}>
-        <DialogContent className="max-w-2xl border-border/50 shadow-none rounded-none p-6">
+        <DialogContent className="max-w-2xl border-border/50 shadow-none p-6">
           <DialogHeader className="mb-4">
             <DialogTitle className="text-lg font-bold tracking-tight uppercase">High-Volume Import</DialogTitle>
             <DialogDescription className="text-xs font-medium italic opacity-60">Bulk provision multiple egress nodes via manifest.</DialogDescription>
           </DialogHeader>
           <div className="py-2">
             <textarea 
-              className="w-full h-48 p-4 rounded-none border border-border/50 bg-muted/5 font-mono text-[11px] focus:ring-0 focus:border-primary/50 outline-none text-foreground/80 leading-relaxed shadow-none resize-none"
+              className="w-full h-48 p-4 border border-border/50 bg-muted/5 font-mono text-[11px] focus:ring-0 focus:border-primary/50 outline-none text-foreground/80 leading-relaxed shadow-none resize-none"
               placeholder={"# One proxy per line\nprotocol://user:pass@host:port\nhost:port:user:pass"}
               value={batchImportText}
               onChange={e => setBatchImportText(e.target.value)}
             />
           </div>
           <DialogFooter className="gap-2 sm:gap-2 mt-4 p-0">
-            <Button variant="outline" className="h-10 flex-1 rounded-md border-border/50 text-xs font-medium" onClick={() => setShowBatchImportModal(false)}>Cancel</Button>
-            <Button className="h-10 flex-1 rounded-md px-8 text-xs font-medium shadow-none" onClick={handleBatchImport} disabled={importing || !batchImportText.trim()}>{importing ? "Importing..." : "Commit Batch"}</Button>
+            <Button variant="outline" className="h-10 flex-1 border-border/50 text-xs font-medium" onClick={() => setShowBatchImportModal(false)}>Cancel</Button>
+            <Button className="h-10 flex-1 px-8 text-xs font-medium shadow-none" onClick={handleBatchImport} disabled={importing || !batchImportText.trim()}>{importing ? "Importing..." : "Commit Batch"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -418,13 +418,13 @@ export default function ProxyPoolsPageClient({ initialData }: ProxyPoolsPageClie
 
 function StatCard({ label, value, icon: Icon, color }: { label: string, value: string | number, icon: any, color?: string }) {
   return (
-    <Card className="border-border/50 bg-muted/10 shadow-none overflow-hidden rounded-none hover:bg-muted/20 transition-colors">
+    <Card className="border-border/50 bg-muted/10 shadow-none overflow-hidden hover:bg-muted/20 transition-colors">
       <CardContent className="p-4 flex items-center justify-between">
         <div className="space-y-0.5">
           <p className="text-xs text-muted-foreground">{label}</p>
           <p className="text-2xl font-bold tracking-tight tabular-nums text-foreground">{value}</p>
         </div>
-        <div className={cn("p-2 rounded-none bg-background border border-border/50", color)}>
+        <div className={cn("p-2 bg-background border border-border/50", color)}>
           <Icon className="size-4" weight="bold" />
         </div>
       </CardContent>

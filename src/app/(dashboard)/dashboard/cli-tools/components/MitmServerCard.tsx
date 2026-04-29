@@ -154,7 +154,7 @@ export default function MitmServerCard({ apiKeys, cloudEnabled, onStatusChange }
 
  return (
  <>
- <Card className="border-primary/20 bg-primary/5 p-4 rounded-none shadow-none">
+ <Card className="border-primary/20 bg-primary/5 p-4 shadow-none">
  <div className="flex flex-col gap-4">
  {/* Header */}
  <div className="flex items-center justify-between">
@@ -162,9 +162,9 @@ export default function MitmServerCard({ apiKeys, cloudEnabled, onStatusChange }
  <Shield className="size-5 text-primary" weight="bold" />
  <span className="font-bold text-xs uppercase tracking-widest text-foreground">MITM Service Engine</span>
  {isRunning ? (
- <Badge className="h-5 px-1.5 text-[9px] font-bold uppercase bg-primary/10 text-primary border-none rounded-none">Running</Badge>
+ <Badge className="h-5 px-1.5 text-[9px] font-bold uppercase bg-primary/10 text-primary border-none">Running</Badge>
  ) : (
- <Badge variant="secondary" className="h-5 px-1.5 text-[9px] font-bold uppercase border-none rounded-none opacity-40">Stopped</Badge>
+ <Badge variant="secondary" className="h-5 px-1.5 text-[9px] font-bold uppercase border-none opacity-40">Stopped</Badge>
  )}
  </div>
  <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
@@ -182,7 +182,7 @@ export default function MitmServerCard({ apiKeys, cloudEnabled, onStatusChange }
  </div>
 
  {/* Purpose & Info */}
- <div className="p-3 rounded-none bg-background/50 border border-border/50 flex flex-col gap-2.5">
+ <div className="p-3 bg-background/50 border border-border/50 flex flex-col gap-2.5">
  <p className="text-[10px] text-muted-foreground font-medium leading-relaxed italic">
  <span className="font-bold text-foreground uppercase tracking-widest opacity-60 not-italic mr-1.5">Goal:</span> 
  Intercept native IDE traffic (Antigravity, Copilot) to use custom 8Router models.
@@ -199,7 +199,7 @@ export default function MitmServerCard({ apiKeys, cloudEnabled, onStatusChange }
  onChange={(e) => setMitmRouterBaseUrl(e.target.value)}
  placeholder={DEFAULT_MITM_ROUTER_BASE}
  disabled={isRunning}
- className="h-9 text-xs rounded-none border-border/50 bg-background focus-visible:ring-0 focus-visible:border-primary/50 transition-colors"
+ className="h-9 text-xs border-border/50 bg-background focus-visible:ring-0 focus-visible:border-primary/50 transition-colors"
  />
  </div>
  {!isRunning && (
@@ -209,7 +209,7 @@ export default function MitmServerCard({ apiKeys, cloudEnabled, onStatusChange }
  <select
  value={selectedApiKey}
  onChange={(e) => setSelectedApiKey(e.target.value)}
- className="w-full h-9 px-3 bg-background border border-border/50 rounded-none text-xs font-bold focus:outline-none focus:border-primary/50 transition-colors"
+ className="w-full h-9 px-3 bg-background border border-border/50 text-xs font-bold focus:outline-none focus:border-primary/50 transition-colors"
  >
  {apiKeys.map((key) => (
  <option key={key.id} value={key.key}>
@@ -218,7 +218,7 @@ export default function MitmServerCard({ apiKeys, cloudEnabled, onStatusChange }
  ))}
  </select>
  ) : (
- <div className="h-9 flex items-center px-3 bg-muted/10 border border-border/50 border-dashed rounded-none text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
+ <div className="h-9 flex items-center px-3 bg-muted/10 border border-border/50 border-dashed text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
  {cloudEnabled ? translate("NO ACTIVE KEYS") : "sk_8router (INTERNAL)"}
  </div>
  )}
@@ -234,7 +234,7 @@ export default function MitmServerCard({ apiKeys, cloudEnabled, onStatusChange }
  size="sm"
  onClick={() => handleAction("trust-cert")}
  disabled={loading}
- className="h-8 rounded-none border-border/50 text-[10px] font-bold uppercase tracking-widest hover:bg-primary/10 hover:text-primary transition-colors"
+ className="h-8 border-border/50 text-[10px] font-bold uppercase tracking-widest hover:bg-primary/10 hover:text-primary transition-colors"
  >
  <ShieldCheck className="size-3.5 mr-1.5" weight="bold" />
  Trust Root CA
@@ -246,7 +246,7 @@ export default function MitmServerCard({ apiKeys, cloudEnabled, onStatusChange }
  size="sm"
  onClick={() => handleAction("stop")}
  disabled={loading}
- className="h-8 rounded-none border-none bg-destructive/10 text-destructive text-[10px] font-bold uppercase tracking-widest hover:bg-destructive/20 transition-colors"
+ className="h-8 border-none bg-destructive/10 text-destructive text-[10px] font-bold uppercase tracking-widest hover:bg-destructive/20 transition-colors"
  >
  <StopCircle className="size-3.5 mr-1.5" weight="bold" />
  Shutdown Server
@@ -256,7 +256,7 @@ export default function MitmServerCard({ apiKeys, cloudEnabled, onStatusChange }
  size="sm"
  onClick={() => handleAction("start")}
  disabled={loading || (isWindows && !isAdmin)}
- className="h-8 rounded-none border-none text-[10px] font-bold uppercase tracking-widest px-6 shadow-none"
+ className="h-8 border-none text-[10px] font-bold uppercase tracking-widest px-6 shadow-none"
  >
  <PlayCircle className="size-3.5 mr-1.5" weight="bold" />
  Provision Node
@@ -269,14 +269,14 @@ export default function MitmServerCard({ apiKeys, cloudEnabled, onStatusChange }
 
  {/* Feedback Alerts */}
  {actionError && (
- <div className="flex items-start gap-2 px-3 py-2 rounded-none text-[10px] font-bold uppercase tracking-widest bg-destructive/5 text-destructive border border-destructive/20 mt-2">
+ <div className="flex items-start gap-2 px-3 py-2 text-[10px] font-bold uppercase tracking-widest bg-destructive/5 text-destructive border border-destructive/20 mt-2">
  <AlertCircle className="size-3.5 mt-0.5 shrink-0" weight="bold" />
  <span>{actionError}</span>
  </div>
  )}
 
  {isWindows && !isAdmin && (
- <div className="flex items-center gap-2 px-3 py-2 rounded-none text-[10px] font-bold uppercase tracking-widest bg-amber-500/10 text-amber-600 border border-amber-500/20 mt-2">
+ <div className="flex items-center gap-2 px-3 py-2 text-[10px] font-bold uppercase tracking-widest bg-amber-500/10 text-amber-600 border border-amber-500/20 mt-2">
  <Shield className="size-3.5" weight="bold" />
  <span>Elevated Privileges Required — Restart as Administrator to use MITM features</span>
  </div>
@@ -287,12 +287,12 @@ export default function MitmServerCard({ apiKeys, cloudEnabled, onStatusChange }
  {/* Password Modal */}
  {showPasswordModal && (
  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
- <div className="bg-background border border-border/50 rounded-none p-6 w-full max-w-sm flex flex-col gap-6 shadow-2xl scale-100 animate-in zoom-in-95 duration-200">
+ <div className="bg-background border border-border/50 p-6 w-full max-w-sm flex flex-col gap-6 shadow-2xl scale-100 animate-in zoom-in-95 duration-200">
  <div className="space-y-1">
  <h3 className="text-lg font-bold tracking-tight text-foreground uppercase">Authority Challenge</h3>
  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Sudo credentials required for SSL/DNS modification.</p>
  </div>
- <div className="flex items-start gap-3 p-3 bg-muted/30 border border-border/50 rounded-none">
+ <div className="flex items-start gap-3 p-3 bg-muted/30 border border-border/50">
  <AlertTriangle className="size-5 text-amber-500 shrink-0" weight="bold" />
  <p className="text-[11px] font-medium text-muted-foreground leading-relaxed italic">Required for SSL certificate installation and hosts file management.</p>
  </div>
@@ -302,20 +302,20 @@ export default function MitmServerCard({ apiKeys, cloudEnabled, onStatusChange }
  value={sudoPassword}
  onChange={(e) => setSudoPassword(e.target.value)}
  onKeyDown={(e) => { if (e.key === "Enter" && !loading) handleConfirmPassword(); }}
- className="h-10 text-lg rounded-none border-border/50 bg-muted/5 focus-visible:ring-0 focus-visible:border-primary/50"
+ className="h-10 text-lg border-border/50 bg-muted/5 focus-visible:ring-0 focus-visible:border-primary/50"
  autoFocus
  />
  {modalError && (
- <div className="flex items-center gap-2 px-3 py-2 rounded-none text-[10px] font-bold uppercase bg-destructive/5 text-destructive border border-destructive/20">
+ <div className="flex items-center gap-2 px-3 py-2 text-[10px] font-bold uppercase bg-destructive/5 text-destructive border border-destructive/20">
  <AlertCircle className="size-3.5" weight="bold" />
  <span>{modalError}</span>
  </div>
  )}
  <div className="flex items-center gap-2 pt-2">
- <Button variant="outline" size="sm" className="flex-1 rounded-none h-10 text-[10px] font-bold uppercase tracking-widest border-border/50" onClick={() => { setShowPasswordModal(false); setSudoPassword(""); setModalError(null); }} disabled={loading}>
+ <Button variant="outline" size="sm" className="flex-1 h-10 text-[10px] font-bold uppercase tracking-widest border-border/50" onClick={() => { setShowPasswordModal(false); setSudoPassword(""); setModalError(null); }} disabled={loading}>
  Cancel
  </Button>
- <Button size="sm" className="flex-1 rounded-none h-10 text-[10px] font-bold uppercase tracking-widest shadow-none" onClick={handleConfirmPassword} disabled={loading}>
+ <Button size="sm" className="flex-1 h-10 text-[10px] font-bold uppercase tracking-widest shadow-none" onClick={handleConfirmPassword} disabled={loading}>
  {loading ? "Verifying..." : "Authorize"}
  </Button>
  </div>

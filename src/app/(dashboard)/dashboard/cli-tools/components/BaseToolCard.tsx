@@ -120,7 +120,7 @@ export default function BaseToolCard({
 
  return (
  <Card className={cn(
- "overflow-hidden transition-all duration-300 border-border/50 rounded-none shadow-none",
+ "overflow-hidden transition-all duration-300 border-border/50 shadow-none",
  isExpanded ? "bg-muted/5" : "hover:bg-muted/5"
  )}>
  {/* Header */}
@@ -132,7 +132,7 @@ export default function BaseToolCard({
  onClick={onToggle}
  >
  <div className="flex items-center gap-4 min-w-0">
- <div className="relative size-10 flex-shrink-0 bg-background rounded-none border border-border/50 p-1.5 flex items-center justify-center shadow-none">
+ <div className="relative size-10 flex-shrink-0 bg-background border border-border/50 p-1.5 flex items-center justify-center shadow-none">
  {tool.image ? (
  <img src={tool.image} alt={tool.name} width={28} height={28} className="object-contain" />
  ) : (
@@ -176,7 +176,7 @@ export default function BaseToolCard({
  {/* Notification Message */}
  {message && (
  <div className={cn(
- "flex items-center gap-2 px-3 py-2 rounded-none text-[10px] font-bold uppercase tracking-widest animate-in fade-in slide-in-from-top-1",
+ "flex items-center gap-2 px-3 py-2 text-[10px] font-bold uppercase tracking-widest animate-in fade-in slide-in-from-top-1",
  message.type === "success" ? "bg-primary/10 text-primary dark:text-primary" : "bg-destructive/10 text-destructive"
  )}>
  {message.type === "success" ? <CheckCircle2 className="size-3.5" weight="bold" /> : <AlertCircle className="size-3.5" weight="bold" />}
@@ -192,7 +192,7 @@ export default function BaseToolCard({
  size="sm"
  onClick={onApply} 
  disabled={applying || !hasActiveProviders} 
- className="font-bold text-[10px] uppercase tracking-widest min-w-[100px] h-8 rounded-none shadow-none"
+ className="font-bold text-[10px] uppercase tracking-widest min-w-[100px] h-8 shadow-none"
  >
  {applying ? translate("Applying...") : translate("Apply")}
  </Button>
@@ -203,7 +203,7 @@ export default function BaseToolCard({
  size="sm"
  onClick={onReset} 
  disabled={restoring || status === "not_configured"} 
- className="font-bold text-[10px] uppercase tracking-widest h-8 rounded-none border-border/50"
+ className="font-bold text-[10px] uppercase tracking-widest h-8 border-border/50"
  >
  <RotateCcw className="mr-1.5 size-3" weight="bold" />
  {restoring ? translate("Resetting...") : translate("Reset")}

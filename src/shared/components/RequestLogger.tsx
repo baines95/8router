@@ -36,7 +36,7 @@ export default function RequestLogger() {
   };
 
   useEffect(() => {
-    fetchLogs();
+    void (async () => { fetchLogs(); })();
   }, []);
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export default function RequestLogger() {
         </div>
       </div>
 
-      <Card className="shadow-none border-border/50 overflow-hidden p-0 bg-muted/5 rounded-none">
+      <Card className="shadow-none border-border/50 overflow-hidden p-0 bg-muted/5">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-left font-mono text-[11px] leading-none whitespace-nowrap">
@@ -96,7 +96,7 @@ export default function RequestLogger() {
                         <td className="px-4 py-2.5 text-muted-foreground opacity-60 tabular-nums">{parts[0]}</td>
                         <td className="px-4 py-2.5 font-bold text-foreground tracking-tight">{parts[1]}</td>
                         <td className="px-4 py-2.5 text-center">
-                          <Badge variant="outline" className="h-4 text-[10px] font-bold uppercase bg-muted/50 border-border/50 text-muted-foreground rounded-none px-1.5">{parts[2]}</Badge>
+                          <Badge variant="outline" className="h-4 text-[10px] font-bold uppercase bg-muted/50 border-border/50 text-muted-foreground px-1.5">{parts[2]}</Badge>
                         </td>
                         <td className="px-4 py-2.5 truncate max-w-[180px] text-muted-foreground font-medium" title={parts[3]}>{parts[3]}</td>
                         <td className="px-4 py-2.5 text-right font-bold text-primary opacity-80 tabular-nums">{parts[4]}</td>

@@ -57,7 +57,7 @@ export default function ManualConfigModal({ isOpen, onClose, title = translate("
                       {copiedIndex === index ? translate("Copied") : translate("Copy Source")}
                    </Button>
                  </div>
-                 <pre className="p-4 rounded-xl bg-muted/40 border border-border font-mono text-[11px] leading-relaxed text-foreground/80 overflow-auto whitespace-pre-wrap break-all shadow-none">
+                 <pre className="p-4 bg-muted/40 border border-border font-mono text-[11px] leading-relaxed text-foreground/80 overflow-auto whitespace-pre-wrap break-all shadow-none">
                    {config.content}
                  </pre>
                </div>

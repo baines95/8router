@@ -185,14 +185,14 @@ export default function ProviderLimits() {
  <span className="hidden sm:inline">Sắp xếp: {sortBy === "provider" ? "Mặc định" : sortBy === "rem_low" ? "Hết Quota" : "Nhiều Quota"}</span>
  </Button>
  } />
- <DropdownMenuContent align="end" className="rounded-none border-border/50 shadow-none bg-background/95 backdrop-blur-md">
- <DropdownMenuItem onClick={() => setSortBy("provider")} className="rounded-none cursor-pointer py-2">Tên A-Z</DropdownMenuItem>
- <DropdownMenuItem onClick={() => setSortBy("rem_low")} className="rounded-none cursor-pointer py-2">Quota thấp nhất</DropdownMenuItem>
- <DropdownMenuItem onClick={() => setSortBy("rem_high")} className="rounded-none cursor-pointer py-2">Quota cao nhất</DropdownMenuItem>
+ <DropdownMenuContent align="end" className=" border-border/50 shadow-none bg-background/95 backdrop-blur-md">
+ <DropdownMenuItem onClick={() => setSortBy("provider")} className=" cursor-pointer py-2">Tên A-Z</DropdownMenuItem>
+ <DropdownMenuItem onClick={() => setSortBy("rem_low")} className=" cursor-pointer py-2">Quota thấp nhất</DropdownMenuItem>
+ <DropdownMenuItem onClick={() => setSortBy("rem_high")} className=" cursor-pointer py-2">Quota cao nhất</DropdownMenuItem>
  </DropdownMenuContent>
  </DropdownMenu>
  
- <Button variant="outline" size="icon" className="size-9 rounded-none border-border/50 bg-background shadow-none" onClick={() => refreshAll(false)} disabled={refreshingAll}>
+ <Button variant="outline" size="icon" className="size-9 border-border/50 bg-background shadow-none" onClick={() => refreshAll(false)} disabled={refreshingAll}>
  {refreshingAll ? <Loader2 className="size-4 animate-spin" weight="bold" /> : <RefreshCw className="size-4" weight="bold" />}
  </Button>
  </div>
@@ -202,7 +202,7 @@ export default function ProviderLimits() {
 
  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
  {connectionsLoading ? (
- Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-48 rounded-none border border-border/40" />)
+ Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-48 border border-border/40" />)
  ) : sortedConnections.map((conn) => (
  <ProviderQuotaCard
  key={conn.id}

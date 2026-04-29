@@ -65,7 +65,7 @@ export default function ModelRow({
   return (
     <div
       className={cn(
-        "group rounded-none border px-2 py-1.5 transition-colors",
+        "group border px-2 py-1.5 transition-colors",
         borderClass,
         "hover:bg-muted/50",
       )}
@@ -81,7 +81,7 @@ export default function ModelRow({
           )}
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <code className="rounded-none bg-muted px-1 py-0.5 font-mono text-[10px] text-muted-foreground w-fit max-w-full truncate">
+          <code className=" bg-muted px-1 py-0.5 font-mono text-[10px] text-muted-foreground w-fit max-w-full truncate">
             {fullModel}
           </code>
           {model.name && (
@@ -99,7 +99,7 @@ export default function ModelRow({
                 onClick={onTest}
                 disabled={isTesting}
                 className={cn(
-                  "rounded-none p-0.5 text-muted-foreground transition-opacity hover:bg-accent hover:text-foreground",
+                  " p-0.5 text-muted-foreground transition-opacity hover:bg-accent hover:text-foreground",
                   isTesting ? "opacity-100" : "opacity-0 group-hover:opacity-100",
                 )}
               >
@@ -109,7 +109,7 @@ export default function ModelRow({
                   <Flask className="size-3.5" weight="bold" />
                 )}
               </button>
-              <span className="pointer-events-none absolute top-6 left-1/2 mt-1 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold uppercase tracking-tighter bg-popover text-popover-foreground px-1.5 py-0.5 rounded-none border border-border/50 shadow-none opacity-0 transition-opacity group-hover/btn:opacity-100 z-10">
+              <span className="pointer-events-none absolute top-6 left-1/2 mt-1 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold uppercase tracking-tighter bg-popover text-popover-foreground px-1.5 py-0.5 border border-border/50 shadow-none opacity-0 transition-opacity group-hover/btn:opacity-100 z-10">
                 {isTesting ? translate("Testing...") : translate("Test")}
               </span>
             </div>
@@ -119,7 +119,7 @@ export default function ModelRow({
             <button
               type="button"
               onClick={() => onCopy(fullModel, `model-${model.id}`)}
-              className="rounded-none p-0.5 text-muted-foreground hover:bg-accent hover:text-foreground"
+              className=" p-0.5 text-muted-foreground hover:bg-accent hover:text-foreground"
             >
               {copied === `model-${model.id}` ? (
                 <Check className="size-3.5 text-primary" weight="bold" />
@@ -127,20 +127,20 @@ export default function ModelRow({
                 <Copy className="size-3.5" weight="bold" />
               )}
             </button>
-            <span className="pointer-events-none absolute top-6 left-1/2 mt-1 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold uppercase tracking-tighter bg-popover text-popover-foreground px-1.5 py-0.5 rounded-none border border-border/50 shadow-none opacity-0 transition-opacity group-hover/btn:opacity-100 z-10">
+            <span className="pointer-events-none absolute top-6 left-1/2 mt-1 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold uppercase tracking-tighter bg-popover text-popover-foreground px-1.5 py-0.5 border border-border/50 shadow-none opacity-0 transition-opacity group-hover/btn:opacity-100 z-10">
               {copied === `model-${model.id}` ? translate("Copied!") : translate("Copy")}
             </span>
           </div>
 
           {isFree && (
-            <span className="h-4 px-1.5 bg-primary/10 text-primary border-none rounded-none text-[9px] font-black uppercase tracking-widest flex items-center justify-center">FREE</span>
+            <span className="h-4 px-1.5 bg-primary/10 text-primary border-none text-[9px] font-black uppercase tracking-widest flex items-center justify-center">FREE</span>
           )}
 
           {isCustom && (
             <button
               type="button"
               onClick={onDeleteAlias}
-              className="rounded-none p-0.5 text-muted-foreground opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
+              className=" p-0.5 text-muted-foreground opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
               title={translate("Remove custom model")}
             >
               <X className="size-3.5" weight="bold" />

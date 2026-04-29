@@ -66,12 +66,12 @@ export default function FlowAnimation() {
             key={tool.id}
             className="flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity group"
           >
-            <div className="w-16 h-16 rounded-2xl bg-card border border-border/50 flex items-center justify-center overflow-hidden p-2 hover:border-primary/50 transition-all hover:scale-105">
+            <div className="w-16 h-16 bg-card border border-border/50 flex items-center justify-center overflow-hidden p-2 hover:border-primary/50 transition-all hover:scale-105">
               <ProviderIcon
                 src={tool.image}
                 alt={tool.name}
                 size={48}
-                className="object-contain rounded-xl max-w-[48px] max-h-[48px]"
+                className="object-contain max-w-[48px] max-h-[48px]"
                 fallbackText={tool.name.slice(0, 2).toUpperCase()}
               />
             </div>
@@ -154,7 +154,7 @@ export default function FlowAnimation() {
         {PROVIDERS.map((provider, idx) => (
           <div
             key={provider.id}
-            className={`px-4 py-2 rounded-lg ${provider.color} ${provider.textColor} flex items-center justify-center font-semibold text-xs transition-all cursor-help min-w-[140px] ${
+            className={`px-4 py-2 ${provider.color} ${provider.textColor} flex items-center justify-center font-semibold text-xs transition-all cursor-help min-w-[140px] ${
               activeFlow === idx ? "ring-2 ring-primary/50 scale-110" : ""
             }`}
             title={provider.name}
@@ -165,7 +165,7 @@ export default function FlowAnimation() {
       </div>
 
       {/* Mobile fallback */}
-      <div className="md:hidden mt-8 w-full p-4 rounded-lg bg-card border border-border/50">
+      <div className="md:hidden mt-8 w-full p-4 bg-card border border-border/50">
         <p className="text-sm text-center text-muted-foreground">
           Interactive diagram visible on desktop
         </p>

@@ -33,14 +33,14 @@ export function LocalModeSection({ machineId, theme, setTheme, dbLoading, import
 
         <div className="space-y-2">
           <Label>{translate("Theme")}</Label>
-          <div className="inline-flex w-full flex-wrap gap-2 rounded-md border p-2 sm:w-auto">
+          <div className="inline-flex w-full flex-wrap gap-2 border p-2 sm:w-auto">
             {["light", "dark", "system"].map((option) => (
               <button
                 key={option}
                 type="button"
                 onClick={() => setTheme(option)}
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+                  "inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors",
                   theme === option ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
                 )}
               >

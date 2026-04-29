@@ -89,7 +89,7 @@ export default function QuotaProgressBar({
  {!unlimited && (
  <Progress 
  value={remaining} 
- className="h-1 bg-muted/40 rounded-none"
+ className="h-1 bg-muted/40"
  indicatorClassName={cn(
  "transition-all duration-700 ease-out",
  isCritical ? "bg-destructive" : isLow ? "bg-amber-500" : "bg-primary"

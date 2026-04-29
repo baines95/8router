@@ -115,9 +115,9 @@ export default function Features() {
           {FEATURES.map((feature) => (
             <div 
               key={feature.title}
-              className={`p-6 rounded-xl bg-card border border-border/50 ${feature.colors.border} ${feature.colors.bg} transition-all duration-300 group`}
+              className={`p-6 bg-card border border-border/50 ${feature.colors.border} ${feature.colors.bg} transition-all duration-300 group`}
             >
-              <div className={`w-10 h-10 rounded-lg ${feature.colors.iconBg} flex items-center justify-center mb-4 ${feature.colors.iconText} group-hover:scale-110 transition-transform duration-300`}>
+              <div className={`w-10 h-10 ${feature.colors.iconBg} flex items-center justify-center mb-4 ${feature.colors.iconText} group-hover:scale-110 transition-transform duration-300`}>
                 <span className="material-symbols-outlined">{feature.icon}</span>
               </div>
               <h3 className={`text-lg font-semibold mb-2 text-foreground ${feature.colors.titleHover} transition-colors`}>

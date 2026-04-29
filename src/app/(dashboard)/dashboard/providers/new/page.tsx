@@ -117,13 +117,13 @@ export default function NewProviderPage() {
 
       {/* Filter Bar */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-        <div className="flex items-center gap-1 bg-muted/30 p-1 border border-border/50 rounded-xl w-full md:w-auto">
+        <div className="flex items-center gap-1 bg-muted/30 p-1 border border-border/50 w-full md:w-auto">
           {["all", "oauth", "apikey", "free"].map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedProviderCategory(cat)}
               className={cn(
-                "px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-all shrink-0",
+                "px-4 py-1.5 text-xs font-bold uppercase tracking-widest transition-all shrink-0",
                 selectedCategory === cat
                   ? "bg-background text-foreground shadow-sm border border-border/50"
                   : "text-muted-foreground hover:text-foreground"
@@ -140,7 +140,7 @@ export default function NewProviderPage() {
             placeholder="Search templates..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 h-10 text-sm bg-muted/10 border-border/40 focus:bg-background transition-all rounded-xl"
+            className="pl-10 h-10 text-sm bg-muted/10 border-border/40 focus:bg-background transition-all"
           />
         </div>
       </div>
@@ -153,10 +153,10 @@ export default function NewProviderPage() {
             href={`/dashboard/providers/${provider.id}`}
             className="group"
           >
-            <Card className="h-full border-border/50 bg-muted/5 hover:bg-muted/10 transition-all duration-300 rounded-2xl shadow-none hover:shadow-xl hover:shadow-primary/5 hover:border-primary/30 overflow-hidden flex flex-col">
+            <Card className="h-full border-border/50 bg-muted/5 hover:bg-muted/10 transition-all duration-300 shadow-none hover:shadow-xl hover:shadow-primary/5 hover:border-primary/30 overflow-hidden flex flex-col">
               <CardHeader className="p-5 pb-2">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="size-12 rounded-2xl bg-background border border-border/50 flex items-center justify-center p-2.5 group-hover:scale-110 transition-transform duration-300 shadow-none">
+                  <div className="size-12 bg-background border border-border/50 flex items-center justify-center p-2.5 group-hover:scale-110 transition-transform duration-300 shadow-none">
                     <img 
                       src={`/providers/${provider.id}.png`} 
                       alt={provider.name} 
@@ -195,9 +195,9 @@ export default function NewProviderPage() {
         {/* Custom Endpoint Slot */}
         <button 
           onClick={() => router.push("/dashboard/providers")} // Or a special custom modal
-          className="group relative h-full border-2 border-dashed border-border/40 bg-muted/5 hover:bg-muted/10 hover:border-primary/40 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center p-8 gap-4 text-center"
+          className="group relative h-full border-2 border-dashed border-border/40 bg-muted/5 hover:bg-muted/10 hover:border-primary/40 transition-all duration-300 flex flex-col items-center justify-center p-8 gap-4 text-center"
         >
-          <div className="size-16 rounded-3xl bg-background border border-dashed border-border/60 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+          <div className="size-16 bg-background border border-dashed border-border/60 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
             <Plus className="size-8 text-muted-foreground group-hover:text-primary" weight="bold" />
           </div>
           <div className="space-y-1">

@@ -129,7 +129,7 @@ export default function AddApiKeyModal({
  if (!open) onClose();
  }}
  >
- <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg rounded-none border-border/50 shadow-none">
+ <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg border-border/50 shadow-none">
  <DialogHeader>
  <DialogTitle className="text-lg font-semibold tracking-tight">{translate("Add")} {providerName || provider} API Key</DialogTitle>
  </DialogHeader>
@@ -145,7 +145,7 @@ export default function AddApiKeyModal({
  setFormData({ ...formData, name: e.target.value })
  }
  placeholder="Production Key"
- className="rounded-none border-border/50 bg-muted/5 h-9 text-sm"
+ className=" border-border/50 bg-muted/5 h-9 text-sm"
  />
  </div>
  <div className="flex gap-2">
@@ -160,7 +160,7 @@ export default function AddApiKeyModal({
  onChange={(e) =>
  setFormData({ ...formData, apiKey: e.target.value })
  }
- className="rounded-none border-border/50 bg-muted/5 h-9 text-sm"
+ className=" border-border/50 bg-muted/5 h-9 text-sm"
  />
  </div>
  <div className="flex items-end">
@@ -169,7 +169,7 @@ export default function AddApiKeyModal({
  variant="secondary"
  onClick={handleValidate}
  disabled={!formData.apiKey || validating || saving}
- className="h-9 rounded-none px-3 text-xs font-bold uppercase tracking-wider"
+ className="h-9 px-3 text-xs font-bold uppercase tracking-wider"
  >
  {validating ? <Spinner className="size-3.5" /> : translate("Check")}
  </Button>
@@ -177,11 +177,11 @@ export default function AddApiKeyModal({
  </div>
  {validationResult &&
  (validationResult ==="success"? (
- <Badge className="border-primary/20 bg-primary/10 text-primary dark:text-primary rounded-none h-5 px-1.5 text-[10px] font-bold uppercase tracking-wider border-none">
+ <Badge className="border-primary/20 bg-primary/10 text-primary dark:text-primary h-5 px-1.5 text-[10px] font-bold uppercase tracking-wider border-none">
  {translate("Valid")}
  </Badge>
  ) : (
- <Badge variant="destructive" className="rounded-none h-5 px-1.5 text-[10px] font-bold uppercase tracking-wider border-none">
+ <Badge variant="destructive" className=" h-5 px-1.5 text-[10px] font-bold uppercase tracking-wider border-none">
  {translate("Invalid")}
  </Badge>
  ))}
@@ -206,7 +206,7 @@ export default function AddApiKeyModal({
  priority: Number.parseInt(e.target.value, 10) || 1,
  })
  }
- className="rounded-none border-border/50 bg-muted/5 tabular-nums h-9 text-sm"
+ className=" border-border/50 bg-muted/5 tabular-nums h-9 text-sm"
  />
  </div>
  <div className="flex flex-col gap-2">
@@ -219,12 +219,12 @@ export default function AddApiKeyModal({
  setFormData({ ...formData, proxyPoolId: v as string })
  }
  >
- <SelectTrigger className="w-full rounded-none border-border/50 bg-muted/5 h-9 text-xs shadow-none">
+ <SelectTrigger className="w-full border-border/50 bg-muted/5 h-9 text-xs shadow-none">
  <SelectValue placeholder="None"/>
  </SelectTrigger>
- <SelectContent className="rounded-none shadow-none border-border/50">
+ <SelectContent className=" shadow-none border-border/50">
  {proxyOptions.map((opt) => (
- <SelectItem key={opt.value} value={opt.value} className="rounded-none text-xs font-medium">
+ <SelectItem key={opt.value} value={opt.value} className=" text-xs font-medium">
  {opt.label}
  </SelectItem>
  ))}
@@ -239,7 +239,7 @@ export default function AddApiKeyModal({
  <div className="flex gap-2 pt-2">
  <Button
  type="button"
- className="flex-1 rounded-none h-9 text-xs font-bold uppercase tracking-wider"
+ className="flex-1 h-9 text-xs font-bold uppercase tracking-wider"
  onClick={handleSubmit}
  disabled={!formData.name || !formData.apiKey || saving}
  >
@@ -248,7 +248,7 @@ export default function AddApiKeyModal({
  <Button
  type="button"
  variant="secondary"
- className="flex-1 rounded-none h-9 text-xs font-bold uppercase tracking-wider"
+ className="flex-1 h-9 text-xs font-bold uppercase tracking-wider"
  onClick={onClose}
  >
  {translate("Cancel")}

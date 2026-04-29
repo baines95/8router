@@ -145,7 +145,7 @@ export default function ModelSelectModal({ isOpen, onClose, onSelect, selectedMo
           <DialogTitle className="text-lg font-semibold tracking-tight">{title}</DialogTitle>
           <div className="relative mt-4">
              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground opacity-50" />
-             <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search infrastructure models..." className="pl-9 h-10 rounded-xl bg-muted/10 border-border/40 focus-visible:bg-background transition-all shadow-none" />
+             <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search infrastructure models..." className="pl-9 h-10 bg-muted/10 border-border/40 focus-visible:bg-background transition-all shadow-none" />
           </div>
         </DialogHeader>
 
@@ -176,7 +176,7 @@ export default function ModelSelectModal({ isOpen, onClose, onSelect, selectedMo
                        <button key={m.id} onClick={() => { onSelect(m); onClose(); }} className={cn("px-3 py-1.5 rounded-full text-xs font-bold border transition-all flex items-center gap-2 shadow-none", selectedModel === m.value ? "bg-primary text-primary-foreground border-primary" : "bg-muted/10 border-border/40 hover:border-primary/30")}>
                           {m.isPlaceholder && <Edit2 className="size-3 opacity-50" />}
                           {m.name}
-                          {m.isCustom && <Badge variant="outline" className="h-3.5 px-1 text-[10px] border-primary/20 text-primary font-bold uppercase rounded-none">CUSTOM</Badge>}
+                          {m.isCustom && <Badge variant="outline" className="h-3.5 px-1 text-[10px] border-primary/20 text-primary font-bold uppercase">CUSTOM</Badge>}
                           {selectedModel === m.value && <Check className="size-3" />}
                        </button>
                     ))}

@@ -40,14 +40,7 @@ export default function MitmPageClient() {
  const [expandedTool, setExpandedTool] = useState<string | null>(null);
  const [mitmStatus, setMitmStatus] = useState<MitmStatus>({ running: false, certExists: false, dnsStatus: {}, hasCachedPassword: false });
 
- useEffect(() => {
- fetchConnections();
- fetchApiKeys();
- fetchAliases();
- fetchCloudSettings();
- }, []);
-
- const fetchConnections = async () => {
+ async function fetchConnections() {
  try {
  const res = await fetch("/api/providers");
  if (res.ok) {
@@ -55,9 +48,9 @@ export default function MitmPageClient() {
  setConnections(data.connections || []);
  }
  } catch { /* ignore */ }
- };
+ }
 
- const fetchApiKeys = async () => {
+ async function fetchApiKeys() {
  try {
  const res = await fetch("/api/keys");
  if (res.ok) {
@@ -65,9 +58,9 @@ export default function MitmPageClient() {
  setApiKeys(data.keys || []);
  }
  } catch { /* ignore */ }
- };
+ }
 
- const fetchAliases = async () => {
+ async function fetchAliases() {
  try {
  const res = await fetch("/api/models/alias");
  if (res.ok) {
@@ -75,9 +68,9 @@ export default function MitmPageClient() {
  setModelAliases(data.aliases || {});
  }
  } catch { /* ignore */ }
- };
+ }
 
- const fetchCloudSettings = async () => {
+ async function fetchCloudSettings() {
  try {
  const res = await fetch("/api/settings");
  if (res.ok) {
@@ -85,7 +78,18 @@ export default function MitmPageClient() {
  setCloudEnabled(data.cloudEnabled || false);
  }
  } catch { /* ignore */ }
- };
+ }
+
+ useEffect(() => {
+ void (async () => {
+ await Promise.all([
+ fetchConnections(),
+ fetchApiKeys(),
+ fetchAliases(),
+ fetchCloudSettings(),
+ ]);
+ })();
+ }, []);
 
  const getActiveProviders = () => connections.filter(c => c.isActive !== false);
 

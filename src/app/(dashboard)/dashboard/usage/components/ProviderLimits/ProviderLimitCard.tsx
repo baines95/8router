@@ -73,13 +73,13 @@ export default function ProviderLimitCard({
  const planVariant = planVariants[plan?.toLowerCase() || ""] || "default";
 
  return (
- <Card className="flex flex-col gap-4 p-4 border-border/50 bg-background/50 rounded-none shadow-none h-full">
+ <Card className="flex flex-col gap-4 p-4 border-border/50 bg-background/50 shadow-none h-full">
  {/* Header */}
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-3">
  {/* Provider Logo */}
  <div
- className="size-9 rounded-none flex items-center justify-center p-1.5 border border-border/50"
+ className="size-9 flex items-center justify-center p-1.5 border border-border/50"
  style={{ backgroundColor: `${providerColor}15` }}
  >
  <ProviderIcon
@@ -99,7 +99,7 @@ export default function ProviderLimitCard({
  {plan && (
  <Badge
  variant={planVariant}
- className="h-4 px-1 text-[9px] font-bold uppercase border-none bg-muted/40 rounded-none"
+ className="h-4 px-1 text-[9px] font-bold uppercase border-none bg-muted/40"
  >
  {plan}
  </Badge>
@@ -111,7 +111,7 @@ export default function ProviderLimitCard({
  <button
  onClick={handleRefresh}
  disabled={refreshing || loading}
- className="p-1.5 rounded-none hover:bg-muted/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-border/50"
+ className="p-1.5 hover:bg-muted/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-border/50"
  title="Refresh quota"
  >
  <RefreshCw className={`size-3.5 text-muted-foreground ${refreshing || loading ? "animate-spin" : ""}`} weight="bold" />
@@ -123,19 +123,19 @@ export default function ProviderLimitCard({
  {loading && (
  <div className="space-y-4 py-4 animate-pulse">
  <div className="space-y-2">
- <div className="h-3 bg-muted/40 rounded-none w-1/3"/>
- <div className="h-1.5 bg-muted/40 rounded-none w-full"/>
+ <div className="h-3 bg-muted/40 w-1/3"/>
+ <div className="h-1.5 bg-muted/40 w-full"/>
  </div>
  <div className="space-y-2">
- <div className="h-3 bg-muted/40 rounded-none w-1/4"/>
- <div className="h-1.5 bg-muted/40 rounded-none w-full"/>
+ <div className="h-3 bg-muted/40 w-1/4"/>
+ <div className="h-1.5 bg-muted/40 w-full"/>
  </div>
  </div>
  )}
 
  {/* Error State */}
  {!loading && error && (
- <div className="p-3 rounded-none bg-destructive/10 border border-destructive/20 mt-2">
+ <div className="p-3 bg-destructive/10 border border-destructive/20 mt-2">
  <div className="flex items-start gap-2">
  <AlertCircle className="size-4 text-destructive mt-0.5" weight="bold" />
  <p className="text-[10px] font-bold uppercase tracking-wide text-destructive leading-relaxed">{error}</p>
@@ -145,7 +145,7 @@ export default function ProviderLimitCard({
 
  {/* Info Message (for providers without API) */}
  {!loading && !error && message && (
- <div className="p-3 rounded-none bg-primary/10 border border-primary/20 mt-2">
+ <div className="p-3 bg-primary/10 border border-primary/20 mt-2">
  <div className="flex items-start gap-2">
  <Info className="size-4 text-primary mt-0.5" weight="bold" />
  <p className="text-[10px] font-bold uppercase tracking-wide text-primary leading-relaxed">

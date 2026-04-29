@@ -84,7 +84,7 @@ export default function DefaultToolCard({
  <select
  value={selectedApiKey}
  onChange={(e) => setSelectedApiKey(e.target.value)}
- className="flex-1 h-9 px-3 bg-muted/5 border border-border/50 rounded-none text-xs font-bold focus:outline-none focus:border-primary/50 transition-colors"
+ className="flex-1 h-9 px-3 bg-muted/5 border border-border/50 text-xs font-bold focus:outline-none focus:border-primary/50 transition-colors"
  >
  {apiKeys.map((key) => (
  <option key={key.id} value={key.key}>{key.key}</option>
@@ -94,13 +94,13 @@ export default function DefaultToolCard({
  variant="outline"
  size="icon"
  onClick={() => handleCopy(selectedApiKey, "apiKey")}
- className="shrink-0 h-9 w-9 rounded-none border-border/50 bg-muted/5"
+ className="shrink-0 h-9 w-9 border-border/50 bg-muted/5"
  >
  {copiedField === "apiKey" ? <Check className="size-4 text-primary" weight="bold" /> : <Copy className="size-4" weight="bold" />}
  </Button>
  </>
  ) : (
- <div className="h-9 flex items-center px-3 bg-muted/10 border border-border/50 border-dashed rounded-none text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 w-full">
+ <div className="h-9 flex items-center px-3 bg-muted/10 border border-border/50 border-dashed text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 w-full">
  {cloudEnabled ? translate("NO ACTIVE KEYS") : "sk_8router (INTERNAL)"}
  </div>
  )}
@@ -115,14 +115,14 @@ export default function DefaultToolCard({
  value={modelValue}
  onChange={(e) => setModelValue(e.target.value)}
  placeholder="provider/model-id"
- className="h-9 text-xs rounded-none border-border/50 bg-muted/5 focus-visible:ring-0 focus-visible:border-primary/50 transition-colors flex-1"
+ className="h-9 text-xs border-border/50 bg-muted/5 focus-visible:ring-0 focus-visible:border-primary/50 transition-colors flex-1"
  />
  <Button
  variant="outline"
  size="sm"
  onClick={() => setShowModelModal(true)}
  disabled={!hasActiveProviders}
- className="h-9 px-3 text-[10px] font-bold uppercase tracking-widest rounded-none border-border/50 bg-muted/5 hover:bg-muted/10 transition-colors"
+ className="h-9 px-3 text-[10px] font-bold uppercase tracking-widest border-border/50 bg-muted/5 hover:bg-muted/10 transition-colors"
  >
  {translate("Map Intelligence")}
  </Button>
@@ -132,7 +132,7 @@ export default function DefaultToolCard({
  variant="outline"
  size="icon"
  onClick={() => handleCopy(modelValue, "model")}
- className="shrink-0 h-9 w-9 rounded-none border-border/50 bg-muted/5"
+ className="shrink-0 h-9 w-9 border-border/50 bg-muted/5"
  >
  {copiedField === "model" ? <Check className="size-4 text-primary" weight="bold" /> : <Copy className="size-4" weight="bold" />}
  </Button>
@@ -140,7 +140,7 @@ export default function DefaultToolCard({
  variant="ghost"
  size="icon"
  onClick={() => setModelValue("")}
- className="h-9 w-9 rounded-none text-muted-foreground hover:text-destructive transition-colors border border-border/50 bg-muted/5"
+ className="h-9 w-9 text-muted-foreground hover:text-destructive transition-colors border border-border/50 bg-muted/5"
  >
  <X className="size-4" weight="bold" />
  </Button>
@@ -165,7 +165,7 @@ export default function DefaultToolCard({
  <div 
  key={index} 
  className={cn(
- "flex items-start gap-3 p-4 rounded-none border",
+ "flex items-start gap-3 p-4 border",
  isWarning ? "bg-muted/30 border-border/50 text-muted-foreground dark:text-muted-foreground":
  isError ? "bg-destructive/5 border-destructive/20 text-destructive":
  "bg-primary/10 border-primary/20 text-primary dark:text-primary"
@@ -197,7 +197,7 @@ export default function DefaultToolCard({
  {canShowGuide() && tool.guideSteps.map((item: any) => (
  <div key={item.step} className="flex items-start gap-4">
  <div 
- className="size-8 rounded-none border border-border/50 bg-muted/10 flex items-center justify-center shrink-0 text-xs font-bold tabular-nums text-foreground"
+ className="size-8 border border-border/50 bg-muted/10 flex items-center justify-center shrink-0 text-xs font-bold tabular-nums text-foreground"
  >
  {item.step}
  </div>
@@ -208,7 +208,7 @@ export default function DefaultToolCard({
  {item.type === "modelSelector" && renderModelSelector()}
  {item.value && (
  <div className="flex items-center gap-2">
- <code className="flex-1 px-3 py-2 bg-muted/30 rounded-none text-[11px] font-mono border border-border/50 truncate text-foreground/70">
+ <code className="flex-1 px-3 py-2 bg-muted/30 text-[11px] font-mono border border-border/50 truncate text-foreground/70">
  {replaceVars(item.value)}
  </code>
  {item.copyable && (
@@ -216,7 +216,7 @@ export default function DefaultToolCard({
  variant="outline"
  size="icon"
  onClick={() => handleCopy(item.value, `${item.step}-${item.title}`)}
- className="shrink-0 h-8 w-8 rounded-none border-border/50 bg-muted/5"
+ className="shrink-0 h-8 w-8 border-border/50 bg-muted/5"
  >
  {copiedField === `${item.step}-${item.title}` ? <Check className="size-3.5 text-primary" weight="bold" /> : <Copy className="size-3.5" weight="bold" />}
  </Button>
@@ -243,7 +243,7 @@ export default function DefaultToolCard({
  {copiedField === "codeblock" ? translate("Copied") : translate("Copy Manifest")}
  </Button>
  </div>
- <pre className="p-4 bg-muted/30 rounded-none border border-border/50 overflow-x-auto shadow-none">
+ <pre className="p-4 bg-muted/30 border border-border/50 overflow-x-auto shadow-none">
  <code className="text-[11px] font-mono whitespace-pre text-foreground/70 leading-relaxed">
  {replaceVars(tool.codeBlock.code)}
  </code>

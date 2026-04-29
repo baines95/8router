@@ -15,7 +15,7 @@ interface StatCardProps {
 
 function StatCard({ label, value, valueClass }: StatCardProps) {
  return (
- <Card className="border-border/50 bg-background/50 shadow-none hover:bg-muted/10 transition-colors rounded-none">
+ <Card className="border-border/50 bg-background/50 shadow-none hover:bg-muted/10 transition-colors">
  <CardHeader className="p-3 pb-2 border-b border-border/50 bg-muted/10">
  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">
  {label}

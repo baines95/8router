@@ -19,7 +19,7 @@ export default function Tooltip({ text, children, position = "top" }: TooltipPro
   return (
     <ShadcnTooltip>
       <TooltipTrigger render={children} />
-      <TooltipContent side={position} className="bg-muted-foreground text-background border-none text-[10px] px-2 py-1 font-bold uppercase tracking-widest rounded-none shadow-none">
+      <TooltipContent side={position} className="bg-muted-foreground text-background border-none text-[10px] px-2 py-1 font-bold uppercase tracking-widest shadow-none">
         <p>{text}</p>
       </TooltipContent>
     </ShadcnTooltip>

@@ -130,7 +130,7 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
             {/* AWS Builder ID */}
             <button
               onClick={() => onMethodSelect("builder-id")}
-              className="w-full p-4 text-left border border-border/50 rounded-lg bg-muted/5 hover:bg-muted/10 transition-colors group"
+              className="w-full p-4 text-left border border-border/50 bg-muted/5 hover:bg-muted/10 transition-colors group"
             >
               <div className="flex items-start gap-3">
                 <ShieldCheck className="size-5 text-primary mt-0.5 group-hover:scale-110 transition-transform" weight="bold" />
@@ -146,7 +146,7 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
             {/* AWS IAM Identity Center (IDC) */}
             <button
               onClick={() => handleMethodSelect("idc")}
-              className="w-full p-4 text-left border border-border/50 rounded-lg bg-muted/5 hover:bg-muted/10 transition-colors group"
+              className="w-full p-4 text-left border border-border/50 bg-muted/5 hover:bg-muted/10 transition-colors group"
             >
               <div className="flex items-start gap-3">
                 <Business className="size-5 text-primary mt-0.5 group-hover:scale-110 transition-transform" weight="bold" />
@@ -162,7 +162,7 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
             {/* Google Social Login - HIDDEN */}
             <button
               onClick={() => handleMethodSelect("social-google")}
-              className="hidden w-full p-4 text-left border border-border/50 rounded-lg bg-muted/5 hover:bg-muted/10 transition-colors group"
+              className="hidden w-full p-4 text-left border border-border/50 bg-muted/5 hover:bg-muted/10 transition-colors group"
             >
               <div className="flex items-start gap-3">
                 <AccountCircle className="size-5 text-primary mt-0.5" weight="bold" />
@@ -178,7 +178,7 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
             {/* GitHub Social Login - HIDDEN */}
             <button
               onClick={() => handleMethodSelect("social-github")}
-              className="hidden w-full p-4 text-left border border-border/50 rounded-lg bg-muted/5 hover:bg-muted/10 transition-colors group"
+              className="hidden w-full p-4 text-left border border-border/50 bg-muted/5 hover:bg-muted/10 transition-colors group"
             >
               <div className="flex items-start gap-3">
                 <Code className="size-5 text-primary mt-0.5" weight="bold" />
@@ -194,7 +194,7 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
             {/* Import Token */}
             <button
               onClick={() => handleMethodSelect("import")}
-              className="w-full p-4 text-left border border-border/50 rounded-lg bg-muted/5 hover:bg-muted/10 transition-colors group"
+              className="w-full p-4 text-left border border-border/50 bg-muted/5 hover:bg-muted/10 transition-colors group"
             >
               <div className="flex items-start gap-3">
                 <FileUpload className="size-5 text-primary mt-0.5 group-hover:scale-110 transition-transform" weight="bold" />
@@ -240,7 +240,7 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
             </div>
 
             {error && (
-              <div className="bg-destructive/10 p-3 rounded-lg border border-destructive/20 flex items-center gap-2">
+              <div className="bg-destructive/10 p-3 border border-destructive/20 flex items-center gap-2">
                 <WarningCircle className="size-4 text-destructive" weight="bold" />
                 <p className="text-xs font-medium text-destructive">{translate(error)}</p>
               </div>
@@ -271,7 +271,7 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
               <>
                 {/* Success message if auto-detected */}
                 {autoDetected && (
-                  <div className="bg-primary/10 p-3 rounded-lg border border-primary/20 flex items-center gap-2">
+                  <div className="bg-primary/10 p-3 border border-primary/20 flex items-center gap-2">
                     <CheckCircle className="size-4 text-primary" weight="bold" />
                     <p className="text-xs font-medium text-primary">
                       {translate("Token auto-detected from Kiro IDE successfully!")}
@@ -281,7 +281,7 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
 
                 {/* Info message if not auto-detected */}
                 {!autoDetected && !error && (
-                  <div className="bg-muted/10 p-3 rounded-lg border border-border/50 flex items-center gap-2">
+                  <div className="bg-muted/10 p-3 border border-border/50 flex items-center gap-2">
                     <Info className="size-4 text-muted-foreground" weight="bold" />
                     <p className="text-xs font-medium text-muted-foreground">
                       {translate("Kiro IDE not detected. Please paste your refresh token manually.")}
@@ -302,7 +302,7 @@ export default function KiroAuthModal({ isOpen, onMethodSelect, onClose }: KiroA
                 </div>
 
                 {error && (
-                  <div className="bg-destructive/10 p-3 rounded-lg border border-destructive/20 flex items-center gap-2">
+                  <div className="bg-destructive/10 p-3 border border-destructive/20 flex items-center gap-2">
                     <WarningCircle className="size-4 text-destructive" weight="bold" />
                     <p className="text-xs font-medium text-destructive">{translate(error)}</p>
                   </div>

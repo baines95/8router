@@ -230,7 +230,7 @@ export default function ClaudeToolCard({
  <div className="space-y-6">
  {/* Installation Notice */}
  {!claudeStatus?.installed && (
- <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex items-start gap-3">
+ <div className="bg-amber-500/10 border border-amber-500/20 p-4 flex items-start gap-3">
  <ShieldAlert className="size-5 text-amber-500 shrink-0 mt-0.5" weight="bold" />
  <div className="space-y-1">
  <p className="text-xs font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest">{translate("Claude Code not detected")}</p>
@@ -250,12 +250,12 @@ export default function ClaudeToolCard({
  )}
 
  {showInstallGuide && (
- <div className="space-y-3 bg-muted/20 p-4 rounded-xl border border-border/40">
+ <div className="space-y-3 bg-muted/20 p-4 border border-border/40">
  <p className="text-xs font-bold text-foreground flex items-center gap-2">
  <BookOpen className="size-4" weight="bold" />
  {translate("How to install Claude Code:")}
  </p>
- <code className="block p-3 bg-background rounded-lg border border-border/50 text-[11px] font-mono text-primary">
+ <code className="block p-3 bg-background border border-border/50 text-[11px] font-mono text-primary">
  npm install -g @anthropic-ai/claude-code
  </code>
  <p className="text-[10px] text-muted-foreground font-medium italic">{translate("After installing, run `claude` once to initialize settings.")}</p>
@@ -277,10 +277,10 @@ export default function ClaudeToolCard({
  value={getDisplayUrl()} 
  onChange={(e) => setCustomBaseUrl(e.target.value)} 
  placeholder="http://localhost:20128"
- className="h-9 text-xs rounded-none border-border/50 bg-muted/5 focus-visible:ring-0 focus-visible:border-primary/50 transition-colors"
+ className="h-9 text-xs border-border/50 bg-muted/5 focus-visible:ring-0 focus-visible:border-primary/50 transition-colors"
  />
  {customBaseUrl && customBaseUrl !== getLocalBaseUrl() && (
- <Button variant="ghost" size="icon" onClick={() => setCustomBaseUrl("")} className="size-9 text-muted-foreground hover:text-primary transition-colors border border-border/50 rounded-none bg-muted/5">
+ <Button variant="ghost" size="icon" onClick={() => setCustomBaseUrl("")} className="size-9 text-muted-foreground hover:text-primary transition-colors border border-border/50 bg-muted/5">
  <RotateCcw className="size-3.5" weight="bold" />
  </Button>
  )}
@@ -297,14 +297,14 @@ export default function ClaudeToolCard({
  <select 
  value={selectedApiKey} 
  onChange={(e) => setSelectedApiKey(e.target.value)} 
- className="w-full h-9 px-3 bg-muted/5 border border-border/50 rounded-none text-xs font-bold focus:outline-none focus:border-primary/50 transition-colors"
+ className="w-full h-9 px-3 bg-muted/5 border border-border/50 text-xs font-bold focus:outline-none focus:border-primary/50 transition-colors"
  >
  {apiKeys.map((key) => (
  <option key={key.id} value={key.key}>{key.key}</option>
  ))}
  </select>
  ) : (
- <div className="h-9 flex items-center px-3 bg-muted/10 border border-border/50 border-dashed rounded-none text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
+ <div className="h-9 flex items-center px-3 bg-muted/10 border border-border/50 border-dashed text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
  {cloudEnabled ? translate("NO ACTIVE KEYS") : "sk_8router (INTERNAL)"}
  </div>
  )}
@@ -312,7 +312,7 @@ export default function ClaudeToolCard({
 
  {/* Filter Logic Toggle */}
  <div className="space-y-2">
- <div className="flex items-center justify-between p-3 bg-muted/5 border border-border/50 rounded-none h-9">
+ <div className="flex items-center justify-between p-3 bg-muted/5 border border-border/50 h-9">
  <div className="flex items-center gap-2">
  <Search className="size-3.5 text-muted-foreground" weight="bold" />
  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">{translate("Intelligent Mapping")}</span>
@@ -340,19 +340,19 @@ export default function ClaudeToolCard({
  value={modelMappings[model.alias] || ""} 
  onChange={(e) => onModelMappingChange(model.alias, e.target.value)} 
  placeholder="provider/model-id"
- className="h-9 text-xs rounded-none border-border/50 bg-muted/5 focus-visible:ring-0 focus-visible:border-primary/50 transition-colors flex-1"
+ className="h-9 text-xs border-border/50 bg-muted/5 focus-visible:ring-0 focus-visible:border-primary/50 transition-colors flex-1"
  />
  <Button 
  variant="outline" 
  size="sm" 
  onClick={() => { setCurrentEditingAlias(model.alias); setModalOpen(true); }} 
  disabled={!hasActiveProviders}
- className="h-9 px-3 text-[10px] font-bold uppercase tracking-widest rounded-none border-border/50 bg-muted/5 hover:bg-muted/10 transition-colors"
+ className="h-9 px-3 text-[10px] font-bold uppercase tracking-widest border-border/50 bg-muted/5 hover:bg-muted/10 transition-colors"
  >
  {translate("Map")}
  </Button>
  {modelMappings[model.alias] && (
- <Button variant="ghost" size="icon" onClick={() => onModelMappingChange(model.alias, "")} className="size-9 rounded-none text-muted-foreground hover:text-destructive transition-colors border border-border/50 bg-muted/5">
+ <Button variant="ghost" size="icon" onClick={() => onModelMappingChange(model.alias, "")} className="size-9 text-muted-foreground hover:text-destructive transition-colors border border-border/50 bg-muted/5">
  <X className="size-4" weight="bold" />
  </Button>
  )}

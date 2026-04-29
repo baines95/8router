@@ -48,18 +48,18 @@ export default function NineRemotePromoModal({ isOpen, onClose }: NineRemoteProm
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200 flex flex-col bg-background border border-border/50">
+      <div className="relative w-full max-w-sm overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200 flex flex-col bg-background border border-border/50">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-border/50 bg-muted/5">
           <div className="flex items-center gap-3">
-            <div className="size-7 rounded-lg flex items-center justify-center bg-[#FF570A] text-white">
+            <div className="size-7 flex items-center justify-center bg-[#FF570A] text-white">
               <Terminal className="size-4" weight="bold" />
             </div>
             <span className="font-mono text-xs font-medium text-[#FF570A]">9Remote</span>
           </div>
           <button
             onClick={onClose}
-            className="size-7 flex items-center justify-center rounded-lg bg-muted/20 border border-border/50 text-muted-foreground hover:text-foreground transition-colors"
+            className="size-7 flex items-center justify-center bg-muted/20 border border-border/50 text-muted-foreground hover:text-foreground transition-colors"
           >
             <X className="size-4" weight="bold" />
           </button>
@@ -70,7 +70,7 @@ export default function NineRemotePromoModal({ isOpen, onClose }: NineRemoteProm
           {/* Hero */}
           <div className="flex flex-col items-center gap-2 text-center mt-2">
             <div
-              className="size-14 rounded-2xl flex items-center justify-center mb-1 bg-[#FF570A] shadow-[0_8px_32px_rgba(255,87,10,0.35)]"
+              className="size-14 flex items-center justify-center mb-1 bg-[#FF570A] shadow-[0_8px_32px_rgba(255,87,10,0.35)]"
             >
               <Terminal className="size-8 text-white" weight="bold" />
             </div>
@@ -83,7 +83,7 @@ export default function NineRemotePromoModal({ isOpen, onClose }: NineRemoteProm
           {/* Feature cards */}
           <div className="flex gap-2 w-full">
             {FEATURES.map(({ icon: Icon, label, desc }) => (
-              <div key={label} className="flex-1 flex flex-col items-center gap-1.5 py-4 px-1 rounded-xl border border-border/50 bg-muted/5">
+              <div key={label} className="flex-1 flex flex-col items-center gap-1.5 py-4 px-1 border border-border/50 bg-muted/5">
                 <Icon className="size-6 text-[#ff6e33]" weight="bold" />
                 <p className="text-xs font-medium text-foreground">{translate(label)}</p>
                 <p className="text-[10px] text-center leading-tight text-muted-foreground">{translate(desc)}</p>
@@ -104,7 +104,7 @@ export default function NineRemotePromoModal({ isOpen, onClose }: NineRemoteProm
           {/* CTA */}
           <button
             onClick={() => window.open(NINE_REMOTE_URL, "_blank")}
-            className="w-full py-3.5 flex items-center justify-center gap-2 rounded-xl bg-[#FF570A] text-xs font-medium text-white shadow-[0_4px_16px_rgba(255,87,10,0.35)] transition-all hover:opacity-90 active:scale-[0.98]"
+            className="w-full py-3.5 flex items-center justify-center gap-2 bg-[#FF570A] text-xs font-medium text-white shadow-[0_4px_16px_rgba(255,87,10,0.35)] transition-all hover:opacity-90 active:scale-[0.98]"
           >
             <ExternalLink className="size-4" weight="bold" />
             {translate("Get 9Remote")}

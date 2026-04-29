@@ -121,7 +121,7 @@ export default function GitLabAuthModal({ isOpen, providerInfo, onSuccess, onClo
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => setMode("oauth")}
-                className="flex flex-col items-center gap-3 p-5 rounded-lg border border-border/50 bg-muted/5 hover:border-primary/50 hover:bg-primary/5 transition-colors text-left group"
+                className="flex flex-col items-center gap-3 p-5 border border-border/50 bg-muted/5 hover:border-primary/50 hover:bg-primary/5 transition-colors text-left group"
               >
                 <LockOpen className="size-8 text-primary group-hover:scale-110 transition-transform" weight="bold" />
                 <div className="text-center">
@@ -131,7 +131,7 @@ export default function GitLabAuthModal({ isOpen, providerInfo, onSuccess, onClo
               </button>
               <button
                 onClick={() => setMode("pat")}
-                className="flex flex-col items-center gap-3 p-5 rounded-lg border border-border/50 bg-muted/5 hover:border-primary/50 hover:bg-primary/5 transition-colors text-left group"
+                className="flex flex-col items-center gap-3 p-5 border border-border/50 bg-muted/5 hover:border-primary/50 hover:bg-primary/5 transition-colors text-left group"
               >
                 <Key className="size-8 text-primary group-hover:scale-110 transition-transform" weight="bold" />
                 <div className="text-center">
@@ -152,26 +152,26 @@ export default function GitLabAuthModal({ isOpen, providerInfo, onSuccess, onClo
                 {translate("GitLab Applications")}
               </a>{" "}
               {translate("with redirect URI")} {" "}
-              <code className="bg-muted px-1 rounded-none font-mono text-[10px]">{getRedirectUri()}</code>
+              <code className="bg-muted px-1 font-mono text-[10px]">{getRedirectUri()}</code>
             </p>
             <div className="grid gap-2">
                <Label className="px-1 text-xs text-muted-foreground">{translate("GitLab Base URL")}</Label>
-               <Input value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)} placeholder={GITLAB_COM} className="rounded-none border-border/50 bg-muted/5 h-9 text-xs" />
+               <Input value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)} placeholder={GITLAB_COM} className=" border-border/50 bg-muted/5 h-9 text-xs" />
             </div>
             <div className="grid gap-2">
                <Label className="px-1 text-xs text-muted-foreground">{translate("Client ID")}</Label>
-               <Input value={clientId} onChange={(e) => setClientId(e.target.value)} placeholder={translate("Your application ID")} className="rounded-none border-border/50 bg-muted/5 h-9 text-xs" />
+               <Input value={clientId} onChange={(e) => setClientId(e.target.value)} placeholder={translate("Your application ID")} className=" border-border/50 bg-muted/5 h-9 text-xs" />
             </div>
             <div className="grid gap-2">
                <Label className="px-1 text-xs text-muted-foreground">{translate("Client Secret (optional)")}</Label>
-               <Input value={clientSecret} onChange={(e) => setClientSecret(e.target.value)} placeholder={translate("PKCE only")} className="rounded-none border-border/50 bg-muted/5 h-9 text-xs" />
+               <Input value={clientSecret} onChange={(e) => setClientSecret(e.target.value)} placeholder={translate("PKCE only")} className=" border-border/50 bg-muted/5 h-9 text-xs" />
             </div>
             {error && <p className="px-1 text-xs font-medium text-destructive">{translate(error)}</p>}
             <div className="flex gap-2 pt-2">
               <Button onClick={handleOAuthStart} className="flex-1 h-10 text-xs font-medium" disabled={!clientId.trim()}>
                 {translate("Authorize")}
               </Button>
-              <Button onClick={() => { setMode(null); setError(null); }} variant="ghost" className="flex-1 h-10 border border-border/50 rounded-none text-xs font-medium">
+              <Button onClick={() => { setMode(null); setError(null); }} variant="ghost" className="flex-1 h-10 border border-border/50 text-xs font-medium">
                 {translate("Back")}
               </Button>
             </div>
@@ -186,24 +186,24 @@ export default function GitLabAuthModal({ isOpen, providerInfo, onSuccess, onClo
               <a href={`${baseUrl.trim() || GITLAB_COM}/-/user_settings/personal_access_tokens`} target="_blank" rel="noreferrer" className="text-primary underline font-bold">
                 {translate("GitLab Access Tokens")}
               </a>{" "}
-              {translate("with scopes:")} <code className="bg-muted px-1 rounded-none font-mono text-[10px]">api</code>,{" "}
-              <code className="bg-muted px-1 rounded-none font-mono text-[10px]">read_user</code>, {translate("and")} {" "}
-              <code className="bg-muted px-1 rounded-none font-mono text-[10px]">ai_features</code>.
+              {translate("with scopes:")} <code className="bg-muted px-1 font-mono text-[10px]">api</code>,{" "}
+              <code className="bg-muted px-1 font-mono text-[10px]">read_user</code>, {translate("and")} {" "}
+              <code className="bg-muted px-1 font-mono text-[10px]">ai_features</code>.
             </p>
             <div className="grid gap-2">
                <Label className="px-1 text-xs text-muted-foreground">{translate("GitLab Base URL")}</Label>
-               <Input value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)} placeholder={GITLAB_COM} className="rounded-none border-border/50 bg-muted/5 h-9 text-xs" />
+               <Input value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)} placeholder={GITLAB_COM} className=" border-border/50 bg-muted/5 h-9 text-xs" />
             </div>
             <div className="grid gap-2">
                <Label className="px-1 text-xs text-muted-foreground">{translate("Personal Access Token")}</Label>
-               <Input value={pat} onChange={(e) => setPat(e.target.value)} placeholder={translate("glpat-xxxxxxxxxxxxxxxxxxxx")} type="password" className="rounded-none border-border/50 bg-muted/5 h-9 text-xs" />
+               <Input value={pat} onChange={(e) => setPat(e.target.value)} placeholder={translate("glpat-xxxxxxxxxxxxxxxxxxxx")} type="password" className=" border-border/50 bg-muted/5 h-9 text-xs" />
             </div>
             {error && <p className="px-1 text-xs font-medium text-destructive">{translate(error)}</p>}
             <div className="flex gap-2 pt-2">
               <Button onClick={handlePATSubmit} className="flex-1 h-10 text-xs font-medium" disabled={!pat.trim() || loading}>
                 {loading ? translate("Connecting...") : translate("Connect")}
               </Button>
-              <Button onClick={() => { setMode(null); setError(null); }} variant="ghost" className="flex-1 h-10 border border-border/50 rounded-none text-xs font-medium">
+              <Button onClick={() => { setMode(null); setError(null); }} variant="ghost" className="flex-1 h-10 border border-border/50 text-xs font-medium">
                 {translate("Back")}
               </Button>
             </div>

@@ -68,7 +68,7 @@ export default function Pagination({
               value={pageSize}
               onChange={(e) => onPageSizeChange(Number(e.target.value))}
               className={cn(
-                "h-7 rounded-none border border-border/50 bg-muted/5",
+                "h-7 border border-border/50 bg-muted/5",
                 "text-[10px] font-bold text-foreground focus:outline-none transition-colors",
                 "cursor-pointer px-2"
               )}
@@ -89,7 +89,7 @@ export default function Pagination({
               size="icon"
               onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="size-7 rounded-none border-border/50"
+              className="size-7 border-border/50"
             >
               <CaretLeft className="size-3.5" weight="bold" />
             </Button>
@@ -100,7 +100,7 @@ export default function Pagination({
                   variant="ghost"
                   size="sm"
                   onClick={() => onPageChange(1)}
-                  className="h-7 min-w-7 px-2 text-[10px] font-bold rounded-none"
+                  className="h-7 min-w-7 px-2 text-[10px] font-bold"
                 >
                   1
                 </Button>
@@ -117,7 +117,7 @@ export default function Pagination({
                 size="sm"
                 onClick={() => onPageChange(page)}
                 className={cn(
-                  "h-7 min-w-7 px-2 text-[10px] font-bold rounded-none",
+                  "h-7 min-w-7 px-2 text-[10px] font-bold",
                   currentPage === page && "bg-primary/10 text-primary border-none"
                 )}
               >
@@ -134,7 +134,7 @@ export default function Pagination({
                   variant="ghost"
                   size="sm"
                   onClick={() => onPageChange(totalPages)}
-                  className="h-7 min-w-7 px-2 text-[10px] font-bold rounded-none"
+                  className="h-7 min-w-7 px-2 text-[10px] font-bold"
                 >
                   {totalPages}
                 </Button>
@@ -146,7 +146,7 @@ export default function Pagination({
               size="icon"
               onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="size-7 rounded-none border-border/50"
+              className="size-7 border-border/50"
             >
               <CaretRight className="size-3.5" weight="bold" />
             </Button>

@@ -25,7 +25,7 @@ function AggregateRow({ label, data, icon: Icon }: AggregateRowProps) {
  const isCritical = data.remainingPct < 10;
 
  return (
- <Card className="border-border/50 bg-background/50 shadow-none py-0 rounded-none h-full">
+ <Card className="border-border/50 bg-background/50 shadow-none py-0 h-full">
  <CardHeader className="flex flex-row items-center justify-between space-y-0 px-4 py-3 border-b border-border/50 bg-muted/10">
  <div className="flex items-center gap-2">
  <Icon className="size-4 text-muted-foreground opacity-60" weight="bold" />
@@ -48,7 +48,7 @@ function AggregateRow({ label, data, icon: Icon }: AggregateRowProps) {
  "transition-all duration-700 ease-out",
  isCritical ? "bg-destructive" : isLow ? "bg-amber-500" : "bg-primary"
  )}
- className="h-1 bg-muted/40 rounded-none"
+ className="h-1 bg-muted/40"
  />
  <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-40">
  <span>Used: <span className="text-foreground tabular-nums opacity-100">{data.sumUsed.toLocaleString()}</span></span>

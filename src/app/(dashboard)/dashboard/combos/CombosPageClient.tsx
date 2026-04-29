@@ -159,7 +159,7 @@ export default function CombosPageClient({ initialData }: CombosPageClientProps)
  </p>
  </div>
 
- <Button size="sm" className="h-8 rounded-md px-4 text-xs font-medium shadow-none" onClick={() => setShowCreateModal(true)}>
+ <Button size="sm" className="h-8 px-4 text-xs font-medium shadow-none" onClick={() => setShowCreateModal(true)}>
  <Plus className="mr-1.5 size-3.5" weight="bold" /> New Combo
  </Button>
  </header>
@@ -167,7 +167,7 @@ export default function CombosPageClient({ initialData }: CombosPageClientProps)
  {/* Combos List */}
  <div className="grid gap-3">
  {combos.length === 0 ? (
- <Card className="flex flex-col items-center justify-center rounded-md border-dashed border-border/50 bg-muted/5 py-20 text-center">
+ <Card className="flex flex-col items-center justify-center border-dashed border-border/50 bg-muted/5 py-20 text-center">
  <Stack className="mb-4 size-16 text-muted-foreground" weight="bold" />
  <p className="text-sm font-medium text-foreground">No combos provisioned</p>
  </Card>
@@ -219,20 +219,20 @@ function ComboCard({ combo, copied, onCopy, onEdit, onDelete, roundRobinEnabled,
   onToggleRoundRobin: (enabled: boolean) => void;
 }) {
  return (
- <Card className="group overflow-hidden rounded-md border-border/50 bg-background/50 p-0 shadow-none">
+ <Card className="group overflow-hidden border-border/50 bg-background/50 p-0 shadow-none">
  <div className="flex flex-col md:flex-row md:items-center justify-between p-4 gap-4">
  <div className="flex items-center gap-4 min-w-0 flex-1">
- <div className="flex size-10 shrink-0 items-center justify-center rounded-md border border-primary/20 bg-primary/5">
+ <div className="flex size-10 shrink-0 items-center justify-center border border-primary/20 bg-primary/5">
  <Stack className="size-5 text-primary" weight="bold" />
  </div>
  <div className="min-w-0 flex-1 space-y-1">
  <div className="flex items-center gap-2.5">
  <code className="truncate font-mono text-xs font-medium tabular-nums text-foreground">{combo.name}</code>
- <Badge variant="outline" className="h-4 rounded-md border-border/50 px-1.5 text-[10px] tabular-nums text-muted-foreground">{combo.models.length} slots</Badge>
+ <Badge variant="outline" className="h-4 border-border/50 px-1.5 text-[10px] tabular-nums text-muted-foreground">{combo.models.length} slots</Badge>
  </div>
  <div className="flex items-center gap-1.5 flex-wrap">
  {combo.models.slice(0, 5).map((model, index) => (
- <code key={index} className="text-[10px] font-mono bg-muted/40 px-1.5 py-0.5 rounded-none text-muted-foreground/80 border border-border/40 tabular-nums">
+ <code key={index} className="text-[10px] font-mono bg-muted/40 px-1.5 py-0.5 text-muted-foreground/80 border border-border/40 tabular-nums">
  {model}
  </code>
  ))}
@@ -250,13 +250,13 @@ function ComboCard({ combo, copied, onCopy, onEdit, onDelete, roundRobinEnabled,
  </div>
 
  <div className="flex items-center gap-1 opacity-0 transition-all group-hover:opacity-100">
- <Button variant="ghost" size="icon" className="size-8 rounded-none hover:bg-primary/10 text-muted-foreground hover:text-primary" onClick={() => onCopy(combo.name, `combo-${combo.id}`)}>
+ <Button variant="ghost" size="icon" className="size-8 hover:bg-primary/10 text-muted-foreground hover:text-primary" onClick={() => onCopy(combo.name, `combo-${combo.id}`)}>
  {copied === `combo-${combo.id}` ? <Check className="size-3.5 text-primary" weight="bold" /> : <Copy className="size-3.5" weight="bold" />}
  </Button>
- <Button variant="ghost" size="icon" className="size-8 rounded-none hover:bg-muted/5 text-muted-foreground hover:text-foreground" onClick={onEdit}>
+ <Button variant="ghost" size="icon" className="size-8 hover:bg-muted/5 text-muted-foreground hover:text-foreground" onClick={onEdit}>
  <PencilSimple className="size-3.5" weight="bold" />
  </Button>
- <Button variant="ghost" size="icon" className="size-8 rounded-none hover:bg-destructive/10 text-muted-foreground hover:text-destructive" onClick={onDelete}>
+ <Button variant="ghost" size="icon" className="size-8 hover:bg-destructive/10 text-muted-foreground hover:text-destructive" onClick={onDelete}>
  <Trash className="size-3.5" weight="bold" />
  </Button>
  </div>
@@ -287,7 +287,7 @@ function ModelItemRow({ index, model, isFirst, isLast, onEdit, onMoveUp, onMoveD
  };
 
  return (
- <div className="flex items-center gap-2.5 p-2 rounded-none border border-border/40 bg-muted/5 group/item transition-colors hover:bg-muted/10">
+ <div className="flex items-center gap-2.5 p-2 border border-border/40 bg-muted/5 group/item transition-colors hover:bg-muted/10">
  <span className="w-4 shrink-0 text-center text-[10px] text-muted-foreground/40 tabular-nums">{index + 1}</span>
  {editing ? (
  <Input 
@@ -296,7 +296,7 @@ function ModelItemRow({ index, model, isFirst, isLast, onEdit, onMoveUp, onMoveD
  onChange={e => setDraft(e.target.value)} 
  onBlur={commit} 
  onKeyDown={e => e.key === "Enter" && commit()} 
- className="h-7 text-xs font-mono py-0 flex-1 bg-background rounded-none border-primary/30 focus-visible:ring-0"
+ className="h-7 text-xs font-mono py-0 flex-1 bg-background border-primary/30 focus-visible:ring-0"
  />
  ) : (
  <div className="flex-1 min-w-0 text-xs font-mono font-medium truncate cursor-text text-foreground/70" onClick={() => setEditing(true)}>
@@ -304,9 +304,9 @@ function ModelItemRow({ index, model, isFirst, isLast, onEdit, onMoveUp, onMoveD
  </div>
  )}
  <div className="flex items-center gap-0.5 opacity-0 group-hover/item:opacity-100 transition-opacity">
- <Button variant="ghost" size="icon" className="size-6 rounded-none text-muted-foreground hover:text-primary" onClick={onMoveUp} disabled={isFirst}><ArrowUp className="size-3" weight="bold" /></Button>
- <Button variant="ghost" size="icon" className="size-6 rounded-none text-muted-foreground hover:text-primary" onClick={onMoveDown} disabled={isLast}><ArrowDown className="size-3" weight="bold" /></Button>
- <Button variant="ghost" size="icon" className="size-6 rounded-none text-muted-foreground hover:text-destructive" onClick={onRemove}><X className="size-3" weight="bold" /></Button>
+ <Button variant="ghost" size="icon" className="size-6 text-muted-foreground hover:text-primary" onClick={onMoveUp} disabled={isFirst}><ArrowUp className="size-3" weight="bold" /></Button>
+ <Button variant="ghost" size="icon" className="size-6 text-muted-foreground hover:text-primary" onClick={onMoveDown} disabled={isLast}><ArrowDown className="size-3" weight="bold" /></Button>
+ <Button variant="ghost" size="icon" className="size-6 text-muted-foreground hover:text-destructive" onClick={onRemove}><X className="size-3" weight="bold" /></Button>
  </div>
  </div>
  );
@@ -354,7 +354,7 @@ function ComboFormModal({ isOpen, combo, onClose, onSave, activeProviders }: Com
  return (
  <>
  <Dialog open={isOpen} onOpenChange={o => !o && onClose()}>
- <DialogContent className="sm:max-w-md rounded-none border-border/50 shadow-none p-6">
+ <DialogContent className="sm:max-w-md border-border/50 shadow-none p-6">
  <DialogHeader className="mb-4">
  <DialogTitle className="text-sm font-medium">{combo ? "Configure Combo" : "Provision Combo"}</DialogTitle>
  <DialogDescription className="text-xs text-muted-foreground">Define logic-gate for high-availability routing.</DialogDescription>
@@ -362,14 +362,14 @@ function ComboFormModal({ isOpen, combo, onClose, onSave, activeProviders }: Com
  <div className="space-y-5 py-2">
  <div className="grid gap-2">
  <Label className="px-1 text-xs text-muted-foreground">Namespace Identifier</Label>
- <Input value={name} onChange={e => { setName(e.target.value); setNameError(""); }} placeholder="gpt-4-claude-stable" className="h-10 rounded-md border-border/50 bg-muted/5 font-mono text-xs"/>
+ <Input value={name} onChange={e => { setName(e.target.value); setNameError(""); }} placeholder="gpt-4-claude-stable" className="h-10 border-border/50 bg-muted/5 font-mono text-xs"/>
  {nameError && <p className="px-1 text-[10px] text-destructive">{nameError}</p>}
  </div>
 
  <div className="space-y-2">
  <div className="flex items-center justify-between px-1">
  <Label className="text-xs text-muted-foreground">Execution Pipeline</Label>
- <Badge variant="outline" className="h-4 rounded-md border-border/50 px-1.5 text-[10px] tabular-nums text-muted-foreground">{models.length} nodes</Badge>
+ <Badge variant="outline" className="h-4 border-border/50 px-1.5 text-[10px] tabular-nums text-muted-foreground">{models.length} nodes</Badge>
  </div>
  
  <ScrollArea className="max-h-[300px] border border-border/40 bg-muted/5 p-1">
@@ -388,21 +388,21 @@ function ComboFormModal({ isOpen, combo, onClose, onSave, activeProviders }: Com
  />
  ))}
  {models.length === 0 && (
- <div className="rounded-md border-2 border-dashed border-border/20 py-10 text-center">
+ <div className=" border-2 border-dashed border-border/20 py-10 text-center">
  <p className="text-xs text-muted-foreground">Pipeline empty</p>
  </div>
  )}
  </div>
  </ScrollArea>
  
- <Button variant="outline" size="sm" className="h-9 w-full rounded-md border-border/50 bg-background text-xs font-medium hover:bg-muted/30" onClick={() => setShowModelSelect(true)}>
+ <Button variant="outline" size="sm" className="h-9 w-full border-border/50 bg-background text-xs font-medium hover:bg-muted/30" onClick={() => setShowModelSelect(true)}>
  <Plus className="mr-1.5 size-3.5" weight="bold" /> Add Intelligence Node
  </Button>
  </div>
  </div>
  <DialogFooter className="mt-4 gap-2 p-0 sm:gap-2">
- <Button variant="outline" className="h-10 flex-1 rounded-md border-border/50 text-xs font-medium" onClick={onClose}>Cancel</Button>
- <Button className="h-10 flex-1 rounded-md text-xs font-medium shadow-none" onClick={handleSave} disabled={saving || !name.trim()}>{saving ? "Committing..." : "Commit Combo"}</Button>
+ <Button variant="outline" className="h-10 flex-1 border-border/50 text-xs font-medium" onClick={onClose}>Cancel</Button>
+ <Button className="h-10 flex-1 text-xs font-medium shadow-none" onClick={handleSave} disabled={saving || !name.trim()}>{saving ? "Committing..." : "Commit Combo"}</Button>
  </DialogFooter>
  </DialogContent>
  </Dialog>

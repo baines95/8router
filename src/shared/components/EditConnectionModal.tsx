@@ -183,14 +183,14 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, au
 
   return (
     <Dialog open={isOpen} onOpenChange={o => !o && onClose()}>
-      <DialogContent className="sm:max-w-md rounded-none border-border/50 p-6 shadow-none">
+      <DialogContent className="sm:max-w-md border-border/50 p-6 shadow-none">
         <DialogHeader className="mb-4">
           <DialogTitle className="text-lg font-semibold tracking-tight">{translate("Update Connection")}</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-5 py-2">
           {/* Status Toggle */}
-          <div className="flex items-center justify-between p-3 bg-muted/5 border border-border/50 rounded-none">
+          <div className="flex items-center justify-between p-3 bg-muted/5 border border-border/50">
             <div className="flex items-center gap-2">
               <Power className={cn("size-4", formData.isActive ? "text-primary" : "text-muted-foreground")} weight="bold" />
               <div className="flex flex-col gap-0.5">
@@ -240,7 +240,7 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, au
               value={formData.name} 
               onChange={e => setFormData({ ...formData, name: e.target.value })} 
               placeholder={isOAuth ? translate("Account Name") : translate("Credential Label")}
-              className="rounded-none border-border/50 bg-muted/5 h-9 text-sm focus-visible:ring-0 focus-visible:border-primary/50 transition-colors"
+              className=" border-border/50 bg-muted/5 h-9 text-sm focus-visible:ring-0 focus-visible:border-primary/50 transition-colors"
             />
           </div>
 
@@ -253,7 +253,7 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, au
                 type="number" 
                 value={formData.priority} 
                 onChange={e => setFormData({ ...formData, priority: parseInt(e.target.value) || 1 })} 
-                className="rounded-none border-border/50 bg-muted/5 h-9 text-sm tabular-nums focus-visible:ring-0 focus-visible:border-primary/50 transition-colors"
+                className=" border-border/50 bg-muted/5 h-9 text-sm tabular-nums focus-visible:ring-0 focus-visible:border-primary/50 transition-colors"
               />
             </div>
 
@@ -265,12 +265,12 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, au
                 value={formData.proxyPoolId}
                 onValueChange={(v) => setFormData({ ...formData, proxyPoolId: v as string })}
               >
-                <SelectTrigger className="w-full rounded-none border-border/50 bg-muted/5 h-9 text-xs focus:ring-0 focus:border-primary/50 shadow-none">
+                <SelectTrigger className="w-full border-border/50 bg-muted/5 h-9 text-xs focus:ring-0 focus:border-primary/50 shadow-none">
                   <SelectValue placeholder={translate("None")}/>
                 </SelectTrigger>
-                <SelectContent className="rounded-none border-border/50 shadow-none">
+                <SelectContent className=" border-border/50 shadow-none">
                   {proxyOptions.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value} className="rounded-none text-xs font-medium focus:bg-muted/50">
+                    <SelectItem key={opt.value} value={opt.value} className=" text-xs font-medium focus:bg-muted/50">
                       {opt.label}
                     </SelectItem>
                   ))}
@@ -290,7 +290,7 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, au
                   value={formData.apiKey} 
                   onChange={e => setFormData({ ...formData, apiKey: e.target.value })} 
                   placeholder={translate("Update key...")} 
-                  className="flex-1 rounded-none border-border/50 bg-muted/5 h-9 text-sm focus-visible:ring-0 focus-visible:border-primary/50 transition-colors" 
+                  className="flex-1 border-border/50 bg-muted/5 h-9 text-sm focus-visible:ring-0 focus-visible:border-primary/50 transition-colors" 
                 />
                 <Button 
                   type="button"
@@ -298,7 +298,7 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, au
                   size="sm" 
                   onClick={handleValidate} 
                   disabled={!formData.apiKey || validating} 
-                  className="h-9 rounded-none px-4 text-xs font-medium"
+                  className="h-9 px-4 text-xs font-medium"
                 >
                   {validating ? <Spinner className="size-4" /> : translate("Verify")}
                 </Button>
@@ -324,7 +324,7 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, au
                 {testResult && (
                   <Badge 
                     variant={testResult === 'success' ? 'secondary' : 'destructive'} 
-                    className="h-5 rounded-none border-none px-2 text-xs tabular-nums"
+                    className="h-5 border-none px-2 text-xs tabular-nums"
                   >
                     {testResult === 'success' ? translate('Link OK') : translate('Link FAIL')}
                   </Badge>
@@ -335,7 +335,7 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, au
                   size="sm" 
                   onClick={handleTest} 
                   disabled={testing} 
-                  className="h-8 rounded-none px-3 text-xs font-medium hover:bg-muted/50"
+                  className="h-8 px-3 text-xs font-medium hover:bg-muted/50"
                 >
                   {testing ? <Spinner className="size-4" /> : <><Pulse className="size-4 mr-1.5" weight="bold" /> {translate("Test")}</>}
                 </Button>
@@ -348,14 +348,14 @@ export default function EditConnectionModal({ isOpen, connection, proxyPools, au
           <Button 
             type="button"
             variant="outline" 
-            className="h-10 flex-1 rounded-none border-border/50 text-xs font-medium hover:bg-muted/30" 
+            className="h-10 flex-1 border-border/50 text-xs font-medium hover:bg-muted/30" 
             onClick={onClose}
           >
             {translate("Cancel")}
           </Button>
           <Button 
             type="button"
-            className="h-10 flex-1 rounded-none text-xs font-medium shadow-none" 
+            className="h-10 flex-1 text-xs font-medium shadow-none" 
             onClick={handleSubmit} 
             disabled={saving}
           >

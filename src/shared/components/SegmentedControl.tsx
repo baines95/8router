@@ -28,7 +28,7 @@ export default function SegmentedControl({
   return (
     <Tabs value={value} onValueChange={onChange} className={className}>
       <TabsList className={cn(
-        "bg-muted/50 p-1 rounded-none border border-border/50 shadow-none h-auto",
+        "bg-muted/50 p-1 border border-border/50 shadow-none h-auto",
         size === "sm" && "h-8",
         size === "md" && "h-10",
         size === "lg" && "h-12"
@@ -38,7 +38,7 @@ export default function SegmentedControl({
             key={option.value}
             value={option.value}
             className={cn(
-              "font-bold uppercase tracking-widest transition-all rounded-none data-[state=active]:shadow-none data-[state=active]:bg-primary/10 data-[state=active]:text-primary",
+              "font-bold uppercase tracking-widest transition-all data-[state=active]:shadow-none data-[state=active]:bg-primary/10 data-[state=active]:text-primary",
               size === "sm" && "text-[9px] px-2 py-1",
               size === "md" && "text-[10px] px-4 py-1.5",
               size === "lg" && "text-xs px-6 py-2"

@@ -377,25 +377,25 @@ export default function BasicChatPageClient({ initialData }: BasicChatPageClient
  // --- Render ---
 
  return (
- <div className="flex flex-col h-full bg-background overflow-hidden relative border-l border-border/50 rounded-none">
+ <div className="flex flex-col h-full bg-background overflow-hidden relative border-l border-border/50">
  {/* Top Header */}
  <header className="h-14 border-b border-border/50 flex items-center justify-between px-4 bg-muted/10 shrink-0">
  <div className="flex items-center gap-2 min-w-0">
  <DropdownMenu>
  <DropdownMenuTrigger render={
- <Button variant="ghost" size="sm" className="h-9 px-3 gap-2 font-bold uppercase tracking-widest rounded-none hover:bg-muted/30">
+ <Button variant="ghost" size="sm" className="h-9 px-3 gap-2 font-bold uppercase tracking-widest hover:bg-muted/30">
  <Cpu className="size-4 text-primary" weight="bold" />
  <span className="truncate max-w-[200px]">{activeModel?.name || "Select Model"}</span>
  <CaretDown className="size-3.5 opacity-40" weight="bold" />
  </Button>
  } />
- <DropdownMenuContent align="start" className="w-[320px] max-h-[60vh] p-0 overflow-hidden rounded-none border-border/50 shadow-none">
+ <DropdownMenuContent align="start" className="w-[320px] max-h-[60vh] p-0 overflow-hidden border-border/50 shadow-none">
  <ScrollArea className="h-full">
  {providerGroups.map(group => (
  <div key={group.providerId} className="p-0">
  <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-40 px-3 py-2 bg-muted/5 border-b border-border/40">{group.providerName}</DropdownMenuLabel>
  {group.models.map(m => (
- <DropdownMenuItem key={m.id} onClick={() => handleSelectModel(m.id)} className="rounded-none gap-3 py-2.5 cursor-pointer focus:bg-primary/5 focus:text-primary px-3">
+ <DropdownMenuItem key={m.id} onClick={() => handleSelectModel(m.id)} className=" gap-3 py-2.5 cursor-pointer focus:bg-primary/5 focus:text-primary px-3">
  <div className="flex-1 min-w-0">
  <p className="text-xs font-bold truncate">{m.name}</p>
  <p className="text-[10px] text-muted-foreground truncate opacity-70 font-mono">{m.requestModel}</p>
@@ -414,15 +414,15 @@ export default function BasicChatPageClient({ initialData }: BasicChatPageClient
  <div className="flex items-center gap-1">
  <DropdownMenu>
  <DropdownMenuTrigger render={
- <Button variant="ghost" size="icon" className="size-9 rounded-none"><History className="size-4" weight="bold" /></Button>
+ <Button variant="ghost" size="icon" className="size-9"><History className="size-4" weight="bold" /></Button>
  } />
- <DropdownMenuContent align="end" className="w-[300px] rounded-none border-border/50 shadow-none p-0 overflow-hidden">
+ <DropdownMenuContent align="end" className="w-[300px] border-border/50 shadow-none p-0 overflow-hidden">
  <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-widest px-3 py-2 bg-muted/5 border-b border-border/40">Recent Conversations</DropdownMenuLabel>
  <ScrollArea className="h-[400px]">
  {sessionItems.length === 0 ? (
  <div className="p-8 text-center opacity-30 text-[10px] font-bold uppercase tracking-widest">No history</div>
  ) : sessionItems.map(s => (
- <DropdownMenuItem key={s.id} onClick={() => setActiveSessionId(s.id)} className="px-3 py-3 flex flex-col items-start gap-1 rounded-none cursor-pointer border-b border-border/20 last:border-0">
+ <DropdownMenuItem key={s.id} onClick={() => setActiveSessionId(s.id)} className="px-3 py-3 flex flex-col items-start gap-1 cursor-pointer border-b border-border/20 last:border-0">
  <span className="text-xs font-bold truncate w-full tracking-tight">{s.title}</span>
  <span className="text-[10px] text-muted-foreground/60 font-bold uppercase tracking-widest">{formatRelativeTime(s.updatedAt)} ago</span>
  </DropdownMenuItem>
@@ -430,8 +430,8 @@ export default function BasicChatPageClient({ initialData }: BasicChatPageClient
  </ScrollArea>
  </DropdownMenuContent>
  </DropdownMenu>
- <Button variant="ghost" size="icon" className="size-9 rounded-none" onClick={handleNewChat} title="New Chat"><Plus className="size-4" weight="bold" /></Button>
- <Button variant="ghost" size="icon" className="size-9 rounded-none text-destructive/60 hover:bg-destructive/10 hover:text-destructive" onClick={() => { if(confirm("Terminate session?")) setSessions(prev => prev.filter(s => s.id !== activeSessionId)); }} title="Terminate"><Trash className="size-4" weight="bold" /></Button>
+ <Button variant="ghost" size="icon" className="size-9" onClick={handleNewChat} title="New Chat"><Plus className="size-4" weight="bold" /></Button>
+ <Button variant="ghost" size="icon" className="size-9 text-destructive/60 hover:bg-destructive/10 hover:text-destructive" onClick={() => { if(confirm("Terminate session?")) setSessions(prev => prev.filter(s => s.id !== activeSessionId)); }} title="Terminate"><Trash className="size-4" weight="bold" /></Button>
  </div>
  </header>
 
@@ -441,7 +441,7 @@ export default function BasicChatPageClient({ initialData }: BasicChatPageClient
  <div className="max-w-3xl mx-auto space-y-10">
  {currentMessages.length === 0 ? (
  <div className="py-20 flex flex-col items-center justify-center text-center gap-6 opacity-10 grayscale">
- <div className="size-16 rounded-none border-2 border-dashed border-muted-foreground flex items-center justify-center"><Chat className="size-8" weight="bold" /></div>
+ <div className="size-16 border-2 border-dashed border-muted-foreground flex items-center justify-center"><Chat className="size-8" weight="bold" /></div>
  <div className="space-y-1">
  <h2 className="text-lg font-black uppercase tracking-[0.2em]">Ready to link</h2>
  <p className="text-xs font-bold uppercase tracking-widest">Select an infrastructure model to initiate session.</p>
@@ -457,12 +457,12 @@ export default function BasicChatPageClient({ initialData }: BasicChatPageClient
  <span className="text-[10px] font-black uppercase tracking-widest opacity-30">{isUser ? "USER" : activeModel?.name || "AI"}</span>
  </div>
  <div className={cn(
- "max-w-[90%] rounded-none p-4 text-[14px] leading-relaxed shadow-none border",
+ "max-w-[90%] p-4 text-[14px] leading-relaxed shadow-none border",
  isUser ? "bg-primary text-primary-foreground font-medium border-primary" : "bg-muted/30 border-border/50 text-foreground"
  )}>
  {m.attachments && m.attachments.length > 0 && (
  <div className="mb-4 grid grid-cols-2 gap-2">
- {m.attachments.map(a => <img key={a.id} src={a.dataUrl} alt={a.name} className="rounded-none border border-border/50 max-h-40 object-cover w-full shadow-none" />)}
+ {m.attachments.map(a => <img key={a.id} src={a.dataUrl} alt={a.name} className=" border border-border/50 max-h-40 object-cover w-full shadow-none" />)}
  </div>
  )}
  <div className="whitespace-pre-wrap break-words">{textValue(m.content) || (m.role === 'assistant' && m.status === 'streaming' ? streamingText : "")}</div>
@@ -484,7 +484,7 @@ export default function BasicChatPageClient({ initialData }: BasicChatPageClient
  {attachments.length > 0 && (
  <div className="flex flex-wrap gap-2 py-3 border-b border-border/40 mb-3">
  {attachments.map(a => (
- <div key={a.id} className="h-8 px-2 rounded-none bg-muted border border-border/50 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
+ <div key={a.id} className="h-8 px-2 bg-muted border border-border/50 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
  <ImageIcon className="size-3.5 opacity-50" weight="bold" />
  <span className="truncate max-w-[120px]">{a.name}</span>
  <button onClick={() => setAttachments(prev => prev.filter(x => x.id !== a.id))} className="hover:text-destructive transition-colors"><X className="size-3.5" weight="bold" /></button>
@@ -495,7 +495,7 @@ export default function BasicChatPageClient({ initialData }: BasicChatPageClient
  
  <div className="relative mt-4">
  <textarea
- className="w-full bg-muted/20 border border-border/60 rounded-none px-4 py-4 pr-14 min-h-[60px] max-h-[250px] text-sm focus:border-primary/50 focus:bg-muted/40 outline-none resize-none transition-all custom-scrollbar font-medium"
+ className="w-full bg-muted/20 border border-border/60 px-4 py-4 pr-14 min-h-[60px] max-h-[250px] text-sm focus:border-primary/50 focus:bg-muted/40 outline-none resize-none transition-all custom-scrollbar font-medium"
  placeholder="Execute prompt..."
  rows={1}
  value={draft}
@@ -503,7 +503,7 @@ export default function BasicChatPageClient({ initialData }: BasicChatPageClient
  onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), canSend && sendMessage())}
  />
  <div className="absolute right-3 bottom-3 flex items-center gap-2">
- <Button variant="ghost" size="icon" className="size-8 rounded-none text-muted-foreground hover:text-foreground opacity-50 hover:opacity-100" onClick={() => fileInputRef.current?.click()}><Paperclip className="size-4" weight="bold" /></Button>
+ <Button variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-foreground opacity-50 hover:opacity-100" onClick={() => fileInputRef.current?.click()}><Paperclip className="size-4" weight="bold" /></Button>
  <input ref={fileInputRef} type="file" multiple className="hidden" onChange={async e => {
  const files = Array.from(e.target.files || []);
  const next = await Promise.all(files.filter(f => f.type.startsWith('image/')).map(async f => ({ id: createId(), name: f.name, type: f.type, dataUrl: await fileToDataUrl(f) })));
@@ -511,7 +511,7 @@ export default function BasicChatPageClient({ initialData }: BasicChatPageClient
  }} />
  <Button 
  size="icon"
- className={cn("size-9 rounded-none shadow-none transition-all", canSend ? "bg-primary text-primary-foreground" : "bg-muted border border-border/50 text-muted-foreground/30")} 
+ className={cn("size-9 shadow-none transition-all", canSend ? "bg-primary text-primary-foreground" : "bg-muted border border-border/50 text-muted-foreground/30")} 
  onClick={isSending ? () => abortRef.current?.abort() : sendMessage}
  disabled={!canSend && !isSending}
  >

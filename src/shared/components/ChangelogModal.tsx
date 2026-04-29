@@ -64,14 +64,14 @@ export default function ChangelogModal({ isOpen, onClose }: ChangelogModalProps)
       {/* Modal content */}
       <div
         ref={modalRef}
-        className="relative w-full bg-background border border-border/50 rounded-2xl shadow-2xl animate-in fade-in zoom-in-95 duration-200 max-w-3xl flex flex-col max-h-[85vh] overflow-hidden"
+        className="relative w-full bg-background border border-border/50 shadow-2xl animate-in fade-in zoom-in-95 duration-200 max-w-3xl flex flex-col max-h-[85vh] overflow-hidden"
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border/50 bg-muted/5">
           <h2 className="text-lg font-bold tracking-tight text-foreground pl-2">System Changelog</h2>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted/10 transition-colors"
+            className="p-1.5 text-muted-foreground hover:bg-muted/10 transition-colors"
             aria-label="Close"
           >
             <X className="size-5" weight="bold" />

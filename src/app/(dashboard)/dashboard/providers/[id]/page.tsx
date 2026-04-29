@@ -686,7 +686,7 @@ export default function ProviderDetailPage() {
  if (!open) closeBulkProxyModal();
  }}
  >
- <DialogContent className="sm:max-w-md rounded-none border-border/50 shadow-none">
+ <DialogContent className="sm:max-w-md border-border/50 shadow-none">
  <DialogHeader>
  <DialogTitle className="uppercase tracking-tight">
  Proxy Action ({selectedConnectionIds.length} selected)
@@ -699,12 +699,12 @@ export default function ProviderDetailPage() {
  value={bulkProxyPoolId}
  onValueChange={(v) => setBulkProxyPoolId(v as string)}
  >
- <SelectTrigger className="w-full rounded-none border-border/50 bg-muted/5 h-9 text-xs shadow-none">
+ <SelectTrigger className="w-full border-border/50 bg-muted/5 h-9 text-xs shadow-none">
  <SelectValue placeholder="None"/>
  </SelectTrigger>
- <SelectContent className="rounded-none shadow-none border-border/50">
+ <SelectContent className=" shadow-none border-border/50">
  {bulkProxyOptions.map((opt) => (
- <SelectItem key={opt.value} value={opt.value} className="rounded-none text-xs font-medium">
+ <SelectItem key={opt.value} value={opt.value} className=" text-xs font-medium">
  {opt.label}
  </SelectItem>
  ))}
@@ -720,7 +720,7 @@ export default function ProviderDetailPage() {
  <Button
  type="button"
  variant="outline"
- className="font-bold text-[10px] uppercase tracking-widest flex-1 h-10 rounded-none border-border/50"
+ className="font-bold text-[10px] uppercase tracking-widest flex-1 h-10 border-border/50"
  onClick={closeBulkProxyModal}
  disabled={bulkUpdatingProxy}
  >
@@ -728,7 +728,7 @@ export default function ProviderDetailPage() {
  </Button>
  <Button
  type="button"
- className="font-bold text-[10px] uppercase tracking-widest flex-1 h-10 rounded-none shadow-none"
+ className="font-bold text-[10px] uppercase tracking-widest flex-1 h-10 shadow-none"
  onClick={handleBulkApplyProxyPool}
  disabled={!canApplyBulkProxy}
  >
@@ -853,7 +853,7 @@ export default function ProviderDetailPage() {
  variant="outline"
  size="sm"
  onClick={() => setShowAddCustomModel(true)}
- className="h-auto border-dashed py-2 px-3 text-[10px] font-bold uppercase tracking-widest rounded-none border-border/60 hover:bg-primary/5 hover:text-primary transition-all"
+ className="h-auto border-dashed py-2 px-3 text-[10px] font-bold uppercase tracking-widest border-border/60 hover:bg-primary/5 hover:text-primary transition-all"
  >
  <Plus className="size-3.5 mr-1.5" weight="bold" />
  Add Model
@@ -883,7 +883,7 @@ export default function ProviderDetailPage() {
  const alias = m.id.split("/").pop();
  await handleSetAlias(m.id, alias as string, providerStorageAlias);
  }}
- className="h-auto px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-none border-border/50 bg-background hover:bg-muted/10 transition-colors"
+ className="h-auto px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-widest border-border/50 bg-background hover:bg-muted/10 transition-colors"
  title={`${m.name} · ${(m.contextLength / 1000).toFixed(0)}k ctx`}
  >
  <Plus className="size-3 mr-1.5" weight="bold" />
@@ -902,11 +902,11 @@ export default function ProviderDetailPage() {
  return (
  <div className="mx-auto max-w-5xl flex flex-col gap-8 pb-10 px-4 animate-pulse">
  <div className="space-y-3 py-4">
- <Skeleton className="h-4 w-32 rounded-none opacity-40"/>
- <Skeleton className="h-10 w-2/3 max-w-md rounded-none"/>
+ <Skeleton className="h-4 w-32 opacity-40"/>
+ <Skeleton className="h-10 w-2/3 max-w-md"/>
  </div>
- <Skeleton className="h-24 w-full rounded-none border border-border/40"/>
- <Skeleton className="h-64 w-full rounded-none border border-border/40"/>
+ <Skeleton className="h-24 w-full border border-border/40"/>
+ <Skeleton className="h-64 w-full border border-border/40"/>
  </div>
  );
  }
@@ -921,7 +921,7 @@ export default function ProviderDetailPage() {
  </div>
  <Link
  href="/dashboard/providers"
- className={cn(buttonVariants({ variant:"outline", size: "sm" }), "rounded-none border-border/50 uppercase font-bold text-[10px] tracking-widest px-6")}
+ className={cn(buttonVariants({ variant:"outline", size: "sm" }), " border-border/50 uppercase font-bold text-[10px] tracking-widest px-6")}
  >
  Back to Registry
  </Link>
@@ -955,7 +955,7 @@ export default function ProviderDetailPage() {
  <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mt-2">
  <div className="flex items-center gap-5">
  <div
- className="size-14 rounded-none flex items-center justify-center border border-border/50 bg-muted/5 shadow-none"
+ className="size-14 flex items-center justify-center border border-border/50 bg-muted/5 shadow-none"
  style={{ backgroundColor: `${providerInfo.color}08` }}
  >
  {headerImgError ? (
@@ -996,7 +996,7 @@ export default function ProviderDetailPage() {
  variant="outline" 
  size="sm" 
  onClick={() => setShowOAuthModal(true)} 
- className="font-bold text-[10px] uppercase tracking-widest h-8 px-5 rounded-none border-border/50 bg-background"
+ className="font-bold text-[10px] uppercase tracking-widest h-8 px-5 border-border/50 bg-background"
  >
  <Plus className="size-3.5 mr-1.5" weight="bold" />
  {providerId === "iflow" ? "OAuth" : translate("Add Connection")}
@@ -1008,7 +1008,7 @@ export default function ProviderDetailPage() {
  variant="outline" 
  size="sm" 
  onClick={() => setShowAddApiKeyModal(true)} 
- className="font-bold text-[10px] uppercase tracking-widest h-8 px-5 rounded-none border-border/50 bg-background"
+ className="font-bold text-[10px] uppercase tracking-widest h-8 px-5 border-border/50 bg-background"
  >
  <Plus className="size-3.5 mr-1.5" weight="bold" />
  {translate("Add Connection")}
@@ -1019,7 +1019,7 @@ export default function ProviderDetailPage() {
  </header>
 
  {providerInfo.deprecated && (
- <Alert variant="destructive" className="border-orange-500/40 bg-orange-500/5 rounded-none p-4">
+ <Alert variant="destructive" className="border-orange-500/40 bg-orange-500/5 p-4">
  <Warning className="text-orange-500 size-5" weight="bold" />
  <AlertTitle className="text-orange-600 font-bold uppercase tracking-widest text-xs">{translate("Deprecated")}</AlertTitle>
  <AlertDescription className="text-orange-600/80 text-[11px] font-medium leading-relaxed italic mt-1">
@@ -1029,7 +1029,7 @@ export default function ProviderDetailPage() {
  )}
 
  {providerInfo.notice && !providerInfo.deprecated && (
- <Alert className="border-primary/40 bg-primary/5 rounded-none p-4">
+ <Alert className="border-primary/40 bg-primary/5 p-4">
  <Info className="text-primary size-5" weight="bold" />
  <AlertDescription className="text-primary/80 text-[11px] font-medium leading-relaxed italic">
  {providerInfo.notice.text}
@@ -1042,7 +1042,7 @@ export default function ProviderDetailPage() {
  rel="noopener noreferrer"
  className={cn(
  buttonVariants({ size: "xs", variant: "secondary" }),
- "font-bold text-[9px] uppercase tracking-widest bg-primary/20 text-primary border-none hover:bg-primary/30 rounded-none",
+ "font-bold text-[9px] uppercase tracking-widest bg-primary/20 text-primary border-none hover:bg-primary/30",
  )}
  >
  Get API Key
@@ -1053,7 +1053,7 @@ export default function ProviderDetailPage() {
  )}
 
  {isCompatible && providerNode && (
- <Card className="p-4 rounded-none bg-muted/5 border-border/50 shadow-none">
+ <Card className="p-4 bg-muted/5 border-border/50 shadow-none">
  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
  <div className="min-w-0 flex flex-col gap-1">
  <h2 className="text-xs font-bold uppercase tracking-widest text-foreground opacity-60">
@@ -1061,7 +1061,7 @@ export default function ProviderDetailPage() {
  ? translate("Anthropic Compatible Parameters")
  : translate("OpenAI Compatible Parameters")}
  </h2>
- <div className="text-xs font-mono text-muted-foreground tabular-nums bg-background/50 p-2 rounded-none border border-border/40 truncate">
+ <div className="text-xs font-mono text-muted-foreground tabular-nums bg-background/50 p-2 border border-border/40 truncate">
  <span className="text-primary font-bold mr-2 uppercase">
  {isAnthropicCompatible
  ?"Messages API"
@@ -1083,7 +1083,7 @@ export default function ProviderDetailPage() {
  variant="outline"
  onClick={() => setShowAddApiKeyModal(true)}
  disabled={connections.length > 0}
- className="h-8 px-3 text-[10px] font-bold uppercase tracking-widest rounded-none border-border/50 bg-background"
+ className="h-8 px-3 text-[10px] font-bold uppercase tracking-widest border-border/50 bg-background"
  >
  <Plus className="size-3.5 mr-1.5" weight="bold" />
  {translate("Add")}
@@ -1092,7 +1092,7 @@ export default function ProviderDetailPage() {
  size="xs"
  variant="secondary"
  onClick={() => setShowEditNodeModal(true)}
- className="h-8 px-3 text-[10px] font-bold uppercase tracking-widest rounded-none bg-muted/20 border-border/50"
+ className="h-8 px-3 text-[10px] font-bold uppercase tracking-widest bg-muted/20 border-border/50"
  >
  <Pencil className="size-3.5 mr-1.5" weight="bold" />
  {translate("Edit")}
@@ -1118,7 +1118,7 @@ export default function ProviderDetailPage() {
  console.log("Error deleting provider node:", error);
  }
  }}
- className="h-8 px-3 text-[10px] font-bold uppercase tracking-widest rounded-none text-destructive bg-destructive/5 hover:bg-destructive/10 border-border/50"
+ className="h-8 px-3 text-[10px] font-bold uppercase tracking-widest text-destructive bg-destructive/5 hover:bg-destructive/10 border-border/50"
  >
  <Trash className="size-3.5 mr-1.5" weight="bold" />
  {translate("Delete")}
@@ -1136,9 +1136,9 @@ export default function ProviderDetailPage() {
 
  {/* Connections */}
  {isFreeNoAuth ? (
- <Card className="p-5 border-primary/20 bg-primary/5 rounded-none shadow-none">
+ <Card className="p-5 border-primary/20 bg-primary/5 shadow-none">
  <div className="flex items-center gap-4">
- <div className="inline-flex size-11 items-center justify-center rounded-none bg-primary/10 text-primary border border-primary/20">
+ <div className="inline-flex size-11 items-center justify-center bg-primary/10 text-primary border border-primary/20">
  <LockOpen className="size-6" weight="bold" />
  </div>
  <div className="flex flex-col gap-0.5">
@@ -1150,7 +1150,7 @@ export default function ProviderDetailPage() {
  </div>
  </Card>
  ) : (
- <Card className="border-border/50 shadow-none overflow-hidden p-0 py-0 rounded-none bg-background/50">
+ <Card className="border-border/50 shadow-none overflow-hidden p-0 py-0 bg-background/50">
  <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between px-4 py-3 border-b border-border/50 bg-muted/10">
  <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground opacity-40">
  {translate("Active Link Registry")}
@@ -1174,7 +1174,7 @@ export default function ProviderDetailPage() {
  value={providerStickyLimit}
  onChange={(e) => handleStickyLimitChange(e.target.value)}
  placeholder="1"
- className="h-7 w-12 px-1 py-0.5 text-xs font-bold tabular-nums text-center bg-background border-border/50 rounded-none shadow-inner"
+ className="h-7 w-12 px-1 py-0.5 text-xs font-bold tabular-nums text-center bg-background border-border/50 shadow-inner"
  />
  </div>
  )}
@@ -1203,7 +1203,7 @@ export default function ProviderDetailPage() {
  <CardContent className="p-0">
  {connections.length === 0 ? (
  <div className="py-16 text-center flex flex-col items-center justify-center opacity-10 grayscale gap-3">
- <div className="mb-2 inline-flex size-14 items-center justify-center rounded-none bg-muted/10 border border-border/40">
+ <div className="mb-2 inline-flex size-14 items-center justify-center bg-muted/10 border border-border/40">
  {isOAuth ? <Lock className="size-8" weight="bold" /> : <Key className="size-8" weight="bold" />}
  </div>
  <div className="space-y-1">
@@ -1218,7 +1218,7 @@ export default function ProviderDetailPage() {
  variant="secondary" 
  size="sm" 
  onClick={() => setShowIFlowCookieModal(true)} 
- className="font-bold text-[10px] uppercase tracking-widest h-9 px-5 rounded-none"
+ className="font-bold text-[10px] uppercase tracking-widest h-9 px-5"
  >
  <Cookie className="size-4 mr-1.5" weight="bold" />
  Cookie Auth
@@ -1229,7 +1229,7 @@ export default function ProviderDetailPage() {
  variant="outline" 
  size="sm" 
  onClick={() => isOAuth ? setShowOAuthModal(true) : setShowAddApiKeyModal(true)} 
- className="font-bold text-[10px] uppercase tracking-widest h-9 px-5 rounded-none border-border/50 bg-background"
+ className="font-bold text-[10px] uppercase tracking-widest h-9 px-5 border-border/50 bg-background"
  >
  <Plus className="size-4 mr-1.5" weight="bold" />
  {providerId === "iflow" ? "OAuth" : translate("Provision link")}
@@ -1245,15 +1245,15 @@ export default function ProviderDetailPage() {
  </CardContent>
  
  {!isCompatible && connections.length > 0 && (
- <CardFooter className="px-4 py-2 border-t border-border/40 bg-muted/5 rounded-none justify-end">
+ <CardFooter className="px-4 py-2 border-t border-border/40 bg-muted/5 justify-end">
  <div className="flex gap-2">
  {providerId === "iflow" && (
- <Button size="xs" variant="secondary" onClick={() => setShowIFlowCookieModal(true)} className="h-7 px-3 text-[9px] font-bold uppercase tracking-widest rounded-none">
+ <Button size="xs" variant="secondary" onClick={() => setShowIFlowCookieModal(true)} className="h-7 px-3 text-[9px] font-bold uppercase tracking-widest">
  <Cookie className="size-3 mr-1.5" weight="bold" />
  Cookie
  </Button>
  )}
- <Button size="xs" variant="outline" onClick={() => isOAuth ? setShowOAuthModal(true) : setShowAddApiKeyModal(true)} className="h-7 px-3 text-[9px] font-bold uppercase tracking-widest rounded-none border-border/50 bg-background">
+ <Button size="xs" variant="outline" onClick={() => isOAuth ? setShowOAuthModal(true) : setShowAddApiKeyModal(true)} className="h-7 px-3 text-[9px] font-bold uppercase tracking-widest border-border/50 bg-background">
  <Plus className="size-3 mr-1.5" weight="bold" />
  {translate("Add")}
  </Button>
@@ -1264,7 +1264,7 @@ export default function ProviderDetailPage() {
  )}
 
  {/* Models */}
- <Card className="border-border/50 shadow-none overflow-hidden p-0 py-0 rounded-none bg-background/50">
+ <Card className="border-border/50 shadow-none overflow-hidden p-0 py-0 bg-background/50">
  <CardHeader className="px-4 py-3 border-b border-border/50 bg-muted/10">
  <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground opacity-40">
  {translate("Acoustic & Intelligence Spectrum")}
@@ -1272,7 +1272,7 @@ export default function ProviderDetailPage() {
  </CardHeader>
  <CardContent className="p-4">
  {!!modelsTestError && (
- <Alert variant="destructive" className="mb-4 border-destructive/20 bg-destructive/5 py-2 rounded-none">
+ <Alert variant="destructive" className="mb-4 border-destructive/20 bg-destructive/5 py-2">
  <Warning className="size-4 text-destructive" weight="bold" />
  <AlertDescription className="text-[10px] font-bold uppercase tracking-wide text-destructive">
  {modelsTestError}

@@ -69,7 +69,7 @@ export default function LandingPage() {
             <CardContent className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button
                 size="lg"
-                className="h-14 w-full rounded-lg border-transparent bg-primary px-10 text-lg font-semibold text-primary-foreground hover:bg-primary/90 sm:w-auto"
+                className="h-14 w-full border-transparent bg-primary px-10 text-lg font-semibold text-primary-foreground hover:bg-primary/90 sm:w-auto"
                 onClick={() => router.push("/dashboard")}
               >
                 Start Free
@@ -77,7 +77,7 @@ export default function LandingPage() {
               <Button
                 variant="outline"
                 size="lg"
-                className="h-14 w-full rounded-lg border-border/50 bg-transparent px-10 text-lg font-semibold text-foreground hover:bg-muted/10 sm:w-auto"
+                className="h-14 w-full border-border/50 bg-transparent px-10 text-lg font-semibold text-foreground hover:bg-muted/10 sm:w-auto"
                 onClick={() => window.open("https://github.com/baines95/8router#readme", "_blank")}
               >
                 Read Documentation

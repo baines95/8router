@@ -57,7 +57,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               return (
                 <div
                   key={n.id}
-                  className={`rounded-xl border px-4 py-3 shadow-lg backdrop-blur-md pointer-events-auto animate-in slide-in-from-right-4 duration-300 ${style.wrapper}`}
+                  className={` border px-4 py-3 shadow-lg backdrop-blur-md pointer-events-auto animate-in slide-in-from-right-4 duration-300 ${style.wrapper}`}
                 >
                   <div className="flex items-start gap-3">
                     <div className="mt-0.5">{style.icon}</div>

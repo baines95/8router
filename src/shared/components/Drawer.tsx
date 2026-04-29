@@ -82,7 +82,7 @@ export default function Drawer({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted/10 hover:text-foreground transition-colors"
+            className="p-1.5 text-muted-foreground hover:bg-muted/10 hover:text-foreground transition-colors"
           >
             <span className="material-symbols-outlined text-[20px]">close</span>
           </button>

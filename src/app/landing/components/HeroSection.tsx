@@ -27,7 +27,7 @@ export default function HeroSection() {
 
         {/* CTA Buttons */}
         <div className="flex flex-wrap items-center justify-center gap-4 w-full">
-          <button className="h-12 px-8 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-base font-semibold transition-all flex items-center gap-2 border border-transparent">
+          <button className="h-12 px-8 bg-primary hover:bg-primary/90 text-primary-foreground text-base font-semibold transition-all flex items-center gap-2 border border-transparent">
             <span className="material-symbols-outlined">rocket_launch</span>
             Get Started
           </button>
@@ -35,7 +35,7 @@ export default function HeroSection() {
             href="https://github.com/baines95/8router" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="h-12 px-8 rounded-lg border border-border/50 bg-muted/10 hover:bg-muted/20 text-foreground text-base font-semibold transition-all flex items-center gap-2"
+            className="h-12 px-8 border border-border/50 bg-muted/10 hover:bg-muted/20 text-foreground text-base font-semibold transition-all flex items-center gap-2"
           >
             <span className="material-symbols-outlined">code</span>
             View on GitHub

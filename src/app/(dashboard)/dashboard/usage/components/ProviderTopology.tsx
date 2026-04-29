@@ -38,7 +38,7 @@ function ProviderNode({ data }: NodeProps<any>) {
  const [imgError, setImgError] = useState(false);
  return (
  <div
- className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg border-2 transition-all duration-300 bg-background"
+ className="flex items-center gap-2.5 px-4 py-2.5 border-2 transition-all duration-300 bg-background"
  style={{
  borderColor: active ? color : "hsl(var(--border))",
  boxShadow: active ? `0 0 16px ${color}40` : "none",
@@ -52,11 +52,11 @@ function ProviderNode({ data }: NodeProps<any>) {
 
  {/* Provider icon */}
  <div
- className="w-8 h-8 rounded-md flex items-center justify-center shrink-0"
+ className="w-8 h-8 flex items-center justify-center shrink-0"
  style={{ backgroundColor: `${color}15` }}
  >
  {!imgError ? (
- <img src={imageUrl} alt={label} className="w-6 h-6 rounded-sm object-contain" onError={() => setImgError(true)} />
+ <img src={imageUrl} alt={label} className="w-6 h-6 object-contain" onError={() => setImgError(true)} />
  ) : (
  <span className="text-sm font-medium" style={{ color }}>{textIcon}</span>
  )}
@@ -85,7 +85,7 @@ function ProviderNode({ data }: NodeProps<any>) {
 function RouterNode({ data }: NodeProps<any>) {
  const { activeCount } = data as any;
  return (
- <div className="flex items-center justify-center px-5 py-3 rounded-xl border-2 border-primary bg-primary/5 min-w-[130px]">
+ <div className="flex items-center justify-center px-5 py-3 border-2 border-primary bg-primary/5 min-w-[130px]">
  <Handle type="source" position={Position.Top} id="top" className="!bg-transparent !border-0 !w-0 !h-0"/>
  <Handle type="source" position={Position.Bottom} id="bottom" className="!bg-transparent !border-0 !w-0 !h-0"/>
  <Handle type="source" position={Position.Left} id="left" className="!bg-transparent !border-0 !w-0 !h-0"/>

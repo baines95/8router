@@ -65,21 +65,20 @@ interface ConnectionRowProps {
 function StatusBadge({ variant, children }: { variant: "success" | "error" | "default", children: React.ReactNode }) {
   if (variant === "success") {
     return (
-      <Badge className="border-primary/20 bg-primary/10 text-primary dark:text-primary px-1.5 py-0 rounded-none h-4 border-none">
+      <Badge className="border-primary/20 bg-primary/10 text-primary dark:text-primary px-1.5 py-0 h-4 border-none">
         {children}
       </Badge>
     );
   }
   if (variant === "error") {
-    return <Badge variant="destructive" className="px-1.5 py-0 rounded-none h-4 border-none">{children}</Badge>;
+    return <Badge variant="destructive" className="px-1.5 py-0 h-4 border-none">{children}</Badge>;
   }
-  return <Badge variant="secondary" className="px-1.5 py-0 rounded-none h-4 border-none">{children}</Badge>;
+  return <Badge variant="secondary" className="px-1.5 py-0 h-4 border-none">{children}</Badge>;
 }
 
 export default function ConnectionRow({
   connection,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  proxyPools,
+  proxyPools: _proxyPools,
   isOAuth,
   isFirst,
   isLast,
@@ -107,11 +106,12 @@ export default function ConnectionRow({
 
   useEffect(() => {
     const checkCooldown = () => {
+      const now = Date.now();
       const until =
         Object.entries(connection)
           .filter(([k]) => k.startsWith("modelLock_"))
           .map(([, v]) => v as string)
-          .filter((v) => v && new Date(v).getTime() > Date.now())
+          .filter((v) => v && new Date(v).getTime() > now)
           .sort()[0] || null;
       setIsCooldown(!!until);
     };
@@ -123,12 +123,19 @@ export default function ConnectionRow({
 
   const quotaSnapshot = connection.providerSpecificData?.quotaSnapshot as QuotaSnapshot | undefined;
   const quotaSnapshotState = quotaSnapshot ? getQuotaSnapshotState(quotaSnapshot) : null;
+  const [nowTick, setNowTick] = useState<number>(() => Date.now());
+
+  useEffect(() => {
+    const id = setInterval(() => setNowTick(Date.now()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+
   const quotaResetAt = quotaSnapshotState?.nextResetAt
     ?? quotaSnapshot?.buckets
       ?.map((bucket) => bucket.resetAt)
       .filter((resetAt): resetAt is string => Boolean(resetAt))
       .map((resetAt) => ({ value: resetAt, ms: Date.parse(resetAt) }))
-      .filter((entry) => Number.isFinite(entry.ms) && entry.ms > Date.now())
+      .filter((entry) => Number.isFinite(entry.ms) && entry.ms > nowTick)
       .sort((a, b) => a.ms - b.ms)[0]
       ?.value
     ?? null;
@@ -147,7 +154,7 @@ export default function ConnectionRow({
   return (
     <div
       className={cn(
-        "group flex items-center justify-between rounded-none p-1.5 transition-colors",
+        "group flex items-center justify-between p-1.5 transition-colors",
         "hover:bg-muted/30",
         connection.isActive === false && "opacity-60",
       )}
@@ -159,7 +166,7 @@ export default function ConnectionRow({
             onClick={onMoveUp}
             disabled={isFirst}
             className={cn(
-              "rounded-none p-0.5",
+              " p-0.5",
               isFirst ? "cursor-not-allowed text-muted-foreground/30" : "text-muted-foreground hover:bg-accent hover:text-foreground",
             )}
           >
@@ -170,14 +177,14 @@ export default function ConnectionRow({
             onClick={onMoveDown}
             disabled={isLast}
             className={cn(
-              "rounded-none p-0.5",
+              " p-0.5",
               isLast ? "cursor-not-allowed text-muted-foreground/30" : "text-muted-foreground hover:bg-accent hover:text-foreground",
             )}
           >
             <CaretDown className="size-3.5" weight="bold" />
           </button>
         </div>
-        <div className="size-7 rounded-none bg-muted/20 flex items-center justify-center shrink-0 border border-border/50">
+        <div className="size-7 bg-muted/20 flex items-center justify-center shrink-0 border border-border/50">
           {isOAuth ? (
             <Lock className="size-4 text-muted-foreground" weight="bold" />
           ) : (
@@ -222,17 +229,17 @@ export default function ConnectionRow({
           <DropdownMenuTrigger
             className={cn(
               buttonVariants({ variant: "ghost", size: "icon" }),
-              "size-7 rounded-none text-muted-foreground hover:text-foreground h-7 w-7"
+              "size-7 text-muted-foreground hover:text-foreground h-7 w-7"
             )}
           >
             <DotsThreeVertical className="size-5" weight="bold" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-[140px] rounded-none border-border/50 shadow-none">
-            <DropdownMenuItem onClick={onEdit} className="rounded-none text-xs gap-2 py-2 cursor-pointer">
+          <DropdownMenuContent align="end" className="min-w-[140px] border-border/50 shadow-none">
+            <DropdownMenuItem onClick={onEdit} className=" text-xs gap-2 py-2 cursor-pointer">
               <Gear className="size-4" weight="bold" />
               {translate("Settings")}
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={onDelete} className="rounded-none text-xs gap-2 py-2 text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer">
+            <DropdownMenuItem onClick={onDelete} className=" text-xs gap-2 py-2 text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer">
               <Trash className="size-4" weight="bold" />
               {translate("Delete")}
             </DropdownMenuItem>

@@ -58,7 +58,7 @@ export default function PricingModal({ isOpen, onClose, onSave }: PricingModalPr
 
   useEffect(() => {
     if (isOpen) {
-      loadPricing();
+      void (async () => { loadPricing(); })();
     }
   }, [isOpen]);
 
@@ -122,7 +122,7 @@ export default function PricingModal({ isOpen, onClose, onSave }: PricingModalPr
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-      <div className="bg-background border border-border/50 rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col scale-100 animate-in zoom-in-95 duration-200">
+      <div className="bg-background border border-border/50 shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col scale-100 animate-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="p-4 border-b border-border/50 flex items-center justify-between bg-muted/5">
           <div className="flex flex-col gap-0.5 pl-2">
@@ -131,7 +131,7 @@ export default function PricingModal({ isOpen, onClose, onSave }: PricingModalPr
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted/10 transition-colors"
+            className="p-1.5 text-muted-foreground hover:bg-muted/10 transition-colors"
           >
             <X className="size-5" weight="bold" />
           </button>
@@ -147,7 +147,7 @@ export default function PricingModal({ isOpen, onClose, onSave }: PricingModalPr
           ) : (
             <div className="space-y-8">
               {/* Instructions */}
-              <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 flex items-start gap-3">
+              <div className="bg-primary/10 border border-primary/20 p-4 flex items-start gap-3">
                 <Warning className="size-5 text-primary shrink-0 mt-0.5" weight="bold" />
                 <div className="space-y-1">
                    <p className="text-xs font-bold text-primary uppercase tracking-widest">Pricing Rates Format</p>
@@ -162,7 +162,7 @@ export default function PricingModal({ isOpen, onClose, onSave }: PricingModalPr
               {allProviders.map(provider => {
                 const models = Object.keys(pricingData[provider]).sort();
                 return (
-                  <div key={provider} className="border border-border/50 rounded-xl overflow-hidden bg-muted/5">
+                  <div key={provider} className="border border-border/50 overflow-hidden bg-muted/5">
                     <div className="bg-muted/10 px-4 py-2.5 font-bold text-[10px] uppercase tracking-[0.2em] text-muted-foreground border-b border-border/50">
                       {provider}
                     </div>
@@ -190,7 +190,7 @@ export default function PricingModal({ isOpen, onClose, onSave }: PricingModalPr
                                     min="0"
                                     value={pricingData[provider][model][field] || 0}
                                     onChange={(e) => handlePricingChange(provider, model, field, e.target.value)}
-                                    className="w-16 px-1.5 py-1 text-right bg-background border border-border/50 rounded-none text-[11px] font-bold tabular-nums focus:outline-none focus:border-primary/50 transition-colors group-hover:border-primary/30"
+                                    className="w-16 px-1.5 py-1 text-right bg-background border border-border/50 text-[11px] font-bold tabular-nums focus:outline-none focus:border-primary/50 transition-colors group-hover:border-primary/30"
                                   />
                                 </td>
                               ))}

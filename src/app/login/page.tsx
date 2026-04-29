@@ -83,7 +83,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background p-6">
       <div className="w-full max-w-sm space-y-8 animate-in fade-in duration-500">
         <div className="flex flex-col items-center text-center">
-          <div className="size-12 rounded-2xl bg-primary flex items-center justify-center mb-6 shadow-none">
+          <div className="size-12 bg-primary flex items-center justify-center mb-6 shadow-none">
             <Zap className="size-6 text-primary-foreground fill-primary-foreground" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight">8Router Gateway</h1>
@@ -119,7 +119,7 @@ export default function LoginPage() {
                 Authorize Session
               </Button>
 
-              <div className="flex items-center justify-center gap-2 p-3 rounded-lg bg-muted/40 border border-border/50">
+              <div className="flex items-center justify-center gap-2 p-3 bg-muted/40 border border-border/50">
                  <span className="text-[10px] font-bold text-muted-foreground uppercase opacity-60">Provisioned password:</span>
                  <code className="text-[10px] font-mono font-bold text-primary">123456</code>
               </div>

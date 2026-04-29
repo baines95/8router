@@ -50,7 +50,7 @@ export default function GetStarted() {
 
           {/* Right: Code block */}
           <div className="flex-1 w-full">
-            <div className="rounded-xl overflow-hidden bg-card border border-border/50">
+            <div className=" overflow-hidden bg-card border border-border/50">
               {/* Terminal header */}
               <div className="flex items-center gap-2 px-4 py-3 bg-muted/30 border-b border-border/50">
                 <div className="w-3 h-3 rounded-full bg-red-500/80"></div>

@@ -37,7 +37,7 @@ export default function Navigation() {
         <div className="flex items-center gap-4">
           <button 
             onClick={() => router.push("/dashboard")}
-            className="hidden sm:flex h-9 items-center justify-center rounded-lg px-4 bg-primary hover:bg-primary/90 transition-all text-primary-foreground text-sm font-semibold border border-transparent"
+            className="hidden sm:flex h-9 items-center justify-center px-4 bg-primary hover:bg-primary/90 transition-all text-primary-foreground text-sm font-semibold border border-transparent"
           >
             Get Started
           </button>
@@ -60,7 +60,7 @@ export default function Navigation() {
             <a className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors" href="https://github.com/baines95/8router" target="_blank" rel="noopener noreferrer">GitHub</a>
             <button 
               onClick={() => router.push("/dashboard")}
-              className="h-9 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-semibold"
+              className="h-9 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-semibold"
             >
               Get Started
             </button>

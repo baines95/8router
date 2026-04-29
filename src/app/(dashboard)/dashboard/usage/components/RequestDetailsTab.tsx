@@ -70,7 +70,7 @@ interface CollapsibleSectionProps {
 function CollapsibleSection({ title, children, defaultOpen = false, icon: Icon = null }: CollapsibleSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   return (
-    <div className="border border-border/40 rounded-none overflow-hidden bg-muted/5">
+    <div className="border border-border/40 overflow-hidden bg-muted/5">
       <button type="button" onClick={() => setIsOpen(!isOpen)} className="w-full flex items-center justify-between px-3 py-2 hover:bg-muted/10 transition-colors">
         <div className="flex items-center gap-2">
           {Icon && <Icon className="size-3.5 text-muted-foreground" weight="bold"/>}
@@ -156,7 +156,7 @@ export default function RequestDetailsTab() {
  return (
  <div className="flex flex-col gap-6">
  {/* Filters Toolbar */}
- <Card className="border-border/40 bg-background/50 shadow-none rounded-none">
+ <Card className="border-border/40 bg-background/50 shadow-none">
  <CardContent className="p-3 flex flex-wrap items-center gap-3">
  <div className="flex items-center gap-2">
  <Filter className="size-3.5 text-muted-foreground" weight="bold"/>
@@ -164,16 +164,16 @@ export default function RequestDetailsTab() {
  </div>
 
  <Select value={filters.provider} onValueChange={v => setFilters({ ...filters, provider: v as string })}>
- <SelectTrigger className="h-8 text-xs font-bold uppercase tracking-widest w-[180px] bg-background/50 border-border/40 shadow-none rounded-none"><SelectValue placeholder="All Providers"/></SelectTrigger>
- <SelectContent className="rounded-none border-border/50 shadow-none">
+ <SelectTrigger className="h-8 text-xs font-bold uppercase tracking-widest w-[180px] bg-background/50 border-border/40 shadow-none"><SelectValue placeholder="All Providers"/></SelectTrigger>
+ <SelectContent className=" border-border/50 shadow-none">
    <SelectItem value="_all_" className="text-xs font-medium">All Providers</SelectItem>
    {providers.map(p => <SelectItem key={p.id} value={p.id} className="text-xs font-medium">{p.name}</SelectItem>)}
  </SelectContent>
  </Select>
 
- <Input type="datetime-local" value={filters.startDate} onChange={e => setFilters({ ...filters, startDate: e.target.value })} className="h-8 text-[10px] w-[180px] bg-background/50 font-mono border-border/40 rounded-none shadow-none"/>
+ <Input type="datetime-local" value={filters.startDate} onChange={e => setFilters({ ...filters, startDate: e.target.value })} className="h-8 text-[10px] w-[180px] bg-background/50 font-mono border-border/40 shadow-none"/>
  <span className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest opacity-40">To</span>
- <Input type="datetime-local" value={filters.endDate} onChange={e => setFilters({ ...filters, endDate: e.target.value })} className="h-8 text-[10px] w-[180px] bg-background/50 font-mono border-border/40 rounded-none shadow-none"/>
+ <Input type="datetime-local" value={filters.endDate} onChange={e => setFilters({ ...filters, endDate: e.target.value })} className="h-8 text-[10px] w-[180px] bg-background/50 font-mono border-border/40 shadow-none"/>
 
  <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase tracking-widest ml-auto hover:bg-muted/50" onClick={() => setFilters({ provider: "", startDate: "", endDate: "" })} disabled={!filters.provider && !filters.startDate && !filters.endDate}>
  <RotateCcw className="size-3.5 mr-2" weight="bold"/> Reset
@@ -182,7 +182,7 @@ export default function RequestDetailsTab() {
  </Card>
 
       {/* Main Table */}
-      <Card className="border-border/40 bg-background/50 shadow-none overflow-hidden p-0 rounded-none">
+      <Card className="border-border/40 bg-background/50 shadow-none overflow-hidden p-0">
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse">
             <thead className="bg-muted/10 border-b border-border/40 text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
@@ -207,7 +207,7 @@ export default function RequestDetailsTab() {
                   <td className="px-3 py-2.5 text-[10px] font-bold tabular-nums text-muted-foreground/60">{new Date(d.timestamp).toLocaleString([], { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}</td>
                   <td className="px-3 py-2.5 font-mono font-bold text-xs tracking-tight text-foreground">{d.model}</td>
                   <td className="px-3 py-2.5">
-                    <Badge variant="outline" className="h-4 text-[9px] font-bold uppercase border-border/40 bg-muted/40 text-muted-foreground/60 rounded-none tracking-tighter">
+                    <Badge variant="outline" className="h-4 text-[9px] font-bold uppercase border-border/40 bg-muted/40 text-muted-foreground/60 tracking-tighter">
                       {getProviderName(d.provider, providerNameCacheState)}
                     </Badge>
                   </td>
@@ -235,8 +235,8 @@ export default function RequestDetailsTab() {
  <div className="p-3 border-t border-border/40 bg-muted/5 flex items-center justify-between">
  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Page {pagination.page} of {pagination.totalPages}</span>
  <div className="flex gap-2">
- <Button variant="outline" size="sm" className="h-7 text-[10px] font-bold uppercase tracking-widest rounded-none border-border/50 bg-background shadow-none" onClick={() => setPagination(p => ({ ...p, page: Math.max(1, p.page - 1) }))} disabled={pagination.page <= 1}>Previous</Button>
- <Button variant="outline" size="sm" className="h-7 text-[10px] font-bold uppercase tracking-widest rounded-none border-border/50 bg-background shadow-none" onClick={() => setPagination(p => ({ ...p, page: Math.min(pagination.totalPages, p.page + 1) }))} disabled={pagination.page >= pagination.totalPages}>Next</Button>
+ <Button variant="outline" size="sm" className="h-7 text-[10px] font-bold uppercase tracking-widest border-border/50 bg-background shadow-none" onClick={() => setPagination(p => ({ ...p, page: Math.max(1, p.page - 1) }))} disabled={pagination.page <= 1}>Previous</Button>
+ <Button variant="outline" size="sm" className="h-7 text-[10px] font-bold uppercase tracking-widest border-border/50 bg-background shadow-none" onClick={() => setPagination(p => ({ ...p, page: Math.min(pagination.totalPages, p.page + 1) }))} disabled={pagination.page >= pagination.totalPages}>Next</Button>
  </div>
  </div>
  )}
@@ -244,7 +244,7 @@ export default function RequestDetailsTab() {
 
  {/* Inspector Sheet */}
  <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
- <SheetContent className="sm:max-w-xl border-l border-border/40 p-0 flex flex-col shadow-2xl rounded-none">
+ <SheetContent className="sm:max-w-xl border-l border-border/40 p-0 flex flex-col shadow-2xl">
  <SheetHeader className="px-6 py-4 border-b border-border/40 bg-muted/10 shrink-0">
  <div className="flex items-center gap-2 text-primary mb-1">
  <History className="size-4" weight="bold"/>
@@ -265,7 +265,7 @@ export default function RequestDetailsTab() {
  <MetaItem label="Service Provider" value={getProviderName(selectedDetail.provider, providerNameCacheState)} />
  <div className="space-y-1">
  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Status Descriptor</span>
- <div><Badge className={cn("border-none h-5 text-[10px] font-bold uppercase tracking-widest rounded-none", selectedDetail.status === 'success' ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive")}>{selectedDetail.status === 'success' ? "Success" : "Failed"}</Badge></div>
+ <div><Badge className={cn("border-none h-5 text-[10px] font-bold uppercase tracking-widest", selectedDetail.status === 'success' ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive")}>{selectedDetail.status === 'success' ? "Success" : "Failed"}</Badge></div>
  </div>
  <div className="space-y-1">
  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Execution Latency</span>
@@ -298,7 +298,7 @@ export default function RequestDetailsTab() {
  <BrainCircuit className="size-4" weight="bold" />
  <span className="text-[10px] font-bold uppercase tracking-widest">Cognitive Chain (Thinking)</span>
  </div>
- <pre className="p-4 rounded-xl bg-muted/30 border border-border/40 text-[11px] leading-relaxed font-mono text-muted-foreground italic whitespace-pre-wrap">{selectedDetail.response.thinking}</pre>
+ <pre className="p-4 bg-muted/30 border border-border/40 text-[11px] leading-relaxed font-mono text-muted-foreground italic whitespace-pre-wrap">{selectedDetail.response.thinking}</pre>
  </div>
  )}
  <CodeBlock content={selectedDetail.response?.content || "[No Content Payload]"} />
@@ -325,7 +325,7 @@ function MetaItem({ label, value, mono = false }: { label: string, value: string
 function CodeBlock({ content }: { content: any }) {
  const text = typeof content === 'object' ? JSON.stringify(content, null, 2) : content;
  return (
- <pre className="p-4 rounded-xl bg-muted/40 border border-border/50 font-mono text-[11px] leading-relaxed text-foreground/70 overflow-auto max-h-[400px] no-scrollbar shadow-none">
+ <pre className="p-4 bg-muted/40 border border-border/50 font-mono text-[11px] leading-relaxed text-foreground/70 overflow-auto max-h-[400px] no-scrollbar shadow-none">
  {text}
  </pre>
  );

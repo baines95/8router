@@ -84,7 +84,7 @@ export default function IFlowCookieModal({ isOpen, onSuccess, onClose }: IFlowCo
                   platform.iflow.cn
                 </a>
               </p>
-              <div className="bg-muted/10 p-3 rounded-lg text-[10px] space-y-2 border border-border/50">
+              <div className="bg-muted/10 p-3 text-[10px] space-y-2 border border-border/50">
                 <p className="font-bold text-foreground uppercase tracking-widest opacity-60">How to get cookie:</p>
                 <ol className="list-decimal list-inside space-y-1 text-muted-foreground font-medium">
                   <li>Open platform.iflow.cn in your browser</li>
@@ -104,20 +104,20 @@ export default function IFlowCookieModal({ isOpen, onSuccess, onClose }: IFlowCo
                 value={cookie}
                 onChange={(e) => setCookie(e.target.value)}
                 placeholder="BXAuth=xxx; ..."
-                className="w-full px-3 py-2 bg-muted/5 border border-border/50 rounded-none text-xs font-mono text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-primary/50 resize-none transition-colors"
+                className="w-full px-3 py-2 bg-muted/5 border border-border/50 text-xs font-mono text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-primary/50 resize-none transition-colors"
                 rows={4}
                 disabled={loading}
               />
             </div>
 
             {error && (
-              <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+              <div className="p-3 bg-destructive/10 border border-destructive/20">
                 <p className="text-xs font-bold uppercase tracking-wide text-destructive">{error}</p>
               </div>
             )}
 
             <div className="flex gap-3 pt-2">
-              <Button variant="secondary" onClick={handleClose} disabled={loading} className="flex-1 h-10 font-bold text-xs uppercase tracking-widest border border-border/50 rounded-none">
+              <Button variant="secondary" onClick={handleClose} disabled={loading} className="flex-1 h-10 font-bold text-xs uppercase tracking-widest border border-border/50">
                 {translate("Cancel")}
               </Button>
               <Button onClick={handleSubmit} disabled={loading} className="flex-1 h-10 font-bold text-xs uppercase tracking-widest shadow-none">

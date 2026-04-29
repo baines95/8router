@@ -336,13 +336,13 @@ export default function ProvidersPage() {
 
  {/* Filter Bar */}
  <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
- <div className="flex items-center gap-0.5 bg-muted/30 p-0.5 border border-border/50 rounded-lg w-full md:w-auto overflow-x-auto no-scrollbar">
+ <div className="flex items-center gap-0.5 bg-muted/30 p-0.5 border border-border/50 w-full md:w-auto overflow-x-auto no-scrollbar">
  {CATEGORIES.map((cat) => (
  <button
  key={cat.id}
  onClick={() => setActiveCategory(cat.id)}
  className={cn(
- "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all shrink-0",
+ "flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all shrink-0",
  activeCategory === cat.id
  ? "bg-background text-foreground shadow-sm border border-border/50"
  : "text-muted-foreground hover:text-foreground"
@@ -407,7 +407,7 @@ export default function ProvidersPage() {
  {/* Add Compatible Slot */}
  {(activeCategory === "all" || activeCategory === "compatible") && (
  <button 
- className="group relative transition-all duration-200 border border-dashed border-border/60 bg-muted/5 hover:bg-muted/10 hover:border-primary/30 rounded-lg overflow-hidden h-fit text-left cursor-pointer"
+ className="group relative transition-all duration-200 border border-dashed border-border/60 bg-muted/5 hover:bg-muted/10 hover:border-primary/30 overflow-hidden h-fit text-left cursor-pointer"
  onClick={() => setShowAddCompatibleModal(true)}
  >
  <div className="p-3 flex flex-col gap-2">
@@ -502,7 +502,7 @@ function NewProviderCard({ provider, stats, testingMode, onToggle, onTest }: {
 
  return (
  <Card className={cn(
- "group relative transition-all duration-200 border-border/50 bg-transparent hover:bg-muted/10 shadow-none rounded-lg overflow-hidden h-fit p-0",
+ "group relative transition-all duration-200 border-border/50 bg-transparent hover:bg-muted/10 shadow-none overflow-hidden h-fit p-0",
  allDisabled && "opacity-50 grayscale"
  )}>
  <CardHeader className="flex flex-row items-center justify-between space-y-0 px-3 py-2 border-b border-border/50">
@@ -594,8 +594,8 @@ function NewProviderCard({ provider, stats, testingMode, onToggle, onTest }: {
 
 function StatCard({ label, value, icon: Icon, color }: { label: string, value: number, icon: any, color: string }) {
  return (
- <Card className="flex items-center gap-3 px-3 py-2 min-w-[100px] border-border/40 shadow-none rounded-lg bg-muted/5">
- <div className={cn("p-2 rounded-md bg-muted/20", color.replace('text-', 'bg-').replace('destructive', 'destructive/10').replace('primary', 'primary/10'))}>
+ <Card className="flex items-center gap-3 px-3 py-2 min-w-[100px] border-border/40 shadow-none bg-muted/5">
+ <div className={cn("p-2 bg-muted/20", color.replace('text-', 'bg-').replace('destructive', 'destructive/10').replace('primary', 'primary/10'))}>
  <Icon className={cn("size-4", color)} weight="bold" />
  </div>
  <div className="flex flex-col">
@@ -611,15 +611,15 @@ function ProvidersLoadingState() {
  return (
  <div className="mx-auto flex max-w-7xl flex-col gap-8 pb-10 px-4">
  <div className="space-y-3 py-8">
- <Skeleton className="h-8 w-48 rounded-lg"/>
- <Skeleton className="h-4 w-full max-w-md rounded-md"/>
+ <Skeleton className="h-8 w-48"/>
+ <Skeleton className="h-4 w-full max-w-md"/>
  </div>
- <div className="flex gap-2 p-1 border border-border/40 rounded-xl bg-muted/10">
- {[1,2,3,4,5].map(i => <Skeleton key={i} className="h-8 w-24 rounded-lg"/>)}
+ <div className="flex gap-2 p-1 border border-border/40 bg-muted/10">
+ {[1,2,3,4,5].map(i => <Skeleton key={i} className="h-8 w-24"/>)}
  </div>
  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mt-6">
  {Array.from({ length: 8 }).map((_, i) => (
- <Skeleton key={i} className="h-32 w-full rounded-xl"/>
+ <Skeleton key={i} className="h-32 w-full"/>
  ))}
  </div>
  </div>
@@ -815,7 +815,7 @@ function ProviderTestResultsView({ results }: { results: any }) {
  return (
  <div className="space-y-1.5 pt-2">
  {results.results?.map((r: any, i: number) => (
- <div key={i} className="flex items-center justify-between p-2.5 rounded-lg border border-border/40 bg-muted/5 text-xs">
+ <div key={i} className="flex items-center justify-between p-2.5 border border-border/40 bg-muted/5 text-xs">
  <div className="flex flex-col gap-0.5">
  <span className="font-medium text-foreground">{r.connectionName}</span>
  <span className="text-xs text-muted-foreground">{r.provider}</span>

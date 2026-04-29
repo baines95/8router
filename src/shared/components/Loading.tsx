@@ -44,7 +44,7 @@ export function PageLoading({ message = "Loading..." }: { message?: string }) {
 export function Skeleton({ className, ...props }: React.ComponentProps<typeof ShadcnSkeleton>) {
   return (
     <ShadcnSkeleton
-      className={cn("rounded-lg", className)}
+      className={cn("", className)}
       {...props}
     />
   );
@@ -53,10 +53,10 @@ export function Skeleton({ className, ...props }: React.ComponentProps<typeof Sh
 // Card skeleton
 export function CardSkeleton() {
   return (
-    <div className="p-6 rounded-xl border border-border bg-card">
+    <div className="p-6 border border-border bg-card">
       <div className="flex items-center justify-between mb-4">
         <Skeleton className="h-4 w-24" />
-        <Skeleton className="size-10 rounded-lg" />
+        <Skeleton className="size-10" />
       </div>
       <Skeleton className="h-8 w-16 mb-2" />
       <Skeleton className="h-3 w-20" />

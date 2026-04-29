@@ -276,7 +276,7 @@ export default function AntigravityToolCard({
  >
  <div className="space-y-6">
  {/* Status Indicators */}
- <div className="flex flex-wrap items-center gap-x-4 gap-y-2 p-3 bg-muted/20 rounded-xl border border-border/50">
+ <div className="flex flex-wrap items-center gap-x-4 gap-y-2 p-3 bg-muted/20 border border-border/50">
  {[
  { key: "cert", label: translate("Cert"), ok: status?.certExists },
  { key: "server", label: translate("Server"), ok: status?.running },
@@ -337,7 +337,7 @@ export default function AntigravityToolCard({
  </div>
 
  {isWindows && !isRunning && (
- <div className="flex items-start gap-3 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+ <div className="flex items-start gap-3 p-3 bg-amber-500/10 border border-amber-500/20">
  <ShieldAlert className="text-amber-600 size-5 shrink-0 mt-0.5" />
  <p className="text-xs text-amber-600 font-medium leading-relaxed italic">
  <span className="font-bold uppercase tracking-widest not-italic mr-1.5">Windows:</span> {translate("Please run Terminal with Administrator privileges to enable MITM.")}
@@ -346,7 +346,7 @@ export default function AntigravityToolCard({
  )}
 
  {!isRunning && (
- <div className="p-4 bg-muted/10 border border-border/50 rounded-xl space-y-3">
+ <div className="p-4 bg-muted/10 border border-border/50 space-y-3">
  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
  <Info className="size-3.5" />
  {translate("Operational Flow")}
@@ -382,12 +382,12 @@ export default function AntigravityToolCard({
  <select 
  value={selectedApiKey} 
  onChange={(e) => setSelectedApiKey(e.target.value)} 
- className="w-full h-9 px-3 py-1 bg-muted/5 border border-border/50 rounded-none text-xs font-bold focus:outline-none focus:border-primary/50 transition-all"
+ className="w-full h-9 px-3 py-1 bg-muted/5 border border-border/50 text-xs font-bold focus:outline-none focus:border-primary/50 transition-all"
  >
  {apiKeys.map((key) => <option key={key.id} value={key.key}>{key.key}</option>)}
  </select>
  ) : (
- <div className="h-9 flex items-center px-3 bg-muted/10 border border-border/50 border-dashed rounded-none text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">
+ <div className="h-9 flex items-center px-3 bg-muted/10 border border-border/50 border-dashed text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">
  {cloudEnabled ? translate("No keys found") : "sk_8router (Internal)"}
  </div>
  )}
@@ -404,14 +404,14 @@ export default function AntigravityToolCard({
  value={modelMappings[model.alias] || ""} 
  onChange={(e) => handleModelMappingChange(model.alias, e.target.value)} 
  placeholder="provider/model-id"
- className="h-9 text-xs rounded-none border-border/50 bg-muted/5 flex-1 font-mono focus-visible:ring-0 focus-visible:border-primary/50"
+ className="h-9 text-xs border-border/50 bg-muted/5 flex-1 font-mono focus-visible:ring-0 focus-visible:border-primary/50"
  />
  <Button 
  variant="outline"
  size="sm"
  onClick={() => openModelSelector(model.alias)} 
  disabled={!hasActiveProviders}
- className="h-9 px-4 text-[10px] font-bold uppercase tracking-widest rounded-none border-border/50 bg-background hover:bg-muted/10 transition-colors"
+ className="h-9 px-4 text-[10px] font-bold uppercase tracking-widest border-border/50 bg-background hover:bg-muted/10 transition-colors"
  >
  {translate("Select")}
  </Button>
@@ -420,7 +420,7 @@ export default function AntigravityToolCard({
  variant="ghost"
  size="icon"
  onClick={() => handleModelMappingChange(model.alias, "")} 
- className="size-9 rounded-none text-muted-foreground hover:text-destructive border border-border/50 bg-muted/5"
+ className="size-9 text-muted-foreground hover:text-destructive border border-border/50 bg-muted/5"
  >
  <X className="size-4" />
  </Button>
@@ -437,13 +437,13 @@ export default function AntigravityToolCard({
  {/* Sudo Password Modal */}
  {showPasswordModal && (
  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
- <div className="bg-background border border-border/50 rounded-none p-6 w-full max-w-sm flex flex-col gap-6 shadow-2xl scale-100 animate-in zoom-in-95 duration-200">
+ <div className="bg-background border border-border/50 p-6 w-full max-w-sm flex flex-col gap-6 shadow-2xl scale-100 animate-in zoom-in-95 duration-200">
  <div className="space-y-1">
  <h3 className="text-lg font-bold tracking-tight text-foreground uppercase">{translate("Authority Challenge")}</h3>
  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">{translate("Sudo required for system configuration.")}</p>
  </div>
 
- <div className="flex items-start gap-3 p-3 bg-muted/30 border border-border/50 rounded-none">
+ <div className="flex items-start gap-3 p-3 bg-muted/30 border border-border/50">
  <ShieldAlert className="text-amber-600 size-5 shrink-0 mt-0.5" />
  <p className="text-[11px] font-medium text-muted-foreground leading-relaxed italic">
  {translate("Credentials used only for execution and are not persisted.")}
@@ -458,7 +458,7 @@ export default function AntigravityToolCard({
  onKeyDown={(e) => {
  if (e.key === "Enter" && !loading) handleConfirmPassword();
  }}
- className="h-10 rounded-none border-border/50 bg-muted/5 focus-visible:ring-0 focus-visible:border-primary/50"
+ className="h-10 border-border/50 bg-muted/5 focus-visible:ring-0 focus-visible:border-primary/50"
  autoFocus
  />
 
@@ -468,7 +468,7 @@ export default function AntigravityToolCard({
  size="sm"
  onClick={() => { setShowPasswordModal(false); setSudoPassword(""); setMessage(null); }}
  disabled={loading}
- className="flex-1 h-10 font-bold text-[10px] uppercase tracking-widest rounded-none border-border/50 hover:bg-muted/30"
+ className="flex-1 h-10 font-bold text-[10px] uppercase tracking-widest border-border/50 hover:bg-muted/30"
  >
  {translate("Cancel")}
  </Button>

@@ -188,18 +188,18 @@ export default function APIPageClient({ initialData }: EndpointPageClientProps) 
   if (loading) {
     return (
       <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6">
-        <Skeleton className="h-24 w-full rounded-xl" />
-        <Skeleton className="h-28 w-full rounded-xl" />
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-28 w-full" />
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          <Skeleton className="h-56 w-full rounded-xl" />
-          <Skeleton className="h-56 w-full rounded-xl" />
-          <Skeleton className="h-56 w-full rounded-xl" />
+          <Skeleton className="h-56 w-full" />
+          <Skeleton className="h-56 w-full" />
+          <Skeleton className="h-56 w-full" />
         </div>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          <Skeleton className="h-96 w-full rounded-xl lg:col-span-8" />
+          <Skeleton className="h-96 w-full lg:col-span-8" />
           <div className="flex flex-col gap-6 lg:col-span-4">
-            <Skeleton className="h-52 w-full rounded-xl" />
-            <Skeleton className="h-40 w-full rounded-xl" />
+            <Skeleton className="h-52 w-full" />
+            <Skeleton className="h-40 w-full" />
           </div>
         </div>
       </div>
@@ -312,7 +312,7 @@ export default function APIPageClient({ initialData }: EndpointPageClientProps) 
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left: Auth */}
-        <Card className="lg:col-span-8 border-border/50 p-0 overflow-hidden rounded-md shadow-none bg-background/50">
+        <Card className="lg:col-span-8 border-border/50 p-0 overflow-hidden shadow-none bg-background/50">
           <CardHeader className="flex flex-row items-center justify-between p-6 border-b border-border/40 bg-muted/10">
             <div className="space-y-1">
               <CardTitle className="text-sm font-medium">{translate("API Key Security")}</CardTitle>
@@ -323,9 +323,9 @@ export default function APIPageClient({ initialData }: EndpointPageClientProps) 
             </Button>
           </CardHeader>
           <CardContent className="p-6">
-            <div className="flex items-center justify-between p-4 mb-8 rounded-md border border-border/50 bg-muted/20">
+            <div className="flex items-center justify-between p-4 mb-8 border border-border/50 bg-muted/20">
               <div className="flex gap-4 items-center">
-                <div className={cn("p-2 rounded-md border border-border/50 bg-background shadow-none", requireApiKey && "text-primary border-primary/20")}>
+                <div className={cn("p-2 border border-border/50 bg-background shadow-none", requireApiKey && "text-primary border-primary/20")}>
                   <LockSimpleIcon className="size-4" weight="bold" />
                 </div>
                 <div>
@@ -337,8 +337,8 @@ export default function APIPageClient({ initialData }: EndpointPageClientProps) 
             </div>
 
             {keys.length === 0 ? (
-              <div className="rounded-md border border-dashed border-border/50 p-8 text-center">
-                <div className="mx-auto mb-3 inline-flex rounded-md border border-border/60 bg-muted/30 p-2">
+              <div className=" border border-dashed border-border/50 p-8 text-center">
+                <div className="mx-auto mb-3 inline-flex border border-border/60 bg-muted/30 p-2">
                   <KeyIcon className="size-5 text-muted-foreground" weight="bold" />
                 </div>
                 <p className="text-sm font-medium text-foreground">{translate("No API keys yet")}</p>
@@ -353,29 +353,29 @@ export default function APIPageClient({ initialData }: EndpointPageClientProps) 
             ) : (
               <div className="space-y-2">
                 {keys.map((key) => (
-                  <div key={key.id} className={cn("flex items-center justify-between p-3.5 rounded-md border border-border/50 hover:bg-muted/30 transition-all group bg-background/50", !key.isActive && "opacity-50 grayscale")}>
+                  <div key={key.id} className={cn("flex items-center justify-between p-3.5 border border-border/50 hover:bg-muted/30 transition-all group bg-background/50", !key.isActive && "opacity-50 grayscale")}>
                     <div className="min-w-0 flex-1 space-y-1">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium text-foreground">{key.name}</span>
-                        {!key.isActive && <Badge variant="outline" className="h-4 px-1 text-xs border-border/40 text-muted-foreground/80 rounded-md">{translate("Paused")}</Badge>}
+                        {!key.isActive && <Badge variant="outline" className="h-4 px-1 text-xs border-border/40 text-muted-foreground/80">{translate("Paused")}</Badge>}
                       </div>
                       <div className="flex items-center gap-2">
                         <code className="text-xs font-mono text-muted-foreground tabular-nums">{visibleKeys.has(key.id) ? key.key : key.key.slice(0, 8) + "..."}</code>
                         <div className="flex gap-0.5">
-                          <Button variant="ghost" size="icon" className="size-7 rounded-md text-muted-foreground hover:text-foreground" onClick={() => {
+                          <Button variant="ghost" size="icon" className="size-7 text-muted-foreground hover:text-foreground" onClick={() => {
                             setVisibleKeys(prev => {
                               const next = new Set(prev);
                               if (next.has(key.id)) next.delete(key.id); else next.add(key.id);
                               return next;
                             });
                           }}>{visibleKeys.has(key.id) ? <EyeSlashIcon className="size-4" weight="bold" /> : <EyeIcon className="size-4" weight="bold" />}</Button>
-                          <Button variant="ghost" size="icon" className="size-7 rounded-md text-muted-foreground hover:text-primary" onClick={() => copy(key.key, key.id)}>{copied === key.id ? <CheckIcon className="size-4 text-primary" weight="bold" /> : <CopyIcon className="size-4" weight="bold" />}</Button>
+                          <Button variant="ghost" size="icon" className="size-7 text-muted-foreground hover:text-primary" onClick={() => copy(key.key, key.id)}>{copied === key.id ? <CheckIcon className="size-4 text-primary" weight="bold" /> : <CopyIcon className="size-4" weight="bold" />}</Button>
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-4 pl-4 border-l border-border/20">
                       <Switch checked={key.isActive ?? true} onCheckedChange={(v) => handleToggleKey(key.id, v)} className="scale-[0.7] data-[state=checked]:bg-primary" />
-                      <Button variant="ghost" size="icon" className="size-8 rounded-md text-muted-foreground hover:text-destructive border border-transparent hover:border-border/50" onClick={() => handleDeleteKey(key.id)}><TrashIcon className="size-4" weight="bold" /></Button>
+                      <Button variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-destructive border border-transparent hover:border-border/50" onClick={() => handleDeleteKey(key.id)}><TrashIcon className="size-4" weight="bold" /></Button>
                     </div>
                   </div>
                 ))}
@@ -386,12 +386,12 @@ export default function APIPageClient({ initialData }: EndpointPageClientProps) 
 
         {/* Right: Tools */}
         <div className="lg:col-span-4 flex flex-col gap-6">
-          <Card className="border-border/50 overflow-hidden p-0 bg-muted/5 rounded-md shadow-none">
+          <Card className="border-border/50 overflow-hidden p-0 bg-muted/5 shadow-none">
             <CardHeader className="p-4 border-b border-border/40 bg-muted/20">
               <CardTitle className="text-sm font-medium flex items-center gap-2"><TerminalWindowIcon className="size-4" weight="bold" /> {translate("Validation")}</CardTitle>
             </CardHeader>
             <CardContent className="p-4 space-y-4">
-              <div className="p-3 bg-black rounded-md font-mono text-xs text-zinc-100 overflow-auto border border-zinc-800 shadow-inner">
+              <div className="p-3 bg-black font-mono text-xs text-zinc-100 overflow-auto border border-zinc-800 shadow-inner">
                 <pre className="whitespace-pre-wrap break-all leading-relaxed">{testCurl}</pre>
               </div>
               <p className="text-xs text-muted-foreground">{translate("Execute this cURL snippet to verify node connectivity. Credentials required.")}</p>
@@ -399,7 +399,7 @@ export default function APIPageClient({ initialData }: EndpointPageClientProps) 
             </CardContent>
           </Card>
 
-          <Card className="border-border/50 p-0 overflow-hidden rounded-md shadow-none">
+          <Card className="border-border/50 p-0 overflow-hidden shadow-none">
             <CardHeader className="p-4 border-b border-border/40 bg-muted/20">
               <CardTitle className="text-sm font-medium flex items-center gap-2"><SlidersHorizontalIcon className="size-4" weight="bold" /> {translate("Advanced controls")}</CardTitle>
             </CardHeader>
@@ -420,7 +420,7 @@ export default function APIPageClient({ initialData }: EndpointPageClientProps) 
                 href="/dashboard/profile"
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "sm" }),
-                  "h-8 w-full text-xs font-medium rounded-md transition-colors hover:bg-primary/10 hover:text-primary"
+                  "h-8 w-full text-xs font-medium transition-colors hover:bg-primary/10 hover:text-primary"
                 )}
               >
                 {translate("Global Security")} <ArrowSquareOutIcon className="ml-2 size-4" weight="bold" />
@@ -432,26 +432,26 @@ export default function APIPageClient({ initialData }: EndpointPageClientProps) 
 
       {/* Modals */}
       <Dialog open={!!createdKey} onOpenChange={() => setCreatedKey(null)}>
-        <DialogContent className="sm:max-w-md rounded-md border-border/50 shadow-none p-6">
+        <DialogContent className="sm:max-w-md border-border/50 shadow-none p-6">
           <DialogHeader><DialogTitle className="text-primary flex items-center gap-2 text-sm font-medium"><CheckCircleIcon className="size-5" weight="bold" /> Token Generated</DialogTitle><DialogDescription className="text-xs text-muted-foreground">Provisioned successfully. Stored in vault, only shown once.</DialogDescription></DialogHeader>
-          <div className="mt-4 flex items-center justify-between gap-4 rounded-md border border-primary/20 bg-muted/10 p-4 font-mono text-sm shadow-inner"><span className="flex-1 truncate tabular-nums text-primary">{createdKey}</span><Button variant="ghost" size="icon" className="rounded-md border border-primary/10 text-primary hover:bg-primary/10" onClick={() => copy(createdKey as string, "nk")}><CopyIcon className="size-4" weight="bold" /></Button></div>
-          <DialogFooter className="mt-6 border-none p-0"><Button className="h-10 w-full rounded-md text-xs font-medium shadow-none" onClick={() => setCreatedKey(null)}>I have saved it</Button></DialogFooter>
+          <div className="mt-4 flex items-center justify-between gap-4 border border-primary/20 bg-muted/10 p-4 font-mono text-sm shadow-inner"><span className="flex-1 truncate tabular-nums text-primary">{createdKey}</span><Button variant="ghost" size="icon" className=" border border-primary/10 text-primary hover:bg-primary/10" onClick={() => copy(createdKey as string, "nk")}><CopyIcon className="size-4" weight="bold" /></Button></div>
+          <DialogFooter className="mt-6 border-none p-0"><Button className="h-10 w-full text-xs font-medium shadow-none" onClick={() => setCreatedKey(null)}>I have saved it</Button></DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-        <DialogContent className="sm:max-w-md rounded-md border-border/50 shadow-none p-6">
+        <DialogContent className="sm:max-w-md border-border/50 shadow-none p-6">
           <DialogHeader className="mb-4"><DialogTitle className="text-sm font-medium">New Access Token</DialogTitle><DialogDescription className="text-xs text-muted-foreground">Identity string for this client connection.</DialogDescription></DialogHeader>
-          <div className="space-y-2 py-2"><Label className="px-1 text-xs text-muted-foreground">Token Label</Label><Input value={newKeyName} onChange={e => setNewKeyName(e.target.value)} placeholder="e.g. Cursor IDE, Cline Agent" className="h-10 rounded-md border-border/50 bg-muted/5 text-sm" autoFocus /></div>
-          <DialogFooter className="mt-4 gap-2 p-0 sm:gap-2"><Button variant="outline" className="h-10 flex-1 rounded-md border-border/50 text-xs font-medium" onClick={() => setShowAddModal(false)}>Cancel</Button><Button className="h-10 flex-1 rounded-md text-xs font-medium shadow-none" onClick={handleCreateKey} disabled={!newKeyName.trim()}>Create Token</Button></DialogFooter>
+          <div className="space-y-2 py-2"><Label className="px-1 text-xs text-muted-foreground">Token Label</Label><Input value={newKeyName} onChange={e => setNewKeyName(e.target.value)} placeholder="e.g. Cursor IDE, Cline Agent" className="h-10 border-border/50 bg-muted/5 text-sm" autoFocus /></div>
+          <DialogFooter className="mt-4 gap-2 p-0 sm:gap-2"><Button variant="outline" className="h-10 flex-1 border-border/50 text-xs font-medium" onClick={() => setShowAddModal(false)}>Cancel</Button><Button className="h-10 flex-1 text-xs font-medium shadow-none" onClick={handleCreateKey} disabled={!newKeyName.trim()}>Create Token</Button></DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={showEnableTunnelModal} onOpenChange={setShowEnableTunnelModal}>
-        <DialogContent className="sm:max-w-md rounded-md border-border/50 shadow-none p-6">
+        <DialogContent className="sm:max-w-md border-border/50 shadow-none p-6">
           <DialogHeader className="mb-4"><DialogTitle className="text-sm font-medium">Provision Cloudflare Tunnel</DialogTitle><DialogDescription className="text-xs text-muted-foreground">Expose node via secure Cloudflare bridge.</DialogDescription></DialogHeader>
           <div className="py-2"><p className="border-l-2 border-primary/50 pl-3 text-xs text-muted-foreground leading-relaxed">This will initialize a high-availability cloudflared instance. Ensure &quot;Security Enforcement&quot; is active above before provisioning.</p></div>
-          <DialogFooter className="mt-4 gap-2 p-0 sm:gap-2"><Button variant="outline" className="h-10 flex-1 rounded-md border-border/50 text-xs font-medium" onClick={() => setShowEnableTunnelModal(false)}>Cancel</Button><Button className="h-10 flex-1 rounded-md text-xs font-medium shadow-none" onClick={() => {
+          <DialogFooter className="mt-4 gap-2 p-0 sm:gap-2"><Button variant="outline" className="h-10 flex-1 border-border/50 text-xs font-medium" onClick={() => setShowEnableTunnelModal(false)}>Cancel</Button><Button className="h-10 flex-1 text-xs font-medium shadow-none" onClick={() => {
             setShowEnableTunnelModal(false);
             fetch("/api/tunnel/enable", { method: "POST" }).then(() => loadSettings());
           }}>Initialize Tunnel</Button></DialogFooter>
@@ -459,9 +459,9 @@ export default function APIPageClient({ initialData }: EndpointPageClientProps) 
       </Dialog>
 
       <Dialog open={showDisableTunnelModal} onOpenChange={setShowDisableTunnelModal}>
-        <DialogContent className="sm:max-w-md rounded-md border-border/50 shadow-none p-6">
+        <DialogContent className="sm:max-w-md border-border/50 shadow-none p-6">
           <DialogHeader className="mb-4"><DialogTitle className="text-sm font-medium text-destructive">Terminate Tunnel?</DialogTitle><DialogDescription className="text-xs text-muted-foreground">The public bridge will be severed immediately.</DialogDescription></DialogHeader>
-          <DialogFooter className="mt-4 gap-2 p-0 sm:gap-2"><Button variant="outline" className="h-10 flex-1 rounded-md border-border/50 text-xs font-medium" onClick={() => setShowDisableTunnelModal(false)}>Cancel</Button><Button variant="destructive" className="h-10 flex-1 rounded-md border-none bg-destructive/10 text-xs font-medium text-destructive shadow-none hover:bg-destructive/20" onClick={() => {
+          <DialogFooter className="mt-4 gap-2 p-0 sm:gap-2"><Button variant="outline" className="h-10 flex-1 border-border/50 text-xs font-medium" onClick={() => setShowDisableTunnelModal(false)}>Cancel</Button><Button variant="destructive" className="h-10 flex-1 border-none bg-destructive/10 text-xs font-medium text-destructive shadow-none hover:bg-destructive/20" onClick={() => {
             fetch("/api/tunnel/disable", { method: "POST" }).then(() => { setTunnelEnabled(false); setShowDisableTunnelModal(false); });
           }}>Terminate Bridge</Button></DialogFooter>
         </DialogContent>
@@ -486,20 +486,20 @@ interface NodeCardProps {
 function NodeCard({ title, desc, url, icon: Icon, badge, active, color, loading = false, onClick }: NodeCardProps) {
   void color;
   return (
-    <Card className={cn("border-border/50 overflow-hidden transition-all rounded-md shadow-none bg-background/50", active && "border-primary/20 bg-primary/[0.01]")}>
+    <Card className={cn("border-border/50 overflow-hidden transition-all shadow-none bg-background/50", active && "border-primary/20 bg-primary/[0.01]")}>
       <CardHeader className="pb-3 px-5 pt-5">
         <div className="flex justify-between items-start mb-4">
-          <div className={cn("p-2 rounded-md border border-border/50 bg-muted/10 shadow-none", active ? "text-primary border-primary/20 bg-primary/5" : "text-muted-foreground")}>
+          <div className={cn("p-2 border border-border/50 bg-muted/10 shadow-none", active ? "text-primary border-primary/20 bg-primary/5" : "text-muted-foreground")}>
             <Icon className="size-5" weight="bold" />
           </div>
-          <Badge variant="outline" className={cn("h-4 rounded-md border-none px-1.5 text-xs", active ? "bg-primary/10 text-primary" : "bg-muted/40 text-muted-foreground/70")}>{badge}</Badge>
+          <Badge variant="outline" className={cn("h-4 border-none px-1.5 text-xs", active ? "bg-primary/10 text-primary" : "bg-muted/40 text-muted-foreground/70")}>{badge}</Badge>
         </div>
         <CardTitle className="text-sm font-medium text-foreground">{title}</CardTitle>
         <CardDescription className="mt-0.5 text-xs text-muted-foreground">{desc}</CardDescription>
       </CardHeader>
       <CardContent className="px-5">
         <div className={cn(
-          "flex h-10 items-center rounded-md border px-3 font-mono text-xs tabular-nums",
+          "flex h-10 items-center border px-3 font-mono text-xs tabular-nums",
           active
             ? "border-border/60 bg-background text-foreground/90"
             : "border-border/50 bg-muted/25 text-muted-foreground"
@@ -512,7 +512,7 @@ function NodeCard({ title, desc, url, icon: Icon, badge, active, color, loading 
           <Button
             variant={active ? "outline" : "default"}
             size="sm"
-            className="h-8 w-full rounded-md border-border/50 text-xs font-medium shadow-none"
+            className="h-8 w-full border-border/50 text-xs font-medium shadow-none"
             onClick={onClick}
             disabled={loading}
           >

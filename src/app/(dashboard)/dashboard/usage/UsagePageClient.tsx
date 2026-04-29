@@ -206,14 +206,14 @@ export default function UsagePageClient() {
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="flex flex-col gap-6">
-        <TabsList className="w-full justify-start border-b border-border/40 rounded-none h-auto p-0 bg-transparent gap-6">
-          <TabsTrigger value="overview" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-1 py-2 text-sm font-medium data-[state=active]:shadow-none -mb-px">
+        <TabsList className="w-full justify-start border-b border-border/40 h-auto p-0 bg-transparent gap-6">
+          <TabsTrigger value="overview" className=" border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-1 py-2 text-sm font-medium data-[state=active]:shadow-none -mb-px">
             {translate("Overview")}
           </TabsTrigger>
-          <TabsTrigger value="network" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-1 py-2 text-sm font-medium data-[state=active]:shadow-none -mb-px">
+          <TabsTrigger value="network" className=" border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-1 py-2 text-sm font-medium data-[state=active]:shadow-none -mb-px">
             {translate("Network Topology")}
           </TabsTrigger>
-          <TabsTrigger value="details" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-1 py-2 text-sm font-medium data-[state=active]:shadow-none -mb-px">
+          <TabsTrigger value="details" className=" border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-1 py-2 text-sm font-medium data-[state=active]:shadow-none -mb-px">
             {translate("Traffic Inspector")}
           </TabsTrigger>
         </TabsList>
@@ -379,7 +379,7 @@ function UsageDashboard() {
             <CardDescription className="text-xs text-muted-foreground">{translate("Traffic and cost metrics over time.")}</CardDescription>
             <CardAction>
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 bg-muted/30 p-1 border rounded-md">
+                <div className="flex items-center gap-1 bg-muted/30 p-1 border">
                   {USAGE_PERIOD_PRESETS.map((p) => (
                     <Button
                       key={p.value}
@@ -456,7 +456,7 @@ function UsageDashboard() {
                   <TabsTrigger 
                     key={tab.value} 
                     value={tab.value} 
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 py-4 text-sm font-medium data-[state=active]:shadow-none -mb-[1px]"
+                    className=" border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 py-4 text-sm font-medium data-[state=active]:shadow-none -mb-[1px]"
                   >
                     {translate(tab.label)}
                   </TabsTrigger>
@@ -698,11 +698,11 @@ function UsageLoadingState() {
   return (
     <div className="flex flex-col gap-6 animate-pulse mt-6">
       <div className="grid gap-4 md:grid-cols-4">
-        {[1,2,3,4].map(i => <Skeleton key={i} className="h-[100px] w-full rounded-md"/>)}
+        {[1,2,3,4].map(i => <Skeleton key={i} className="h-[100px] w-full"/>)}
       </div>
       <div className="grid gap-4 lg:grid-cols-3">
-        <Skeleton className="lg:col-span-2 h-[350px] rounded-md"/>
-        <Skeleton className="h-[350px] rounded-md"/>
+        <Skeleton className="lg:col-span-2 h-[350px]"/>
+        <Skeleton className="h-[350px]"/>
       </div>
     </div>
   );

@@ -66,7 +66,7 @@ export default function PricingPageClient({ initialPricing }: PricingPageClientP
           </p>
         </div>
 
-        <Button size="sm" className="font-bold text-[10px] uppercase tracking-widest h-9 px-6 rounded-none shadow-none" onClick={() => setShowModal(true)}>
+        <Button size="sm" className="font-bold text-[10px] uppercase tracking-widest h-9 px-6 shadow-none" onClick={() => setShowModal(true)}>
           <Plus className="size-3.5 mr-2" /> Adjust Rates
         </Button>
       </header>
@@ -80,7 +80,7 @@ export default function PricingPageClient({ initialPricing }: PricingPageClientP
 
       <div className="grid gap-6 lg:grid-cols-12">
         {/* Help Card */}
-        <Card className="lg:col-span-7 shadow-none border-border/50 bg-muted/5 overflow-hidden rounded-none">
+        <Card className="lg:col-span-7 shadow-none border-border/50 bg-muted/5 overflow-hidden">
           <CardHeader className="border-b border-border/40 bg-muted/20">
              <CardTitle className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                 <Info className="size-4 text-primary" />
@@ -88,9 +88,9 @@ export default function PricingPageClient({ initialPricing }: PricingPageClientP
              </CardTitle>
           </CardHeader>
           <CardContent className="p-6 space-y-4 text-xs font-medium leading-relaxed text-muted-foreground/80 italic">
-            <div className="p-4 rounded-none border border-border/50 bg-background space-y-2 shadow-inner">
+            <div className="p-4 border border-border/50 bg-background space-y-2 shadow-inner">
                <p className="font-bold text-foreground not-italic">Economic Formula</p>
-               <code className="block p-2 bg-muted rounded-none font-mono text-[10px] text-primary">Cost = (Input × Rate) + (Output × Rate) + (Cache × Discount)</code>
+               <code className="block p-2 bg-muted font-mono text-[10px] text-primary">Cost = (Input × Rate) + (Output × Rate) + (Cache × Discount)</code>
             </div>
             <p>Rates are defined as <span className="font-bold text-foreground not-italic">USD per 1,000,000 tokens</span>. For example, a rate of 2.50 represents $2.50 per 1M units.</p>
             <div className="grid grid-cols-2 gap-4 pt-2">
@@ -107,7 +107,7 @@ export default function PricingPageClient({ initialPricing }: PricingPageClientP
         </Card>
 
         {/* Preview Card */}
-        <Card className="lg:col-span-5 shadow-none border-border/50 overflow-hidden flex flex-col rounded-none bg-background/50">
+        <Card className="lg:col-span-5 shadow-none border-border/50 overflow-hidden flex flex-col bg-background/50">
            <CardHeader className="border-b border-border/40 bg-muted/20">
               <CardTitle className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                  <Activity className="size-4 text-primary" />
@@ -120,13 +120,13 @@ export default function PricingPageClient({ initialPricing }: PricingPageClientP
                    {Object.keys(currentPricing).slice(0, 10).map(p => (
                       <div key={p} className="p-3.5 hover:bg-muted/30 transition-all flex items-center justify-between group">
                          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60 group-hover:text-primary transition-colors">{p}</span>
-                         <Badge variant="outline" className="h-4 text-[9px] font-bold border-border/40 bg-muted/40 px-1.5 rounded-none tabular-nums opacity-60">{Object.keys(currentPricing[p]).length} MODELS</Badge>                      </div>
+                         <Badge variant="outline" className="h-4 text-[9px] font-bold border-border/40 bg-muted/40 px-1.5 tabular-nums opacity-60">{Object.keys(currentPricing[p]).length} MODELS</Badge>                      </div>
                    ))}
                 </div>
               ) : <div className="p-10 text-center opacity-20 text-[10px] font-bold uppercase tracking-widest">No data found</div>}
            </CardContent>
            <CardFooter className="p-2 border-t border-border/40 bg-muted/10 shrink-0">
-              <Button variant="ghost" size="sm" className="w-full h-8 text-[10px] font-bold uppercase tracking-widest group rounded-none" onClick={() => setShowModal(true)}>
+              <Button variant="ghost" size="sm" className="w-full h-8 text-[10px] font-bold uppercase tracking-widest group" onClick={() => setShowModal(true)}>
                  View full registry <ChevronRight className="ml-1 size-3 group-hover:translate-x-1 transition-transform" />
               </Button>
            </CardFooter>
@@ -147,13 +147,13 @@ interface StatCardProps {
 
 function StatCard({ label, value, icon: Icon, color }: StatCardProps) {
   return (
-    <Card className="shadow-none border-border/50 bg-muted/10 rounded-none hover:bg-muted/20 transition-colors">
+    <Card className="shadow-none border-border/50 bg-muted/10 hover:bg-muted/20 transition-colors">
       <CardContent className="p-4 flex items-center justify-between">
         <div className="space-y-0.5">
            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">{label}</p>
            <p className="text-2xl font-bold tracking-tight tabular-nums text-foreground">{value}</p>
         </div>
-        <div className={cn("p-2 rounded-none bg-background border border-border/50 shadow-none", color)}>
+        <div className={cn("p-2 bg-background border border-border/50 shadow-none", color)}>
            <Icon className="size-4" />
         </div>
       </CardContent>

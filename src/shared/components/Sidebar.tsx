@@ -126,7 +126,7 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
                 return (
                   <SidebarMenuButton size="lg" render={
                     <Link href="/dashboard">
-                      <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground shrink-0 shadow-none">
+                      <div className="flex aspect-square size-8 items-center justify-center bg-sidebar-primary text-sidebar-primary-foreground shrink-0 shadow-none">
                         <TeamLogo className="size-4" weight="bold" />
                       </div>
                       <div className="grid flex-1 text-left text-sm leading-tight ml-1">
@@ -154,7 +154,7 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
                         <span>{translate(item.title)}</span>
                       </Link>
                     } />
-                    {item.badge && <SidebarMenuBadge className="rounded-md bg-primary/10 text-primary border-none text-xs px-1 h-4">{item.badge}</SidebarMenuBadge>}
+                    {item.badge && <SidebarMenuBadge className=" bg-primary/10 text-primary border-none text-xs px-1 h-4">{item.badge}</SidebarMenuBadge>}
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
@@ -209,9 +209,9 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
               <DropdownMenu>
                 <DropdownMenuTrigger render={
                   <SidebarMenuButton size="lg">
-                    <Avatar className="h-8 w-8 rounded-none border border-border/50">
+                    <Avatar className="h-8 w-8 border border-border/50">
                       <AvatarImage src={navData.user.avatar} alt={navData.user.name} />
-                      <AvatarFallback className="rounded-none bg-muted/20 text-muted-foreground">SA</AvatarFallback>
+                      <AvatarFallback className=" bg-muted/20 text-muted-foreground">SA</AvatarFallback>
                     </Avatar>
                     <div className="ml-1 grid flex-1 text-left leading-tight">
                       <span className="truncate text-xs font-medium text-foreground">{navData.user.name}</span>
@@ -221,15 +221,15 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
                   </SidebarMenuButton>
                 } />
                 <DropdownMenuContent
-                  className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-none shadow-none border-border/50 bg-background/95 backdrop-blur-md"
+                  className="w-[--radix-dropdown-menu-trigger-width] min-w-56 shadow-none border-border/50 bg-background/95 backdrop-blur-md"
                   side={isMobile ? "bottom" : "right"}
                   align="end"
                   sideOffset={4}
                 >
                   <div className="flex items-center gap-2 px-2 py-3 border-b border-border/40 bg-muted/10">
-                    <Avatar className="h-9 w-9 rounded-none border border-border/50 shadow-none">
+                    <Avatar className="h-9 w-9 border border-border/50 shadow-none">
                       <AvatarImage src={navData.user.avatar} alt={navData.user.name} />
-                      <AvatarFallback className="rounded-none">SA</AvatarFallback>
+                      <AvatarFallback className="">SA</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left leading-tight">
                       <span className="truncate text-xs font-medium text-foreground">{navData.user.name}</span>
@@ -259,16 +259,16 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
       </Sidebar>
 
       <Dialog open={showShutdownModal} onOpenChange={setShowShutdownModal}>
-        <DialogContent className="border-border/50 shadow-none sm:max-w-md rounded-none">
+        <DialogContent className="border-border/50 shadow-none sm:max-w-md">
           <DialogTitle className="uppercase tracking-tight">Critical Shutdown</DialogTitle>
           <DialogDescription className="text-xs font-medium italic opacity-60">
             Terminate the 8Router infrastructure core. This will disconnect all active upstream sessions.
           </DialogDescription>
           <div className="flex justify-end gap-2 mt-6">
-            <Button variant="outline" onClick={() => setShowShutdownModal(false)} className="text-[10px] font-bold uppercase tracking-widest h-9 rounded-none border-border/50 bg-background">
+            <Button variant="outline" onClick={() => setShowShutdownModal(false)} className="text-[10px] font-bold uppercase tracking-widest h-9 border-border/50 bg-background">
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleShutdown} disabled={isShuttingDown} className="text-[10px] font-bold uppercase tracking-widest h-9 rounded-none border-none bg-destructive/10 text-destructive hover:bg-destructive/20 shadow-none">
+            <Button variant="destructive" onClick={handleShutdown} disabled={isShuttingDown} className="text-[10px] font-bold uppercase tracking-widest h-9 border-none bg-destructive/10 text-destructive hover:bg-destructive/20 shadow-none">
                {isShuttingDown ? (
                  <>
                    <Desktop data-icon="inline-start" className="size-3.5 animate-spin mr-1.5" />
@@ -284,15 +284,15 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
 
       {isDisconnected && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm">
-          <div className="bg-card p-8 rounded-none border border-border/50 text-center max-w-sm mx-4 shadow-2xl flex flex-col gap-6">
-            <div className="size-16 rounded-none bg-destructive/10 border border-destructive/20 flex items-center justify-center mx-auto">
+          <div className="bg-card p-8 border border-border/50 text-center max-w-sm mx-4 shadow-2xl flex flex-col gap-6">
+            <div className="size-16 bg-destructive/10 border border-destructive/20 flex items-center justify-center mx-auto">
               <Power className="size-10 text-destructive" weight="bold" />
             </div>
             <div className="space-y-1">
               <h2 className="text-xl font-bold tracking-tight text-foreground uppercase">8Router Offline</h2>
               <p className="text-xs text-muted-foreground font-medium italic opacity-60 leading-relaxed">The infrastructure node has been successfully de-provisioned and halted.</p>
             </div>
-            <Button className="w-full font-bold text-[10px] uppercase tracking-widest h-11 rounded-none shadow-none" onClick={() => globalThis.location.reload()}>
+            <Button className="w-full font-bold text-[10px] uppercase tracking-widest h-11 shadow-none" onClick={() => globalThis.location.reload()}>
               Reconnect Gateway
             </Button>
           </div>

@@ -83,7 +83,7 @@ export default function AddCustomModelModal({
  if (!open) onClose();
  }}
  >
- <DialogContent className="sm:max-w-md rounded-none border-border/50 shadow-none">
+ <DialogContent className="sm:max-w-md border-border/50 shadow-none">
  <DialogHeader>
  <DialogTitle className="text-lg font-semibold tracking-tight">{translate("Add Custom Model")}</DialogTitle>
  </DialogHeader>
@@ -104,7 +104,7 @@ export default function AddCustomModelModal({
  }}
  onKeyDown={handleKeyDown}
  placeholder="e.g. claude-opus-4-5"
- className="flex-1 rounded-none border-border/50 bg-muted/5 h-9 text-sm"
+ className="flex-1 border-border/50 bg-muted/5 h-9 text-sm"
  autoFocus
  />
  <Button
@@ -112,7 +112,7 @@ export default function AddCustomModelModal({
  variant="secondary"
  onClick={handleTest}
  disabled={!modelId.trim() || testStatus ==="testing"}
- className="shrink-0 h-9 rounded-none px-3 text-xs font-bold uppercase tracking-wider gap-1.5"
+ className="shrink-0 h-9 px-3 text-xs font-bold uppercase tracking-wider gap-1.5"
  >
  {testStatus ==="testing"? (
  <Spinner className="size-4 animate-spin" />
@@ -124,7 +124,7 @@ export default function AddCustomModelModal({
  </div>
  <p className="text-[10px] text-muted-foreground font-medium italic opacity-70">
  {translate("Sent to provider as")}:{""}
- <code className="rounded-none bg-muted px-1 font-mono text-[10px] text-foreground">
+ <code className=" bg-muted px-1 font-mono text-[10px] text-foreground">
  {modelId.trim() ||"model-id"}
  </code>
  </p>
@@ -148,7 +148,7 @@ export default function AddCustomModelModal({
  type="button"
  variant="outline"
  size="sm"
- className="flex-1 rounded-none h-9 text-[10px] font-bold uppercase tracking-widest"
+ className="flex-1 h-9 text-[10px] font-bold uppercase tracking-widest"
  onClick={onClose}
  >
  {translate("Cancel")}
@@ -156,7 +156,7 @@ export default function AddCustomModelModal({
  <Button
  type="button"
  size="sm"
- className="flex-1 rounded-none h-9 text-[10px] font-bold uppercase tracking-widest"
+ className="flex-1 h-9 text-[10px] font-bold uppercase tracking-widest"
  onClick={handleSave}
  disabled={!modelId.trim() || saving}
  >

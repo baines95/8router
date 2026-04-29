@@ -57,7 +57,7 @@ export default function CursorAuthModal({ open, onSuccess, onClose }: CursorAuth
   // Auto-detect tokens when modal opens
   useEffect(() => {
     if (!open) return;
-    runAutoDetect();
+    void (async () => { runAutoDetect(); })();
   }, [open]);
 
   const handleImportToken = async () => {
@@ -120,7 +120,7 @@ export default function CursorAuthModal({ open, onSuccess, onClose }: CursorAuth
           <>
             {/* Success message if auto-detected */}
             {autoDetected && (
-              <div className="bg-primary/10 p-3 rounded-lg border border-primary/20 flex items-center gap-2">
+              <div className="bg-primary/10 p-3 border border-primary/20 flex items-center gap-2">
                 <CheckCircle className="size-4 text-primary" weight="bold" />
                 <p className="text-xs font-medium text-primary">
                   {translate("Tokens auto-detected from Cursor IDE successfully!")}
@@ -130,7 +130,7 @@ export default function CursorAuthModal({ open, onSuccess, onClose }: CursorAuth
 
             {/* Windows manual instructions */}
             {windowsManual && (
-              <div className="bg-amber-500/10 dark:bg-amber-500/5 p-3 rounded-lg border border-amber-500/20 flex flex-col gap-2">
+              <div className="bg-amber-500/10 dark:bg-amber-500/5 p-3 border border-amber-500/20 flex flex-col gap-2">
                 <div className="flex gap-2 items-center">
                   <Info className="size-4 text-amber-500" weight="bold" />
                   <p className="text-xs font-medium text-amber-500">
@@ -148,7 +148,7 @@ export default function CursorAuthModal({ open, onSuccess, onClose }: CursorAuth
 
             {/* Info message if not auto-detected */}
             {!autoDetected && !windowsManual && !error && (
-              <div className="bg-muted/10 p-3 rounded-lg border border-border/50 flex items-center gap-2">
+              <div className="bg-muted/10 p-3 border border-border/50 flex items-center gap-2">
                 <Info className="size-4 text-muted-foreground" weight="bold" />
                 <p className="text-xs font-medium text-muted-foreground">
                   {translate("Cursor IDE not detected. Please paste your tokens manually.")}
@@ -166,7 +166,7 @@ export default function CursorAuthModal({ open, onSuccess, onClose }: CursorAuth
                 onChange={(e) => setAccessToken(e.target.value)}
                 placeholder={translate("Access token will be auto-filled...")}
                 rows={3}
-                className="w-full px-3 py-2 text-xs font-mono border border-border/50 rounded-none bg-muted/5 focus:outline-none focus:border-primary/50 resize-none transition-colors"
+                className="w-full px-3 py-2 text-xs font-mono border border-border/50 bg-muted/5 focus:outline-none focus:border-primary/50 resize-none transition-colors"
               />
             </div>
 
@@ -179,13 +179,13 @@ export default function CursorAuthModal({ open, onSuccess, onClose }: CursorAuth
                 value={machineId}
                 onChange={(e) => setMachineId(e.target.value)}
                 placeholder={translate("Machine ID will be auto-filled...")}
-                className="font-mono text-xs h-10 bg-muted/5 border-border/50 rounded-none"
+                className="font-mono text-xs h-10 bg-muted/5 border-border/50"
               />
             </div>
 
             {/* Error Display */}
             {error && (
-              <div className="bg-destructive/10 p-3 rounded-lg border border-destructive/20 flex items-center gap-2">
+              <div className="bg-destructive/10 p-3 border border-destructive/20 flex items-center gap-2">
                 <WarningCircle className="size-4 text-destructive" weight="bold" />
                 <p className="text-xs font-medium text-destructive">{translate(error)}</p>
               </div>
@@ -200,7 +200,7 @@ export default function CursorAuthModal({ open, onSuccess, onClose }: CursorAuth
               >
                 {importing ? translate("Importing...") : translate("Import Token")}
               </Button>
-              <Button onClick={onClose} variant="ghost" className="flex-1 h-10 border border-border/50 rounded-none text-xs font-medium">
+              <Button onClick={onClose} variant="ghost" className="flex-1 h-10 border border-border/50 text-xs font-medium">
                 {translate("Cancel")}
               </Button>
             </div>

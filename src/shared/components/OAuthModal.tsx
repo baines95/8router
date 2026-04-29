@@ -64,7 +64,7 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
   // Detect client origin for callback placeholder
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setPlaceholderUrl(`${window.location.origin}/callback?code=...`);
+      void (async () => { setPlaceholderUrl(`${window.location.origin}/callback?code=...`); })();
     }
   }, []);
 
@@ -236,7 +236,7 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
 
   useEffect(() => {
     if (open) {
-      startOAuthFlow();
+      void (async () => { startOAuthFlow(); })();
     } else {
       // Cleanup
       if (popupRef.current) popupRef.current.close();
@@ -340,7 +340,7 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
             <p className="text-sm text-muted-foreground mb-4 font-medium italic">
               Complete the authorization in the popup window.
             </p>
-            <Button variant="ghost" onClick={() => setStep("input")} className="w-full h-10 font-bold text-xs uppercase tracking-widest rounded-none border border-border/50 bg-muted/5">
+            <Button variant="ghost" onClick={() => setStep("input")} className="w-full h-10 font-bold text-xs uppercase tracking-widest border border-border/50 bg-muted/5">
               Popup blocked? Enter URL manually
             </Button>
           </div>
@@ -352,7 +352,7 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
               <p className="text-sm text-muted-foreground mb-4">
                 Visit the login URL below and authorize:
               </p>
-              <div className="bg-muted/30 p-4 rounded-none mb-4 border border-border/50">
+              <div className="bg-muted/30 p-4 mb-4 border border-border/50">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1 opacity-60">Login URL</p>
                 <div className="flex items-center gap-2">
                   <code className="flex-1 text-sm break-all font-mono opacity-80">{deviceLoginUrl}</code>
@@ -361,7 +361,7 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
                     size="icon"
                     onClick={() => copy(deviceLoginUrl, "login_url")}
                     disabled={!deviceLoginUrl}
-                    className="size-8 rounded-none"
+                    className="size-8"
                   >
                     {copied === "login_url" ? <CheckIcon className="size-4" weight="bold" /> : <CopyIcon className="size-4" weight="bold" />}
                   </Button>
@@ -370,13 +370,13 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
                     size="icon"
                     onClick={() => window.open(deviceLoginUrl, "_blank", "noopener,noreferrer")}
                     disabled={!deviceLoginUrl}
-                    className="size-8 rounded-none"
+                    className="size-8"
                   >
                     <ArrowSquareOutIcon className="size-4" weight="bold" />
                   </Button>
                 </div>
               </div>
-              <div className="bg-primary/10 p-4 rounded-none border border-primary/20">
+              <div className="bg-primary/10 p-4 border border-primary/20">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">Authorization Code</p>
                 <div className="flex items-center justify-center gap-3">
                   <p className="text-2xl font-mono font-bold text-primary tracking-wider tabular-nums">{deviceData.user_code}</p>
@@ -384,7 +384,7 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
                     variant="ghost"
                     size="icon"
                     onClick={() => copy(deviceData.user_code, "user_code")}
-                    className="size-8 text-primary hover:bg-primary/20 rounded-none"
+                    className="size-8 text-primary hover:bg-primary/20"
                   >
                     {copied === "user_code" ? <CheckIcon className="size-4" weight="bold" /> : <CopyIcon className="size-4" weight="bold" />}
                   </Button>
@@ -405,8 +405,8 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 opacity-60">Step 1: Open challenge URL</p>
               <div className="flex gap-2">
-                <Input value={authData?.authUrl || ""} readOnly className="flex-1 font-mono text-xs h-9 bg-muted/5 border-border/50 rounded-none opacity-60" />
-                <Button variant="outline" onClick={() => copy(authData?.authUrl || "", "auth_url")} className="h-9 px-4 text-[10px] font-bold uppercase tracking-widest rounded-none border-border/50 bg-background">
+                <Input value={authData?.authUrl || ""} readOnly className="flex-1 font-mono text-xs h-9 bg-muted/5 border-border/50 opacity-60" />
+                <Button variant="outline" onClick={() => copy(authData?.authUrl || "", "auth_url")} className="h-9 px-4 text-[10px] font-bold uppercase tracking-widest border-border/50 bg-background">
                    {copied === "auth_url" ? <CheckIcon className="size-3.5 mr-1.5" weight="bold" /> : <CopyIcon className="size-3.5 mr-1.5" weight="bold" />}
                    Copy
                 </Button>
@@ -422,15 +422,15 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
                 value={callbackUrl}
                 onChange={(e) => setCallbackUrl(e.target.value)}
                 placeholder={placeholderUrl}
-                className="font-mono text-xs h-9 bg-muted/5 border-border/50 rounded-none"
+                className="font-mono text-xs h-9 bg-muted/5 border-border/50"
               />
             </div>
 
             <div className="flex gap-2 pt-2">
-              <Button onClick={handleManualSubmit} className="flex-1 h-10 font-bold text-[10px] uppercase tracking-widest rounded-none shadow-none" disabled={!callbackUrl || loading} loading={loading}>
+              <Button onClick={handleManualSubmit} className="flex-1 h-10 font-bold text-[10px] uppercase tracking-widest shadow-none" disabled={!callbackUrl || loading} loading={loading}>
                 Connect Node
               </Button>
-              <Button onClick={handleClose} variant="outline" className="flex-1 h-10 font-bold text-[10px] uppercase tracking-widest border-border/50 rounded-none bg-background">
+              <Button onClick={handleClose} variant="outline" className="flex-1 h-10 font-bold text-[10px] uppercase tracking-widest border-border/50 bg-background">
                 Cancel
               </Button>
             </div>
@@ -439,14 +439,14 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
 
         {step === "success" && (
           <div className="text-center py-6">
-            <div className="size-16 mx-auto mb-4 rounded-none bg-primary/10 border border-primary/20 flex items-center justify-center">
+            <div className="size-16 mx-auto mb-4 bg-primary/10 border border-primary/20 flex items-center justify-center">
               <CheckCircleIcon className="size-8 text-primary" weight="bold" />
             </div>
             <h3 className="text-lg font-bold tracking-tight text-foreground uppercase">Linked Successfully</h3>
             <p className="text-xs text-muted-foreground mb-6 font-medium italic opacity-60">
               The {providerInfo.name} infrastructure node is now active.
             </p>
-            <Button onClick={handleClose} className="w-full h-11 font-bold text-[10px] uppercase tracking-widest rounded-none shadow-none">
+            <Button onClick={handleClose} className="w-full h-11 font-bold text-[10px] uppercase tracking-widest shadow-none">
               Finish Provisioning
             </Button>
           </div>
@@ -454,16 +454,16 @@ export default function OAuthModal({ open, provider, providerInfo, onSuccess, on
 
         {step === "error" && (
           <div className="text-center py-6">
-            <div className="size-16 mx-auto mb-4 rounded-none bg-destructive/5 border border-destructive/20 flex items-center justify-center">
+            <div className="size-16 mx-auto mb-4 bg-destructive/5 border border-destructive/20 flex items-center justify-center">
               <WarningCircleIcon className="size-8 text-destructive" weight="bold" />
             </div>
             <h3 className="text-lg font-bold tracking-tight text-foreground uppercase">Connection Failed</h3>
             <p className="text-[10px] font-bold uppercase tracking-wide text-destructive mb-8 px-4">{error}</p>
             <div className="flex gap-2">
-              <Button onClick={startOAuthFlow} variant="secondary" className="flex-1 h-10 font-bold text-[10px] uppercase tracking-widest rounded-none bg-muted/20 border border-border/50" loading={loading}>
+              <Button onClick={startOAuthFlow} variant="secondary" className="flex-1 h-10 font-bold text-[10px] uppercase tracking-widest bg-muted/20 border border-border/50" loading={loading}>
                 Retry Challenge
               </Button>
-              <Button onClick={handleClose} variant="outline" className="flex-1 h-10 font-bold text-[10px] uppercase tracking-widest border border-border/50 rounded-none bg-background">
+              <Button onClick={handleClose} variant="outline" className="flex-1 h-10 font-bold text-[10px] uppercase tracking-widest border border-border/50 bg-background">
                 Cancel
               </Button>
             </div>

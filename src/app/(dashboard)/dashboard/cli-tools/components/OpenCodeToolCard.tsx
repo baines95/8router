@@ -222,7 +222,7 @@ export default function OpenCodeToolCard({
  >
  <div className="space-y-6">
  {!opencodeStatus?.installed && (
- <div className="bg-muted/10 border border-border/50 rounded-xl p-4 flex items-start gap-3">
+ <div className="bg-muted/10 border border-border/50 p-4 flex items-start gap-3">
  <Info className="size-5 text-muted-foreground shrink-0 mt-0.5" weight="bold" />
  <p className="text-[11px] text-muted-foreground font-medium leading-relaxed italic">
  {translate("OpenCode CLI not detected. Settings will be written to ~/.config/opencode/opencode.json manually.")}
@@ -236,7 +236,7 @@ export default function OpenCodeToolCard({
  <Input 
  value={baseUrl} 
  readOnly 
- className="h-9 text-xs rounded-none border-border/50 bg-muted/5 font-mono opacity-60 cursor-not-allowed"
+ className="h-9 text-xs border-border/50 bg-muted/5 font-mono opacity-60 cursor-not-allowed"
  />
  </div>
 
@@ -249,14 +249,14 @@ export default function OpenCodeToolCard({
  <select 
  value={selectedApiKey} 
  onChange={(e) => setSelectedApiKey(e.target.value)} 
- className="w-full h-9 px-3 bg-muted/5 border border-border/50 rounded-none text-xs font-bold focus:outline-none focus:border-primary/50 transition-colors"
+ className="w-full h-9 px-3 bg-muted/5 border border-border/50 text-xs font-bold focus:outline-none focus:border-primary/50 transition-colors"
  >
  {apiKeys.map((key) => (
  <option key={key.id} value={key.key}>{key.key}</option>
  ))}
  </select>
  ) : (
- <div className="h-9 flex items-center px-3 bg-muted/10 border border-border/50 border-dashed rounded-none text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
+ <div className="h-9 flex items-center px-3 bg-muted/10 border border-border/50 border-dashed text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
  {cloudEnabled ? translate("NO ACTIVE KEYS") : "sk_8router (INTERNAL)"}
  </div>
  )}
@@ -271,18 +271,18 @@ export default function OpenCodeToolCard({
  size="xs" 
  onClick={() => { setModalFor("models"); setModalOpen(true); }}
  disabled={!hasActiveProviders}
- className="h-6 rounded-none text-[9px] font-bold uppercase tracking-widest border-border/50 hover:bg-muted/10"
+ className="h-6 text-[9px] font-bold uppercase tracking-widest border-border/50 hover:bg-muted/10"
  >
  <Plus className="size-2.5 mr-1" weight="bold" /> {translate("Add Model")}
  </Button>
  </div>
  
- <div className="flex flex-wrap gap-2 min-h-[40px] p-3 bg-muted/5 border border-border/40 rounded-none">
+ <div className="flex flex-wrap gap-2 min-h-[40px] p-3 bg-muted/5 border border-border/40">
  {models.length === 0 ? (
  <p className="text-[10px] text-muted-foreground italic opacity-40 uppercase tracking-widest flex items-center h-full w-full justify-center">Catalog is empty</p>
  ) : (
  models.map(m => (
- <Badge key={m} variant="secondary" className="h-6 gap-1 pr-1 pl-2 font-mono text-[10px] bg-primary/10 text-primary border-none rounded-none group">
+ <Badge key={m} variant="secondary" className="h-6 gap-1 pr-1 pl-2 font-mono text-[10px] bg-primary/10 text-primary border-none group">
  {m}
  <button onClick={() => removeModel(m)} className="p-0.5 hover:bg-primary/20 rounded-full transition-colors opacity-0 group-hover:opacity-100">
  <X className="size-3" weight="bold" />
@@ -297,8 +297,8 @@ export default function OpenCodeToolCard({
  <div className="space-y-2">
  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 px-1">Active Model</label>
  <div className="flex gap-2">
- <Input value={activeModel} readOnly placeholder="Select from catalog..." className="h-9 text-xs rounded-none border-border/50 bg-muted/5" />
- <Button variant="outline" size="sm" onClick={() => { setModalFor("active"); setModalOpen(true); }} disabled={!hasActiveProviders} className="h-9 px-3 text-[10px] font-bold uppercase tracking-widest rounded-none border-border/50">
+ <Input value={activeModel} readOnly placeholder="Select from catalog..." className="h-9 text-xs border-border/50 bg-muted/5" />
+ <Button variant="outline" size="sm" onClick={() => { setModalFor("active"); setModalOpen(true); }} disabled={!hasActiveProviders} className="h-9 px-3 text-[10px] font-bold uppercase tracking-widest border-border/50">
  {translate("Set")}
  </Button>
  </div>
@@ -307,8 +307,8 @@ export default function OpenCodeToolCard({
  <div className="space-y-2">
  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 px-1">Explorer Agent</label>
  <div className="flex gap-2">
- <Input value={subagentModel} readOnly placeholder="Select from catalog..." className="h-9 text-xs rounded-none border-border/50 bg-muted/5" />
- <Button variant="outline" size="sm" onClick={() => { setModalFor("subagent"); setModalOpen(true); }} disabled={!hasActiveProviders} className="h-9 px-3 text-[10px] font-bold uppercase tracking-widest rounded-none border-border/50">
+ <Input value={subagentModel} readOnly placeholder="Select from catalog..." className="h-9 text-xs border-border/50 bg-muted/5" />
+ <Button variant="outline" size="sm" onClick={() => { setModalFor("subagent"); setModalOpen(true); }} disabled={!hasActiveProviders} className="h-9 px-3 text-[10px] font-bold uppercase tracking-widest border-border/50">
  {translate("Set")}
  </Button>
  </div>
