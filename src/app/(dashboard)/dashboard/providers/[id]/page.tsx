@@ -1,26 +1,24 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  Cookie,
-  PencilSimple as Pencil,
-  Plus,
-  Trash,
-  ArrowLeft,
-  Warning,
-  Info,
-  Lock,
-  LockOpen,
-  Key,
-  ShieldCheck,
-  CircleNotch,
-  CheckCircle,
-  WarningCircle as AlertCircle
+  CookieIcon as Cookie,
+  PencilSimpleIcon as Pencil,
+  PlusIcon as Plus,
+  TrashIcon as Trash,
+  ArrowLeftIcon as ArrowLeft,
+  WarningIcon as Warning,
+  InfoIcon as Info,
+  LockIcon as Lock,
+  LockOpenIcon as LockOpen,
+  KeyIcon as Key,
+  ShieldCheckIcon as ShieldCheck,
+  CircleNotchIcon as CircleNotch,
+  WarningCircleIcon as AlertCircle,
 } from "@phosphor-icons/react";
-import { Spinner } from "@/components/ui/spinner";
 import { translate } from "@/i18n/runtime";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -76,12 +74,11 @@ import {
   getProviderAlias, 
   isOpenAICompatibleProvider, 
   isAnthropicCompatibleProvider, 
-  AI_PROVIDERS, 
-  THINKING_CONFIG 
 } from "@/shared/constants/providers";
 import { getModelsByProviderId } from "@/shared/constants/models";
 import { useCopyToClipboard } from "@/shared/hooks/useCopyToClipboard";
-import { fetchSuggestedModels } from "@/shared/utils/providerModelsFetcher";
+import { useProviderModels } from "@/shared/hooks/useProviderModels";
+import { getProviderModelFallbackWarning } from "@/shared/utils/providerModelFallbackWarning";
 import ModelRow from "./ModelRow";
 import CompatibleModelsSection from "./CompatibleModelsSection";
 import ConnectionRow from "./ConnectionRow";
@@ -159,9 +156,12 @@ export default function ProviderDetailPage() {
  const [providerStickyLimit, setProviderStickyLimit] = useState("");
  const [providerAutoPauseByQuota, setProviderAutoPauseByQuota] = useState(false);
   
- const [thinkingMode, setThinkingMode] = useState("auto");
  const [suggestedModels, setSuggestedModels] = useState<any[]>([]);
- const [kiloFreeModels, setKiloFreeModels] = useState<Model[]>([]);
+ const {
+ data: resolvedProviderModels,
+ error: providerModelsError,
+ refresh: refreshProviderModels,
+ } = useProviderModels(providerId);
  const { copied, copy } = useCopyToClipboard();
 
  const isOpenAICompatible = isOpenAICompatibleProvider(providerId);
@@ -182,12 +182,13 @@ export default function ProviderDetailPage() {
  
  const isOAuth = !!(OAUTH_PROVIDERS as any)[providerId] || !!(FREE_PROVIDERS as any)[providerId];
  const isFreeNoAuth = !!(FREE_PROVIDERS as any)[providerId]?.noAuth;
- const models = getModelsByProviderId(providerId);
+ const fallbackModels = getModelsByProviderId(providerId);
+ const models = (resolvedProviderModels ? resolvedProviderModels.models : fallbackModels) as Model[];
+ const fallbackReason = getProviderModelFallbackWarning(resolvedProviderModels ?? null, providerModelsError);
+ const shouldShowFallbackWarning = !!fallbackReason;
  const providerAlias = getProviderAlias(providerId);
  
   
- const thinkingConfig = (AI_PROVIDERS as any)[providerId]?.thinkingConfig || THINKING_CONFIG.extended;
- 
  const providerStorageAlias = isCompatible ? providerId : providerAlias;
  const providerDisplayAlias = isCompatible
  ? (providerNode?.prefix || providerId)
@@ -206,14 +207,6 @@ export default function ProviderDetailPage() {
  }
  }, []);
 
- // Fetch free models from Kilo API for kilocode provider
- useEffect(() => {
- if (providerId !=="kilocode") return;
- fetch("/api/providers/kilo/free-models")
- .then((res) => res.json())
- .then((data) => { if (data.models?.length) setKiloFreeModels(data.models); })
- .catch(() => {});
- }, [providerId]);
 
  const fetchConnections = useCallback(async () => {
  try {
@@ -239,9 +232,6 @@ export default function ProviderDetailPage() {
  setProviderStrategy(override.fallbackStrategy || null);
  setProviderStickyLimit(override.stickyRoundRobinLimit != null ? String(override.stickyRoundRobinLimit) :"1");
  setProviderAutoPauseByQuota(override.autoPauseByQuota === true);
- // Load per-provider thinking config
- const thinkingCfg = (settingsData.providerThinking || {})[providerId] || {};
- setThinkingMode(thinkingCfg.mode ||"auto");
  if (nodesRes.ok) {
  let node = (nodesData.nodes || []).find((entry: any) => entry.id === providerId) || null;
 
@@ -371,33 +361,6 @@ export default function ProviderDetailPage() {
  }
  };
 
- const saveThinkingConfig = async (mode: string) => {
- try {
- const settingsRes = await fetch("/api/settings", { cache:"no-store"});
- const settingsData = settingsRes.ok ? await settingsRes.json() : {};
- const current = settingsData.providerThinking || {};
- const updated = { ...current };
- if (!mode || mode ==="auto") {
- delete updated[providerId];
- } else {
- updated[providerId] = { mode };
- }
- await fetch("/api/settings", {
- method:"PATCH",
- headers: {"Content-Type":"application/json"},
- body: JSON.stringify({ providerThinking: updated }),
- });
- } catch (error) {
- console.error("Error saving thinking config:", error);
- }
- };
-
-  
- const handleThinkingModeChange = (mode: string) => {
- setThinkingMode(mode);
- saveThinkingConfig(mode);
- };
-
  useEffect(() => {
  const timer = window.setTimeout(() => {
  fetchConnections();
@@ -408,10 +371,14 @@ export default function ProviderDetailPage() {
  }, [fetchConnections, fetchAliases]);
 
  // Fetch suggested models from provider's public API (if configured)
+ // Suggestions are optional and not used as primary source for main model list.
  useEffect(() => {
  const fetcher = ((OAUTH_PROVIDERS as any)[providerId] || (APIKEY_PROVIDERS as any)[providerId] || (FREE_PROVIDERS as any)[providerId] || (FREE_TIER_PROVIDERS as any)[providerId])?.modelsFetcher;
- if (!fetcher) return;
- fetchSuggestedModels(fetcher).then(setSuggestedModels);
+ if (!fetcher) {
+ setSuggestedModels([]);
+ return;
+ }
+ fetcher().then((items: any[]) => setSuggestedModels(items || [])).catch(() => setSuggestedModels([]));
  }, [providerId]);
 
  const handleSetAlias = async (modelId: string, alias: string, providerAliasOverride = providerAlias) => {
@@ -506,21 +473,6 @@ export default function ProviderDetailPage() {
  }
  };
 
- const handleUpdateConnectionStatus = async (id: string, isActive: boolean) => {
- try {
- const res = await fetch(`/api/providers/${id}`, {
- method:"PUT",
- headers: {"Content-Type":"application/json"},
- body: JSON.stringify({ isActive }),
- });
- if (res.ok) {
- setConnections(prev => prev.map(c => c.id === id ? { ...c, isActive } : c));
- }
- } catch (error) {
- console.log("Error updating connection status:", error);
- }
- };
-
  const handleSwapPriority = async (index1: number, index2: number) => {
  // Optimistic update state
  const newConnections = [...connections];
@@ -548,26 +500,6 @@ export default function ProviderDetailPage() {
 
  const selectedConnections = connections.filter((conn) => selectedConnectionIds.includes(conn.id));
   
- const allSelected = connections.length > 0 && selectedConnectionIds.length === connections.length;
-
-  
- const toggleSelectConnection = (connectionId: string) => {
- setSelectedConnectionIds((prev) => (
- prev.includes(connectionId)
- ? prev.filter((id) => id !== connectionId)
- : [...prev, connectionId]
- ));
- };
-
-  
- const toggleSelectAllConnections = () => {
- if (allSelected) {
- setSelectedConnectionIds([]);
- return;
- }
- setSelectedConnectionIds(connections.map((conn) => conn.id));
- };
-
  const clearSelection = () => {
  setSelectedConnectionIds([]);
  setBulkProxyPoolId("__none__");
@@ -598,13 +530,6 @@ export default function ProviderDetailPage() {
  })();
 
   
- const openBulkProxyModal = () => {
- if (selectedConnections.length === 0) return;
- const uniquePoolIds = [...new Set(selectedConnections.map((conn) => conn.providerSpecificData?.proxyPoolId ||"__none__"))];
- setBulkProxyPoolId(uniquePoolIds.length === 1 ? (uniquePoolIds[0] as string) :"__none__");
- setShowBulkProxyModal(true);
- };
-
  const closeBulkProxyModal = () => {
  if (bulkUpdatingProxy) return;
  setShowBulkProxyModal(false);
@@ -648,8 +573,6 @@ export default function ProviderDetailPage() {
 
 
   
- const isSelected = (connectionId: string) => selectedConnectionIds.includes(connectionId);
-
  const connectionsList = (
  <div className="flex flex-col divide-y divide-border">
  {connections
@@ -790,12 +713,10 @@ export default function ProviderDetailPage() {
  />
  );
  }
- // Combine hardcoded models with Kilo free models (deduplicated)
+ // Use resolved union models (with local hardcoded fallback only when unresolved)
  // Exclude non-llm models (embedding, tts, etc.) — they have dedicated pages under media-providers
- const displayModels = [
- ...models,
- ...kiloFreeModels.filter((fm) => !models.some((m) => m.id === fm.id)),
- ].filter((m: any) => !m.type || m.type ==="llm");
+ const dedupedModels = Array.from(new Map(models.map((m) => [m.id, m])).values());
+ const displayModels = dedupedModels.filter((m: any) => !m.type || m.type ==="llm");
  // Custom models added by user (stored as aliases: modelId → providerAlias/modelId)
  const customModels = Object.entries(modelAliases)
  .filter(([alias, fullModel]) => {
@@ -1274,9 +1195,16 @@ export default function ProviderDetailPage() {
  {/* Models */}
  <Card className="border-border/50 shadow-none overflow-hidden p-0 py-0 bg-background/50">
  <CardHeader className="px-4 py-3 border-b border-border/50 bg-muted/10">
+ <div className="flex items-center justify-between gap-2">
  <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground opacity-40">
  {translate("Acoustic & Intelligence Spectrum")}
  </CardTitle>
+ {!isCompatible && (
+ <Button variant="outline" size="sm" onClick={() => refreshProviderModels()} className="h-8 text-xs">
+ {translate("Refresh")}
+ </Button>
+ )}
+ </div>
  </CardHeader>
  <CardContent className="p-4">
  {!!modelsTestError && (
@@ -1284,6 +1212,14 @@ export default function ProviderDetailPage() {
  <Warning className="size-4 text-destructive" weight="bold" />
  <AlertDescription className="text-[10px] font-bold uppercase tracking-wide text-destructive">
  {modelsTestError}
+ </AlertDescription>
+ </Alert>
+ )}
+ {shouldShowFallbackWarning && (
+ <Alert className="mb-4 border-warning/30 bg-warning/10 py-2">
+ <AlertCircle className="size-4 text-warning" weight="bold" />
+ <AlertDescription className="text-xs text-warning-foreground">
+ {fallbackReason}
  </AlertDescription>
  </Alert>
  )}

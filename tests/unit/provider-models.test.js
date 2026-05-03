@@ -12,6 +12,7 @@ vi.mock("next/server", () => ({
 
 vi.mock("../../src/lib/localDb.js", () => ({
   getProviderConnectionById: vi.fn(),
+  getProviderConnections: vi.fn(),
 }));
 
 vi.mock("../../src/shared/constants/providers.js", async () => {
@@ -26,12 +27,14 @@ vi.mock("../../src/shared/constants/providers.js", async () => {
 describe("GET /api/providers/[id]/models", () => {
   let GET;
   let getProviderConnectionById;
+  let getProviderConnections;
 
   beforeEach(async () => {
     vi.clearAllMocks();
 
     const db = await import("../../src/lib/localDb.js");
     getProviderConnectionById = db.getProviderConnectionById;
+    getProviderConnections = db.getProviderConnections;
 
     const routeModule = await import("../../src/app/api/providers/[id]/models/route.js");
     GET = routeModule.GET;
@@ -84,4 +87,110 @@ describe("GET /api/providers/[id]/models", () => {
     expect(response.body.models.some((m) => m.id === "gpt-5.4")).toBe(true);
     expect(response.body.warning).toContain("Failed to fetch models");
   });
+
+  it("deduplicates live union models across two active provider accounts", async () => {
+    getProviderConnectionById.mockResolvedValue(null);
+
+    getProviderConnections.mockResolvedValue([
+      { id: "openai-a", provider: "openai", isActive: true, apiKey: "key-a", providerSpecificData: { baseUrl: "https://api.openai.com/v1" } },
+      { id: "openai-b", provider: "openai", isActive: true, apiKey: "key-b", providerSpecificData: { baseUrl: "https://api.openai.com/v1" } },
+    ]);
+
+    global.fetch = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ data: [{ id: "gpt-5" }, { id: "gpt-5-mini" }] }) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ data: [{ id: "gpt-5" }, { id: "gpt-5.4" }] }) });
+
+    const response = await GET({}, { params: Promise.resolve({ id: "openai" }) });
+
+    expect(response.status).toBe(200);
+    expect(response.body.source).toBe("live");
+    expect(response.body.models.filter((m) => m.id === "gpt-5")).toHaveLength(1);
+    expect(response.body.models.some((m) => m.id === "gpt-5-mini")).toBe(true);
+    expect(response.body.models.some((m) => m.id === "gpt-5.4")).toBe(true);
+  });
+
+  it("returns live source when one account fails and one succeeds", async () => {
+    getProviderConnectionById.mockResolvedValue(null);
+
+    getProviderConnections.mockResolvedValue([
+      { id: "openai-a", provider: "openai", isActive: true, apiKey: "key-a", providerSpecificData: { baseUrl: "https://api.openai.com/v1" } },
+      { id: "openai-b", provider: "openai", isActive: true, apiKey: "key-b", providerSpecificData: { baseUrl: "https://api.openai.com/v1" } },
+    ]);
+
+    global.fetch = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("Connection timeout"))
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ data: [{ id: "gpt-5" }] }) });
+
+    const response = await GET({}, { params: Promise.resolve({ id: "openai" }) });
+
+    expect(response.status).toBe(200);
+    expect(response.body.source).toBe("live");
+    expect(response.body.models.some((m) => m.id === "gpt-5")).toBe(true);
+  });
+
+  it("starts provider-level live fetches for all active accounts before awaiting results", async () => {
+    getProviderConnectionById.mockResolvedValue(null);
+
+    getProviderConnections.mockResolvedValue([
+      { id: "openai-a", provider: "openai", isActive: true, apiKey: "key-a", providerSpecificData: { baseUrl: "https://api.openai.com/v1" } },
+      { id: "openai-b", provider: "openai", isActive: true, apiKey: "key-b", providerSpecificData: { baseUrl: "https://api.openai.com/v1" } },
+    ]);
+
+    let resolveFirst;
+    const firstFetchPromise = new Promise((resolve) => {
+      resolveFirst = resolve;
+    });
+
+    const secondFetchPromise = Promise.resolve({
+      ok: true,
+      json: async () => ({ data: [{ id: "gpt-4.1-mini" }] }),
+    });
+
+    global.fetch = vi
+      .fn()
+      .mockImplementationOnce(() => firstFetchPromise)
+      .mockImplementationOnce(() => secondFetchPromise);
+
+    const responsePromise = GET({}, { params: Promise.resolve({ id: "openai" }) });
+
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+
+    resolveFirst({
+      ok: true,
+      json: async () => ({ data: [{ id: "gpt-4.1" }] }),
+    });
+
+    const response = await responsePromise;
+
+    expect(response.status).toBe(200);
+    expect(response.body.source).toBe("live");
+  });
+
+  it("falls back to static models with fallback reason when all live fetches fail", async () => {
+    getProviderConnectionById.mockResolvedValue(null);
+
+    getProviderConnections.mockResolvedValue([
+      { id: "openai-a", provider: "openai", isActive: true, apiKey: "key-a", providerSpecificData: { baseUrl: "https://api.openai.com/v1" } },
+      { id: "openai-b", provider: "openai", isActive: true, apiKey: "key-b", providerSpecificData: { baseUrl: "https://api.openai.com/v1" } },
+    ]);
+
+    global.fetch = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("Rate limited"))
+      .mockRejectedValueOnce(new Error("Network down"));
+
+    const response = await GET({}, { params: Promise.resolve({ id: "openai" }) });
+
+    expect(response.status).toBe(200);
+    expect(response.body.source).toBe("fallback");
+    expect(response.body.models.length).toBeGreaterThan(0);
+    expect(response.body.fallbackReason).toContain("all live fetches failed");
+  });
+
 });

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getProviderConnectionById } from "@/lib/localDb";
+import { getProviderConnectionById, getProviderConnections } from "@/lib/localDb";
 import { isOpenAICompatibleProvider, isAnthropicCompatibleProvider } from "@/shared/constants/providers";
 import { KiroService } from "@/lib/oauth/services/kiro";
 import { GEMINI_CONFIG } from "@/lib/oauth/constants/oauth";
@@ -200,270 +200,282 @@ const PROVIDER_MODELS_CONFIG: Record<string, any> = {
   assemblyai: createOpenAIModelsConfig("https://api.assemblyai.com/v1/models")
 };
 
+type LiveModelsResult = {
+  models: any[];
+  source: "live" | "fallback";
+  warning?: string;
+  status?: number;
+};
+
+const getConnectionLiveModels = async (connection: any): Promise<LiveModelsResult> => {
+  if (isOpenAICompatibleProvider(connection.provider)) {
+    const baseUrl = connection.providerSpecificData?.baseUrl;
+    if (!baseUrl) {
+      return { models: [], source: "fallback", warning: "missing base URL" };
+    }
+
+    const url = `${baseUrl.replace(/\/$/, "")}/models`;
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${connection.apiKey}`,
+      },
+    });
+
+    if (!response.ok) {
+      return { models: [], source: "fallback", warning: `Failed to fetch models: ${response.status}`, status: response.status };
+    }
+
+    const data = await response.json();
+    return { models: parseOpenAIStyleModels(data), source: "live" };
+  }
+
+  if (isAnthropicCompatibleProvider(connection.provider)) {
+    const response = await fetch("https://api.anthropic.com/v1/models", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": connection.apiKey,
+        "anthropic-version": "2023-06-01",
+        "Authorization": `Bearer ${connection.apiKey}`
+      },
+    });
+
+    if (!response.ok) {
+      return { models: [], source: "fallback", warning: `Failed to fetch models: ${response.status}`, status: response.status };
+    }
+
+    const data = await response.json();
+    return { models: data.data || data.models || [], source: "live" };
+  }
+
+  if (connection.provider === "kiro") {
+    const kiroService: any = new KiroService();
+    const profileArn = connection.providerSpecificData?.profileArn;
+    const accessToken = connection.accessToken;
+    const refreshToken = connection.refreshToken;
+
+    if (accessToken && profileArn) {
+      try {
+        const models = await kiroService.listAvailableModels(accessToken, profileArn);
+        if (models.length > 0) {
+          return { models, source: "live" };
+        }
+      } catch (error) {
+        console.log("Failed to fetch Kiro dynamic models:", error);
+      }
+    }
+
+    if (refreshToken) {
+      try {
+        const refreshed = await refreshKiroToken(refreshToken, connection.providerSpecificData);
+        if (refreshed?.accessToken && profileArn) {
+          await updateProviderCredentials(connection.id, {
+            accessToken: refreshed.accessToken,
+            refreshToken: refreshed.refreshToken || refreshToken,
+            expiresIn: refreshed.expiresIn,
+          });
+
+          const models = await kiroService.listAvailableModels(refreshed.accessToken, profileArn);
+          if (models.length > 0) {
+            return { models, source: "live" };
+          }
+        }
+      } catch (error) {
+        console.log("Failed to refresh Kiro token or fetch models:", error);
+      }
+    }
+
+    return { models: getModelsByProviderId(connection.provider), source: "fallback", warning: "using static fallback" };
+  }
+
+  if (connection.provider === "gemini-cli") {
+    const accessToken = connection.accessToken;
+    const refreshToken = connection.refreshToken;
+
+    if (!accessToken && !refreshToken) {
+      return { models: [], source: "fallback", warning: "missing OAuth credentials", status: 401 };
+    }
+
+    const projectId = connection.projectId || connection.providerSpecificData?.projectId;
+    const body = projectId ? { project: projectId } : {};
+
+    const fetchModels = async (token: string) => fetch(GEMINI_CLI_MODELS_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+        "User-Agent": "code_assist_server/0.1.0",
+        "x-goog-api-client": "google-cloud-sdk"
+      },
+      body: JSON.stringify(body)
+    });
+
+    let response;
+
+    try {
+      response = await fetchModels(accessToken);
+
+      if (!response.ok && (response.status === 401 || response.status === 403) && refreshToken) {
+        const refreshed = await refreshGoogleToken(refreshToken, GEMINI_CONFIG.clientId, GEMINI_CONFIG.clientSecret);
+        if (refreshed?.accessToken) {
+          await updateProviderCredentials(connection.id, {
+            accessToken: refreshed.accessToken,
+            refreshToken: refreshed.refreshToken,
+            expiresIn: refreshed.expiresIn,
+          });
+          response = await fetchModels(refreshed.accessToken);
+        }
+      }
+
+      if (response.ok) {
+        const data = await response.json();
+        const models = parseGeminiCliModels(data);
+        if (models.length > 0) {
+          return { models, source: "live" };
+        }
+      }
+    } catch (error) {
+      console.log("Gemini CLI dynamic model fetch failed:", error);
+    }
+
+    return { models: getModelsByProviderId(connection.provider), source: "fallback", warning: "using static fallback" };
+  }
+
+  const config = PROVIDER_MODELS_CONFIG[connection.provider as keyof typeof PROVIDER_MODELS_CONFIG];
+  if (!config) {
+    return { models: getModelsByProviderId(connection.provider), source: "fallback", warning: "using static fallback" };
+  }
+
+  const headers: Record<string, string> = { ...config.headers };
+  if (connection.apiKey && config.authHeader) {
+    headers[config.authHeader] = `${config.authPrefix || ""}${connection.apiKey}`;
+  }
+
+  const response = await fetch(config.url, {
+    method: config.method,
+    headers,
+    body: config.body,
+  });
+
+  if (!response.ok) {
+    return { models: getModelsByProviderId(connection.provider), source: "fallback", warning: `Failed to fetch models: ${response.status}`, status: response.status };
+  }
+
+  const data = await response.json();
+  const models = config.parseResponse(data);
+  if (!models || models.length === 0) {
+    return { models: getModelsByProviderId(connection.provider), source: "fallback", warning: "using static fallback" };
+  }
+
+  return { models, source: "live" };
+};
+
 /**
  * GET /api/providers/[id]/models - Get models list from provider
  */
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }): Promise<NextResponse> {
   try {
     const { id } = await context.params;
-    const connection: any = await getProviderConnectionById(id);
 
-    if (!connection) {
-      return NextResponse.json({ error: "Connection not found" }, { status: 404 });
-    }
-
-    if (isOpenAICompatibleProvider(connection.provider)) {
-      const baseUrl = connection.providerSpecificData?.baseUrl;
-      if (!baseUrl) {
-        return NextResponse.json({ error: "No base URL configured for OpenAI compatible provider" }, { status: 400 });
-      }
-      const url = `${baseUrl.replace(/\/$/, "")}/models`;
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${connection.apiKey}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.log(`Error fetching models from ${connection.provider}:`, errorText);
-        return returnDynamicOrStaticFallback(
-          connection,
-          `Failed to fetch models: ${response.status}`,
-          response.status
-        );
+    const directConnection = await getProviderConnectionById(id);
+    if (directConnection) {
+      const { models, source, warning } = await getConnectionLiveModels(directConnection);
+      if (models.length > 0) {
+        return NextResponse.json({
+          provider: directConnection.provider,
+          connectionId: directConnection.id,
+          models,
+          source,
+          ...(warning ? { warning } : {})
+        });
       }
 
-      const data = await response.json();
-      const models = data.data || data.models || [];
-
+      const fallbackModels = getModelsByProviderId(directConnection.provider);
       return NextResponse.json({
-        provider: connection.provider,
-        connectionId: connection.id,
-        models
+        provider: directConnection.provider,
+        connectionId: directConnection.id,
+        models: fallbackModels,
+        source: "fallback",
+        ...(warning ? { warning } : {})
       });
     }
 
-    if (isAnthropicCompatibleProvider(connection.provider)) {
-      let baseUrl = connection.providerSpecificData?.baseUrl;
-      if (!baseUrl) {
-        return NextResponse.json({ error: "No base URL configured for Anthropic compatible provider" }, { status: 400 });
-      }
+    const providerConnections: any[] = (await getProviderConnections({ provider: id, isActive: true })) || [];
 
-      baseUrl = baseUrl.replace(/\/$/, "");
-      if (baseUrl.endsWith("/messages")) {
-        baseUrl = baseUrl.slice(0, -9);
-      }
-
-      const url = `${baseUrl}/models`;
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": connection.apiKey,
-          "anthropic-version": "2023-06-01",
-          "Authorization": `Bearer ${connection.apiKey}`
-        },
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.log(`Error fetching models from ${connection.provider}:`, errorText);
-        return returnDynamicOrStaticFallback(
-          connection,
-          `Failed to fetch models: ${response.status}`,
-          response.status
-        );
-      }
-
-      const data = await response.json();
-      const models = data.data || data.models || [];
-
+    if (providerConnections.length === 0) {
       return NextResponse.json({
-        provider: connection.provider,
-        connectionId: connection.id,
-        models
+        provider: id,
+        models: getModelsByProviderId(id),
+        source: "fallback",
+        fallbackReason: "no active connections",
+        connectionCount: 0,
+        liveSuccessCount: 0
       });
     }
 
-    // Kiro: Try dynamic model fetching first
-    if (connection.provider === "kiro") {
-      let warning;
-      try {
-        const kiroService: any = new KiroService();
-        const profileArn = connection.providerSpecificData?.profileArn;
-        const accessToken = connection.accessToken;
-        const refreshToken = connection.refreshToken;
+    if (providerConnections.length > 0) {
+      const staticModels = getModelsByProviderId(id);
+      const modelsById = new Map<string, any>();
+      const warnings: string[] = [];
+      let liveSuccessCount = 0;
 
-        if (accessToken && profileArn) {
-          try {
-            const models = await kiroService.listAvailableModels(accessToken, profileArn);
-            return NextResponse.json({
-              provider: connection.provider,
-              connectionId: connection.id,
-              models
-            });
-          } catch (error: any) {
-            if (error.message.includes("AccessDeniedException") && refreshToken) {
-              console.log("Kiro token invalid/expired. Attempting refresh...");
-              const refreshed = await refreshKiroToken(refreshToken, connection.providerSpecificData);
+      const settledResults = await Promise.allSettled(
+        providerConnections.map((connection) => getConnectionLiveModels(connection))
+      );
 
-              if (refreshed?.accessToken) {
-                await updateProviderCredentials(connection.id, {
-                  accessToken: refreshed.accessToken,
-                  refreshToken: refreshed.refreshToken || refreshToken,
-                  expiresIn: refreshed.expiresIn,
-                });
+      settledResults.forEach((result, index) => {
+        const connection = providerConnections[index];
 
-                const models = await kiroService.listAvailableModels(refreshed.accessToken, profileArn);
-                return NextResponse.json({
-                  provider: connection.provider,
-                  connectionId: connection.id,
-                  models
-                });
+        if (result.status === "fulfilled") {
+          const { models, source, warning } = result.value;
+
+          if (source === "live" && models.length > 0) {
+            liveSuccessCount += 1;
+            for (const model of models) {
+              if (model?.id && !modelsById.has(model.id)) {
+                modelsById.set(model.id, model);
               }
             }
-            throw error; // Let outer catch handle it
           }
+
+          if (warning) {
+            warnings.push(`${connection.id}: ${warning}`);
+          }
+
+          return;
         }
-      } catch (error: any) {
-        warning = `Failed to fetch Kiro models: ${error.message}`;
-        console.log("Failed to fetch Kiro models dynamically, falling back to static:", error.message);
-      }
 
-      return returnDynamicOrStaticFallback(
-        connection,
-        warning || "Failed to fetch Kiro models"
-      );
-    }
+        console.log(`Error fetching models from connection ${connection.id}:`, result.reason);
+        warnings.push(`${connection.id}: fetch failed`);
+      });
 
-    if (connection.provider === "gemini-cli") {
-      const { accessToken, refreshToken } = connection;
-      if (!accessToken) {
-        return NextResponse.json({ error: "No valid token found" }, { status: 401 });
-      }
-
-      const projectId = connection.projectId || connection.providerSpecificData?.projectId;
-      const body = projectId ? { project: projectId } : {};
-
-      const fetchModels = async (token: string) => {
-        const response = await fetch(GEMINI_CLI_MODELS_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-            "User-Agent": "google-api-nodejs-client/9.15.1",
-            "X-Goog-Api-Client": "google-cloud-sdk vscode_cloudshelleditor/0.1"
-          },
-          body: JSON.stringify(body)
+      if (modelsById.size > 0) {
+        return NextResponse.json({
+          provider: id,
+          models: Array.from(modelsById.values()),
+          source: "live",
+          connectionCount: providerConnections.length,
+          liveSuccessCount,
+          ...(warnings.length > 0 ? { warnings } : {})
         });
-        return response;
-      };
-
-      let warning;
-
-      try {
-        let response = await fetchModels(accessToken);
-
-        // Attempt refresh on 401/403 when refresh token exists
-        if (!response.ok && (response.status === 401 || response.status === 403) && refreshToken) {
-          const refreshed = await refreshGoogleToken(refreshToken, GEMINI_CONFIG.clientId, GEMINI_CONFIG.clientSecret);
-          if (refreshed?.accessToken) {
-            await updateProviderCredentials(connection.id, {
-              accessToken: refreshed.accessToken,
-              refreshToken: refreshed.refreshToken,
-              expiresIn: refreshed.expiresIn,
-            });
-            response = await fetchModels(refreshed.accessToken);
-          }
-        }
-
-        if (response.ok) {
-          const data = await response.json();
-          const models = parseGeminiCliModels(data);
-          if (models.length > 0) {
-            return NextResponse.json({
-              provider: connection.provider,
-              connectionId: connection.id,
-              models
-            });
-          }
-        } else {
-          const errorText = await response.text();
-          warning = `Failed to fetch Gemini CLI models: ${response.status} ${errorText}`;
-          console.log("Failed to fetch Gemini CLI models dynamically, falling back to static:", errorText);
-        }
-      } catch (error: any) {
-        warning = `Failed to fetch Gemini CLI models: ${error.message}`;
-        console.log("Failed to fetch Gemini CLI models dynamically, falling back to static:", error.message);
       }
 
-      return returnDynamicOrStaticFallback(
-        connection,
-        warning || "Failed to fetch Gemini CLI models"
-      );
+      if (staticModels.length > 0) {
+        return NextResponse.json({
+          provider: id,
+          models: staticModels,
+          source: "fallback",
+          fallbackReason: "all live fetches failed",
+          connectionCount: providerConnections.length,
+          liveSuccessCount,
+          ...(warnings.length > 0 ? { warnings } : {})
+        });
+      }
     }
 
-    const config = PROVIDER_MODELS_CONFIG[connection.provider];
-    if (!config) {
-      return NextResponse.json(
-        { error: `Provider ${connection.provider} does not support models listing` },
-        { status: 400 }
-      );
-    }
-
-    // Get auth token
-    const token = connection.providerSpecificData?.copilotToken || connection.accessToken || connection.apiKey;
-    if (!token) {
-      return NextResponse.json({ error: "No valid token found" }, { status: 401 });
-    }
-
-    // Build request URL
-    let url = config.url;
-    if (connection.provider === "qwen") {
-      url = resolveQwenModelsUrl(connection);
-    }
-    if (config.authQuery) {
-      url += `?${config.authQuery}=${token}`;
-    }
-
-    // Build headers
-    const headers = { ...config.headers };
-    if (config.authHeader && !config.authQuery) {
-      headers[config.authHeader] = (config.authPrefix || "") + token;
-    }
-
-    // Make request
-    const fetchOptions: any = {
-      method: config.method,
-      headers
-    };
-
-    if (config.body && config.method === "POST") {
-      fetchOptions.body = JSON.stringify(config.body);
-    }
-
-    const response = await fetch(url, fetchOptions);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.log(`Error fetching models from ${connection.provider}:`, errorText);
-      return NextResponse.json(
-        { error: `Failed to fetch models: ${response.status}` },
-        { status: response.status }
-      );
-    }
-
-    const data = await response.json();
-    const models = config.parseResponse(data);
-
-    return NextResponse.json({
-      provider: connection.provider,
-      connectionId: connection.id,
-      models
-    });
+    return NextResponse.json({ error: "Provider connection not found" }, { status: 404 });
   } catch (error) {
     console.log("Error fetching provider models:", error);
     return NextResponse.json({ error: "Failed to fetch models" }, { status: 500 });
