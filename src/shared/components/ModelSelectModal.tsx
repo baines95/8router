@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
@@ -50,6 +50,12 @@ interface ProviderConnection {
   };
 }
 
+type ProviderModelsResponse = {
+  provider: string;
+  source: "live" | "fallback";
+  models: Array<{ id: string; name?: string }>;
+};
+
 interface ModelItem {
   id: string;
   name: string;
@@ -67,6 +73,137 @@ interface GroupedModels {
   };
 }
 
+type LiveProviderModelMap = Record<string, ProviderModelsResponse["models"]>;
+
+const fetchJson = async (input: string): Promise<unknown> => {
+  const response = await fetch(input, { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${input}: ${response.status}`);
+  }
+
+  return response.json();
+};
+
+const isModelArray = (value: unknown): value is ProviderModelsResponse["models"] => (
+  Array.isArray(value)
+  && value.every((item) => typeof item === "object" && item !== null && typeof (item as { id?: unknown }).id === "string")
+);
+
+const isProviderModelsResponse = (value: unknown): value is ProviderModelsResponse => {
+  if (!value || typeof value !== "object") return false;
+
+  const candidate = value as Partial<ProviderModelsResponse>;
+  return typeof candidate.provider === "string"
+    && (candidate.source === "live" || candidate.source === "fallback")
+    && isModelArray(candidate.models);
+};
+
+const getProviderAliasModels = (modelAliases: Record<string, string>, alias: string): ModelItem[] => Object.entries(modelAliases)
+  .filter(([, value]) => value.startsWith(`${alias}/`))
+  .map(([name, value]) => ({
+    id: value.replace(`${alias}/`, ""),
+    name,
+    value,
+    isCustom: true,
+  }));
+
+const mapProviderModels = (models: ProviderModelsResponse["models"], alias: string): ModelItem[] => models.map((model) => ({
+  id: model.id,
+  name: model.name || model.id,
+  value: `${alias}/${model.id}`,
+}));
+
+const mergeProviderModels = (primary: ModelItem[], extra: ModelItem[]): ModelItem[] => {
+  const seen = new Set(primary.map((model) => model.id));
+  return [...primary, ...extra.filter((model) => !seen.has(model.id))];
+};
+
+const getStaticProviderModels = (providerId: string, alias: string, modelAliases: Record<string, string>): ModelItem[] => {
+  const hard = getModelsByProviderId(providerId);
+  const hardIds = new Set(hard.map((model) => model.id));
+  const hasHard = hard.length > 0;
+  const custom = getProviderAliasModels(modelAliases, alias).filter((model) => (hasHard ? model.name === model.id : true) && !hardIds.has(model.id));
+  return mergeProviderModels(hard.map((model) => ({ id: model.id, name: model.name || model.id, value: `${alias}/${model.id}` })), custom);
+};
+
+const getLiveProviderModels = (providerId: string, alias: string, liveProviderModels: LiveProviderModelMap, modelAliases: Record<string, string>): ModelItem[] | null => {
+  const live = liveProviderModels[providerId];
+  if (!live || live.length === 0) return null;
+  return mergeProviderModels(mapProviderModels(live, alias), getProviderAliasModels(modelAliases, alias));
+};
+
+const loadLiveProviderModels = async (activeProviders: ProviderConnection[]): Promise<LiveProviderModelMap> => {
+  const uniqueProviders = [...new Set(activeProviders.map((connection) => connection.provider))];
+  const entries = await Promise.all(uniqueProviders.map(async (providerId) => {
+    try {
+      const payload = await fetchJson(`/api/providers/${providerId}/models`);
+      if (!isProviderModelsResponse(payload)) return null;
+      return [providerId, payload.models] as const;
+    } catch {
+      return null;
+    }
+  }));
+
+  return Object.fromEntries(entries.filter((entry): entry is readonly [string, ProviderModelsResponse["models"]] => entry !== null));
+};
+
+const buildGroupedModels = (
+  activeProviders: ProviderConnection[],
+  modelAliases: Record<string, string>,
+  allProviders: Record<string, any>,
+  providerNodes: ProviderNode[],
+  liveProviderModels: LiveProviderModelMap,
+): GroupedModels => {
+  const groups: GroupedModels = {};
+  const activeConnectionIds = activeProviders.map((provider) => provider.provider);
+  const providerIdsToShow = new Set([...activeConnectionIds, ...NO_AUTH_PROVIDER_IDS]);
+  const sortedProviderIds = [...providerIdsToShow].sort((a, b) => {
+    const indexA = PROVIDER_ORDER.indexOf(a);
+    const indexB = PROVIDER_ORDER.indexOf(b);
+    return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+  });
+
+  sortedProviderIds.forEach((providerId) => {
+    const alias = (PROVIDER_ID_TO_ALIAS as any)[providerId] || providerId;
+    const providerInfo = (allProviders as any)[providerId] || { name: providerId, color: "#666" };
+    const isCustomProvider = isOpenAICompatibleProvider(providerId) || isAnthropicCompatibleProvider(providerId);
+
+    if (providerInfo.passthroughModels) {
+      const aliasModels = getProviderAliasModels(modelAliases, alias);
+      if (aliasModels.length > 0) {
+        groups[providerId] = {
+          name: providerNodes.find((node) => node.id === providerId)?.name || providerInfo.name,
+          alias,
+          color: providerInfo.color,
+          models: aliasModels,
+        };
+      }
+      return;
+    }
+
+    if (isCustomProvider) {
+      const connection = activeProviders.find((provider) => provider.provider === providerId);
+      const node = providerNodes.find((provider) => provider.id === providerId);
+      const prefix = connection?.providerSpecificData?.prefix || node?.prefix || alias;
+      groups[providerId] = {
+        name: node?.name || providerInfo.name,
+        alias,
+        color: providerInfo.color,
+        models: [{ id: `__p__${providerId}`, name: `${prefix}/model-id`, value: `${prefix}/model-id`, isPlaceholder: true }],
+      };
+      return;
+    }
+
+    const liveModels = getLiveProviderModels(providerId, alias, liveProviderModels, modelAliases);
+    const models = liveModels || getStaticProviderModels(providerId, alias, modelAliases);
+    if (models.length > 0) {
+      groups[providerId] = { name: providerInfo.name, alias, color: providerInfo.color, models };
+    }
+  });
+
+  return groups;
+};
+
 interface ModelSelectModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -81,51 +218,49 @@ export default function ModelSelectModal({ isOpen, onClose, onSelect, selectedMo
   const [searchQuery, setSearchQuery] = useState("");
   const [combos, setCombos] = useState<Combo[]>([]);
   const [providerNodes, setProviderNodes] = useState<ProviderNode[]>([]);
+  const [liveProviderModels, setLiveProviderModels] = useState<LiveProviderModelMap>({});
 
   useEffect(() => {
-    if (isOpen) {
-       fetch("/api/combos").then(r => r.json()).then(d => setCombos(d.combos || [])).catch(() => {});
-       fetch("/api/provider-nodes").then(r => r.json()).then(d => setProviderNodes(d.nodes || [])).catch(() => {});
-    }
+    if (!isOpen) return;
+
+    fetch("/api/combos")
+      .then((response) => response.json())
+      .then((data) => setCombos(data.combos || []))
+      .catch(() => {});
+
+    fetch("/api/provider-nodes")
+      .then((response) => response.json())
+      .then((data) => setProviderNodes(data.nodes || []))
+      .catch(() => {});
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let cancelled = false;
+    loadLiveProviderModels(activeProviders)
+      .then((models) => {
+        if (!cancelled) {
+          setLiveProviderModels(models);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLiveProviderModels({});
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeProviders, isOpen]);
 
   const allProviders = useMemo(() => ({ ...OAUTH_PROVIDERS, ...FREE_PROVIDERS, ...FREE_TIER_PROVIDERS, ...APIKEY_PROVIDERS }), []);
 
-  const groupedModels = useMemo(() => {
-    const groups: GroupedModels = {};
-    const activeConnectionIds = activeProviders.map(p => p.provider);
-    const providerIdsToShow = new Set([...activeConnectionIds, ...NO_AUTH_PROVIDER_IDS]);
-    const sortedProviderIds = [...providerIdsToShow].sort((a, b) => {
-      const indexA = PROVIDER_ORDER.indexOf(a);
-      const indexB = PROVIDER_ORDER.indexOf(b);
-      return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
-    });
-
-    sortedProviderIds.forEach((providerId) => {
-      const alias = (PROVIDER_ID_TO_ALIAS as any)[providerId] || providerId;
-      const providerInfo = (allProviders as any)[providerId] || { name: providerId, color: "#666" };
-      const isCustomProvider = isOpenAICompatibleProvider(providerId) || isAnthropicCompatibleProvider(providerId);
-
-      if (providerInfo.passthroughModels) {
-        const aliasModels = Object.entries(modelAliases).filter(([, f]) => f.startsWith(`${alias}/`)).map(([n, f]) => ({ id: f.replace(`${alias}/`, ""), name: n, value: f }));
-        if (aliasModels.length > 0) groups[providerId] = { name: providerNodes.find(n => n.id === providerId)?.name || providerInfo.name, alias, color: providerInfo.color, models: aliasModels };
-      } else if (isCustomProvider) {
-        const conn = activeProviders.find(p => p.provider === providerId);
-        const node = providerNodes.find(n => n.id === providerId);
-        const prefix = conn?.providerSpecificData?.prefix || node?.prefix || providerId;
-        const nodeModels = Object.entries(modelAliases).filter(([, f]) => f.startsWith(`${providerId}/`)).map(([n, f]) => ({ id: f.replace(`${providerId}/`, ""), name: n, value: `${prefix}/${f.replace(`${providerId}/`, "")}` }));
-        groups[providerId] = { name: conn?.name || node?.name || providerInfo.name, alias: prefix, color: providerInfo.color, models: nodeModels.length ? nodeModels : [{ id: `__p__${providerId}`, name: `${prefix}/model-id`, value: `${prefix}/model-id`, isPlaceholder: true }] };
-      } else {
-        const hard = getModelsByProviderId(providerId);
-        const hardIds = new Set(hard.map(m => m.id));
-        const hasHard = hard.length > 0;
-        const custom = Object.entries(modelAliases).filter(([n, f]) => f.startsWith(`${alias}/`) && (hasHard ? n === f.replace(`${alias}/`, "") : true) && !hardIds.has(f.replace(`${alias}/`, ""))).map(([n, f]) => ({ id: f.replace(`${alias}/`, ""), name: n, value: f, isCustom: true }));
-        const all = [...hard.map(m => ({ id: m.id, name: m.name || m.id, value: `${alias}/${m.id}` })), ...custom];
-        if (all.length > 0) groups[providerId] = { name: providerInfo.name, alias, color: providerInfo.color, models: all };
-      }
-    });
-    return groups;
-  }, [activeProviders, modelAliases, allProviders, providerNodes]);
+  const groupedModels = useMemo(
+    () => buildGroupedModels(activeProviders, modelAliases, allProviders, providerNodes, liveProviderModels),
+    [activeProviders, modelAliases, allProviders, providerNodes, liveProviderModels],
+  );
 
   const filteredCombos = useMemo(() => combos.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase())), [combos, searchQuery]);
   const filteredGroups = useMemo(() => {
@@ -159,7 +294,9 @@ export default function ModelSelectModal({ isOpen, onClose, onSelect, selectedMo
                  </div>
                  <div className="flex flex-wrap gap-2">
                     {filteredCombos.map(c => (
-                      <button key={c.id} onClick={() => { onSelect({ id: c.name, name: c.name, value: c.name }); onClose(); }} className={cn("px-3 py-1.5 rounded-full text-xs font-bold border transition-all shadow-none", selectedModel === c.name ? "bg-primary text-primary-foreground border-primary" : "bg-muted/30 border-border/40 hover:border-primary/30")}>{c.name}</button>
+                      <button key={c.id} onClick={() => onSelect({ id: c.id, name: c.name, value: c.id })} className={cn("px-3 py-1.5 rounded-full text-xs font-bold border transition-all shadow-none", selectedModel === c.name ? "bg-primary text-primary-foreground border-primary" : "bg-muted/30 border-border/40 hover:border-primary/30")}>
+                         <Layers className="size-3.5 inline mr-1.5 opacity-70" />{c.name}
+                      </button>
                     ))}
                  </div>
               </div>
@@ -168,17 +305,15 @@ export default function ModelSelectModal({ isOpen, onClose, onSelect, selectedMo
             {Object.entries(filteredGroups).map(([pid, g]) => (
               <div key={pid} className="space-y-3">
                  <div className="flex items-center gap-2 sticky top-0 bg-background py-1 z-10">
-                    <div className="size-2 rounded-full" style={{ backgroundColor: g.color }} />
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: g.color }} />
                     <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">{g.name}</span>
                  </div>
                  <div className="flex flex-wrap gap-2">
                     {g.models.map(m => (
-                       <button key={m.id} onClick={() => { onSelect(m); onClose(); }} className={cn("px-3 py-1.5 rounded-full text-xs font-bold border transition-all flex items-center gap-2 shadow-none", selectedModel === m.value ? "bg-primary text-primary-foreground border-primary" : "bg-muted/10 border-border/40 hover:border-primary/30")}>
-                          {m.isPlaceholder && <Edit2 className="size-3 opacity-50" />}
-                          {m.name}
-                          {m.isCustom && <Badge variant="outline" className="h-3.5 px-1 text-[10px] border-primary/20 text-primary font-bold uppercase">CUSTOM</Badge>}
-                          {selectedModel === m.value && <Check className="size-3" />}
-                       </button>
+                      <button key={m.value} onClick={() => !m.isPlaceholder && onSelect(m)} className={cn("px-3 py-1.5 rounded-full text-xs font-bold border transition-all shadow-none flex items-center gap-1.5", m.isPlaceholder ? "border-dashed opacity-60 hover:opacity-100" : selectedModel === m.value ? "bg-primary text-primary-foreground border-primary" : "bg-background border-border/50 hover:border-primary/30")}>
+                         {m.isPlaceholder ? <Edit2 className="size-3.5" /> : selectedModel === m.value ? <Check className="size-3.5" /> : <Badge variant="outline" className="px-1.5 py-0 h-5 text-[9px] uppercase tracking-wider border-border/50">{g.alias}</Badge>}
+                         <span>{m.name}</span>
+                      </button>
                     ))}
                  </div>
               </div>

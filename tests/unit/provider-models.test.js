@@ -172,6 +172,47 @@ describe("GET /api/providers/[id]/models", () => {
     expect(response.body.source).toBe("live");
   });
 
+  it("parses real codex model payloads that use slug and display_name", async () => {
+    getProviderConnectionById.mockResolvedValue({
+      id: "conn-codex",
+      provider: "codex",
+      accessToken: "codex-token",
+      providerSpecificData: {},
+    });
+
+    global.fetch = vi.fn(async (url, options) => {
+      if (url === "https://chatgpt.com/backend-api/codex/models?client_version=1.0.0") {
+        expect(options?.headers?.Authorization).toBe("Bearer codex-token");
+        return {
+          ok: true,
+          json: async () => ({
+            models: [{ slug: "gpt-5.5", display_name: "GPT-5.5" }],
+          }),
+        };
+      }
+
+      throw new Error(`Unexpected URL: ${String(url)}`);
+    });
+
+    const response = await GET(new Request("http://localhost/api/providers/conn-codex/models"), {
+      params: Promise.resolve({ id: "conn-codex" }),
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body.source).toBe("live");
+    expect(response.body.models).toEqual([
+      { id: "gpt-5.5", name: "GPT-5.5", slug: "gpt-5.5", display_name: "GPT-5.5" },
+      {
+        id: "gpt-5.5-review",
+        name: "GPT-5.5 Review",
+        slug: "gpt-5.5",
+        display_name: "GPT-5.5",
+        upstreamModelId: "gpt-5.5",
+        quotaFamily: "review",
+      },
+    ]);
+  });
+
   it("falls back to static models with fallback reason when all live fetches fail", async () => {
     getProviderConnectionById.mockResolvedValue(null);
 

@@ -7,10 +7,49 @@ import { refreshGoogleToken, updateProviderCredentials, refreshKiroToken } from 
 import { getModelsByProviderId } from "@/shared/constants/models";
 
 const GEMINI_CLI_MODELS_URL = "https://cloudcode-pa.googleapis.com/v1internal:fetchAvailableModels";
+const CODEX_REVIEW_SUFFIX = "-review";
+const CODEX_REVIEW_QUOTA_FAMILY = "review";
 
 const parseOpenAIStyleModels = (data: any): any[] => {
   if (Array.isArray(data)) return data;
   return data?.data || data?.models || data?.results || [];
+};
+
+const parseCodexModels = (data: any): any[] => {
+  const models = parseOpenAIStyleModels(data);
+  const existingIds = new Set(
+    models
+      .map((model: any) => model?.id || model?.slug)
+      .filter((id: unknown): id is string => typeof id === "string" && id.length > 0),
+  );
+
+  return models.flatMap((model: any) => {
+    const id = model?.id || model?.slug;
+    if (!id || typeof id !== "string") return [];
+
+    const name = model?.name || model?.display_name || id;
+    const normalized = {
+      ...model,
+      id,
+      name,
+    };
+    const reviewId = `${id}${CODEX_REVIEW_SUFFIX}`;
+
+    if (id.endsWith(CODEX_REVIEW_SUFFIX) || existingIds.has(reviewId)) {
+      return [normalized];
+    }
+
+    return [
+      normalized,
+      {
+        ...normalized,
+        id: reviewId,
+        name: `${name} Review`,
+        upstreamModelId: id,
+        quotaFamily: CODEX_REVIEW_QUOTA_FAMILY,
+      },
+    ];
+  });
 };
 
 const parseGeminiCliModels = (data: any): any[] => {
@@ -45,47 +84,6 @@ const createOpenAIModelsConfig = (url: string) => ({
   parseResponse: parseOpenAIStyleModels
 });
 
-const resolveQwenModelsUrl = (connection: any): string => {
-  const fallback = "https://portal.qwen.ai/v1/models";
-  const raw = connection?.providerSpecificData?.resourceUrl;
-  if (!raw || typeof raw !== "string") return fallback;
-  const value = raw.trim();
-  if (!value) return fallback;
-  if (value.startsWith("http://") || value.startsWith("https://")) {
-    return `${value.replace(/\/$/, "")}/models`;
-  }
-  return `https://${value.replace(/\/$/, "")}/v1/models`;
-};
-
-const mapStaticModels = (providerId: string) =>
-  getModelsByProviderId(providerId).map((model: any) => ({
-    id: model.id,
-    name: model.name || model.id,
-    type: model.type,
-  }));
-
-const buildStaticFallbackResponse = (connection: any, warning: string) => {
-  const staticModels = mapStaticModels(connection.provider);
-  if (!staticModels.length) return null;
-
-  return NextResponse.json({
-    provider: connection.provider,
-    connectionId: connection.id,
-    models: staticModels,
-    warning,
-  });
-};
-
-const returnDynamicOrStaticFallback = (connection: any, warning: string, status?: number) => {
-  const fallback = buildStaticFallbackResponse(connection, warning);
-  if (fallback) return fallback;
-
-  return NextResponse.json(
-    { error: warning },
-    { status: status || 502 }
-  );
-};
-
 // Provider models endpoints configuration
 const PROVIDER_MODELS_CONFIG: Record<string, any> = {
   claude: {
@@ -112,6 +110,17 @@ const PROVIDER_MODELS_CONFIG: Record<string, any> = {
     authHeader: "Authorization",
     authPrefix: "Bearer ",
     parseResponse: (data: any) => data.data || []
+  },
+  codex: {
+    url: "https://chatgpt.com/backend-api/codex/models?client_version=1.0.0",
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    authHeader: "Authorization",
+    authPrefix: "Bearer ",
+    parseResponse: parseCodexModels,
   },
   antigravity: {
     url: "https://daily-cloudcode-pa.sandbox.googleapis.com/v1internal:models",
@@ -349,8 +358,9 @@ const getConnectionLiveModels = async (connection: any): Promise<LiveModelsResul
   }
 
   const headers: Record<string, string> = { ...config.headers };
-  if (connection.apiKey && config.authHeader) {
-    headers[config.authHeader] = `${config.authPrefix || ""}${connection.apiKey}`;
+  const authToken = connection.accessToken || connection.apiKey;
+  if (authToken && config.authHeader) {
+    headers[config.authHeader] = `${config.authPrefix || ""}${authToken}`;
   }
 
   const response = await fetch(config.url, {
