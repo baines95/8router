@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { getModelsByProviderId, PROVIDER_ID_TO_ALIAS } from "@/shared/constants/models";
 import { OAUTH_PROVIDERS, APIKEY_PROVIDERS, FREE_PROVIDERS, FREE_TIER_PROVIDERS, isOpenAICompatibleProvider, isAnthropicCompatibleProvider } from "@/shared/constants/providers";
+import { getProviderFetchKey, loadLiveProviderModels, type LiveProviderModelMap, type ProviderModelsResponse } from "@/shared/utils/providerModelLiveFetch";
 
 const PROVIDER_ORDER = [
   ...Object.keys(OAUTH_PROVIDERS),
@@ -50,12 +51,6 @@ interface ProviderConnection {
   };
 }
 
-type ProviderModelsResponse = {
-  provider: string;
-  source: "live" | "fallback";
-  models: Array<{ id: string; name?: string }>;
-};
-
 interface ModelItem {
   id: string;
   name: string;
@@ -72,31 +67,6 @@ interface GroupedModels {
     models: ModelItem[];
   };
 }
-
-type LiveProviderModelMap = Record<string, ProviderModelsResponse["models"]>;
-
-const fetchJson = async (input: string): Promise<unknown> => {
-  const response = await fetch(input, { cache: "no-store" });
-  if (!response.ok) {
-    throw new Error(`Failed to fetch ${input}: ${response.status}`);
-  }
-
-  return response.json();
-};
-
-const isModelArray = (value: unknown): value is ProviderModelsResponse["models"] => (
-  Array.isArray(value)
-  && value.every((item) => typeof item === "object" && item !== null && typeof (item as { id?: unknown }).id === "string")
-);
-
-const isProviderModelsResponse = (value: unknown): value is ProviderModelsResponse => {
-  if (!value || typeof value !== "object") return false;
-
-  const candidate = value as Partial<ProviderModelsResponse>;
-  return typeof candidate.provider === "string"
-    && (candidate.source === "live" || candidate.source === "fallback")
-    && isModelArray(candidate.models);
-};
 
 const getProviderAliasModels = (modelAliases: Record<string, string>, alias: string): ModelItem[] => Object.entries(modelAliases)
   .filter(([, value]) => value.startsWith(`${alias}/`))
@@ -130,21 +100,6 @@ const getLiveProviderModels = (providerId: string, alias: string, liveProviderMo
   const live = liveProviderModels[providerId];
   if (!live || live.length === 0) return null;
   return mergeProviderModels(mapProviderModels(live, alias), getProviderAliasModels(modelAliases, alias));
-};
-
-const loadLiveProviderModels = async (activeProviders: ProviderConnection[]): Promise<LiveProviderModelMap> => {
-  const uniqueProviders = [...new Set(activeProviders.map((connection) => connection.provider))];
-  const entries = await Promise.all(uniqueProviders.map(async (providerId) => {
-    try {
-      const payload = await fetchJson(`/api/providers/${providerId}/models`);
-      if (!isProviderModelsResponse(payload)) return null;
-      return [providerId, payload.models] as const;
-    } catch {
-      return null;
-    }
-  }));
-
-  return Object.fromEntries(entries.filter((entry): entry is readonly [string, ProviderModelsResponse["models"]] => entry !== null));
 };
 
 const buildGroupedModels = (
@@ -219,6 +174,8 @@ export default function ModelSelectModal({ isOpen, onClose, onSelect, selectedMo
   const [combos, setCombos] = useState<Combo[]>([]);
   const [providerNodes, setProviderNodes] = useState<ProviderNode[]>([]);
   const [liveProviderModels, setLiveProviderModels] = useState<LiveProviderModelMap>({});
+  const lastFetchedProviderKeyRef = useRef<string | null>(null);
+  const providerFetchKey = useMemo(() => getProviderFetchKey(activeProviders), [activeProviders]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -235,17 +192,21 @@ export default function ModelSelectModal({ isOpen, onClose, onSelect, selectedMo
   }, [isOpen]);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || providerFetchKey.length === 0 || providerFetchKey === lastFetchedProviderKeyRef.current) {
+      return;
+    }
 
     let cancelled = false;
     loadLiveProviderModels(activeProviders)
       .then((models) => {
         if (!cancelled) {
+          lastFetchedProviderKeyRef.current = providerFetchKey;
           setLiveProviderModels(models);
         }
       })
       .catch(() => {
         if (!cancelled) {
+          lastFetchedProviderKeyRef.current = providerFetchKey;
           setLiveProviderModels({});
         }
       });
@@ -253,7 +214,7 @@ export default function ModelSelectModal({ isOpen, onClose, onSelect, selectedMo
     return () => {
       cancelled = true;
     };
-  }, [activeProviders, isOpen]);
+  }, [activeProviders, isOpen, providerFetchKey]);
 
   const allProviders = useMemo(() => ({ ...OAUTH_PROVIDERS, ...FREE_PROVIDERS, ...FREE_TIER_PROVIDERS, ...APIKEY_PROVIDERS }), []);
 

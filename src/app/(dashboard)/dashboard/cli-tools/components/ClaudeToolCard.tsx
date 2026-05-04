@@ -11,6 +11,7 @@ import {
 import { BaseToolCard } from "./";
 import { ArrowRight, ArrowsClockwise as RotateCcw, X, Info, MagnifyingGlass as Search, ShieldWarning as ShieldAlert, BookOpen } from "@phosphor-icons/react";
 import { translate } from "@/i18n/runtime";
+import { getHydratedModelMappings } from "@/shared/utils/claudeModelMappingSync";
 
 interface ClaudeStatus {
   installed: boolean;
@@ -104,15 +105,21 @@ export default function ClaudeToolCard({
  }, [isExpanded, claudeStatus]);
 
  useEffect(() => {
- if (claudeStatus && isExpanded) {
- tool.defaultModels.forEach((m: any) => {
- const existingVal = claudeStatus?.settings?.env?.[m.envKey];
- if (existingVal && modelMappings[m.alias] !== existingVal) {
- onModelMappingChange(m.alias, existingVal);
- } else if (!existingVal && m.id && !modelMappings[m.alias]) {
- onModelMappingChange(m.alias, m.id);
- }
+ if (!claudeStatus || !isExpanded) return;
+
+ const hydratedMappings = getHydratedModelMappings({
+ defaultModels: tool.defaultModels,
+ currentMappings: modelMappings,
+ existingEnv: claudeStatus.settings?.env || {},
+ hasHydrated: hasInitializedModels.current,
  });
+
+ Object.entries(hydratedMappings).forEach(([alias, target]) => {
+ onModelMappingChange(alias, target);
+ });
+
+ if (Object.keys(hydratedMappings).length > 0 || !hasInitializedModels.current) {
+ hasInitializedModels.current = true;
  }
  }, [isExpanded, claudeStatus, tool.defaultModels, modelMappings, onModelMappingChange]);
 
