@@ -26,6 +26,7 @@ export const PROVIDER_MODELS: Record<string, ModelEntry[]> = {
   ],
   cx: [  // OpenAI Codex
     { id: "gpt-5.4", name: "GPT 5.4" },
+    { id: "gpt-5.5", name: "GPT 5.5" },
     // GPT 5.3 Codex - all thinking levels
     { id: "gpt-5.3-codex", name: "GPT 5.3 Codex" },
     { id: "gpt-5.3-codex-xhigh", name: "GPT 5.3 Codex (xHigh)" },

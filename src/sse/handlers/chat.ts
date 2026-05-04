@@ -8,6 +8,7 @@ import {
   isValidApiKey,
 } from "../services/auth";
 import { cacheClaudeHeaders } from "@/lib/open-sse/utils/claudeHeaderCache";
+import { detectClientTool } from "@/lib/open-sse/utils/clientDetector";
 import { getSettings } from "@/lib/localDb";
 import { getModelInfo, getComboModels } from "../services/model";
 import { handleChatCore } from "@/lib/open-sse/handlers/chatCore";
@@ -117,7 +118,8 @@ export async function handleChat(request: Request, clientRawRequest: any = null)
  * Handle single model chat request
  */
 async function handleSingleModelChat(body: any, modelStr: string, clientRawRequest: any = null, request: any = null, apiKey: string | null = null): Promise<Response> {
-  const modelInfo = await getModelInfo(modelStr);
+  const clientTool = detectClientTool(clientRawRequest?.headers || {}, body);
+  const modelInfo = await getModelInfo(modelStr, clientTool);
 
   // If provider is null, this might be a combo name - check and handle
   if (!modelInfo.provider) {

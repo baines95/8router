@@ -15,7 +15,7 @@ export async function resolveModelAlias(alias: string): Promise<{ provider: stri
 /**
  * Get full model info (parse or resolve)
  */
-export async function getModelInfo(modelStr: string): Promise<{ provider: string | null; model: string }> {
+export async function getModelInfo(modelStr: string, clientTool: string | null = null): Promise<{ provider: string | null; model: string }> {
   const parsed = parseModel(modelStr);
 
   if (!parsed.isAlias) {
@@ -49,7 +49,7 @@ export async function getModelInfo(modelStr: string): Promise<{ provider: string
     return { provider: null, model: parsed.model };
   }
 
-  return getModelInfoCore(modelStr, getModelAliases);
+  return getModelInfoCore(modelStr, getModelAliases, { clientTool });
 }
 
 /**

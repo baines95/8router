@@ -5,12 +5,19 @@ import fs from "fs/promises";
 import path from "path";
 import os from "os";
 import { parseTOML, stringifyTOML } from "confbox";
+import { PROVIDER_MODELS } from "@/lib/open-sse/config/providerModels";
 
 const execAsync = promisify(exec);
 
 const getCodexDir = () => path.join(os.homedir(), ".codex");
 const getCodexConfigPath = () => path.join(getCodexDir(), "config.toml");
 const getCodexAuthPath = () => path.join(getCodexDir(), "auth.json");
+
+const isBareCodexModel = (model: string): boolean =>
+  !!model && !model.includes("/") && (PROVIDER_MODELS.cx?.some((entry) => entry.id === model) || false);
+
+export const normalizeCodexSettingsModel = (model: string): string =>
+  isBareCodexModel(model) ? `cx/${model}` : model;
 
 // Flatten confbox-parsed TOML into a writable object, preserving nested tables
 const parsedToWritable = (obj: any): any => obj ?? {};
@@ -127,7 +134,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     } catch { /* No existing config */ }
 
     // Update only 8Router related fields (api_key goes to auth.json, not config.toml)
-    parsed.model = model;
+    parsed.model = normalizeCodexSettingsModel(model);
     parsed.model_provider = "8router";
 
     // Update or create 8router provider section (no api_key - Codex reads from auth.json)
@@ -140,7 +147,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     });
 
     // Add subagent configuration
-    const effectiveSubagentModel = subagentModel || model;
+    const effectiveSubagentModel = normalizeCodexSettingsModel(subagentModel || model);
     setNestedSection(parsed, "agents.subagent", {
       model: effectiveSubagentModel,
     });

@@ -1,3 +1,4 @@
+import { PROVIDER_MODELS } from "../config/providerModels";
 import { ALIAS_TO_ID } from "@/shared/constants/providers";
 
 /**
@@ -65,7 +66,19 @@ export function resolveModelAliasFromMap(alias: string, aliases: Record<string, 
 /**
  * Get full model info (parse or resolve)
  */
-export async function getModelInfoCore(modelStr: string, aliasesOrGetter: Record<string, any> | (() => Promise<Record<string, any>>)): Promise<{ provider: string; model: string }> {
+export interface ModelResolutionOptions {
+  clientTool?: string | null;
+}
+
+function isBareCodexModel(modelName: string): boolean {
+  return PROVIDER_MODELS.cx?.some((model) => model.id === modelName) ?? false;
+}
+
+export async function getModelInfoCore(
+  modelStr: string,
+  aliasesOrGetter: Record<string, any> | (() => Promise<Record<string, any>>),
+  options: ModelResolutionOptions = {}
+): Promise<{ provider: string; model: string }> {
   const parsed = parseModel(modelStr);
 
   if (!parsed.isAlias) {
@@ -83,6 +96,13 @@ export async function getModelInfoCore(modelStr: string, aliasesOrGetter: Record
   const resolved = resolveModelAliasFromMap(parsed.model, aliases);
   if (resolved) {
     return resolved;
+  }
+
+  if (options.clientTool === "codex" && isBareCodexModel(parsed.model)) {
+    return {
+      provider: "codex",
+      model: parsed.model,
+    };
   }
 
   return {
